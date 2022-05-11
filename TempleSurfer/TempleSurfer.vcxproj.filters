@@ -24,9 +24,6 @@
     <ClCompile Include="tigl.cpp">
       <Filter>lib</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -52,18 +49,18 @@
       <Filter>components</Filter>
     </ClCompile>
     <ClCompile Include="EnemyComponent.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>components</Filter>
     </ClCompile>
     <ClCompile Include="BoundingBoxComponent.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tigl.h">
       <Filter>lib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TimerJumper.h">
       <Filter>components</Filter>
@@ -87,10 +84,13 @@
       <Filter>components</Filter>
     </ClInclude>
     <ClInclude Include="EnemyComponent.h">
-      <Filter>Header Files</Filter>
+      <Filter>components</Filter>
     </ClInclude>
     <ClInclude Include="BoundingBoxComponent.h">
-      <Filter>Header Files</Filter>
+      <Filter>components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
