@@ -75,6 +75,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(OPENCV)\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OPENCV)\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -107,13 +109,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\glm;$(SolutionDir)lib\glew-2.1.0\include;$(SolutionDir)lib\glfw-3.3.2\include;$(SolutionDir)lib\AntTweakBar\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\glm;$(SolutionDir)lib\glew-2.1.0\include;$(SolutionDir)lib\glfw-3.3.2\include;$(SolutionDir)lib\AntTweakBar\include;$(OPENCV)\build\x64\vc15\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\glfw-3.3.2\$(Platform);$(SolutionDir)lib\glew-2.1.0\lib\Release\$(Platform);$(SolutionDir)lib\AntTweakBar\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world455d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

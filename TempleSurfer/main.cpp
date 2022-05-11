@@ -4,6 +4,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 using tigl::Vertex;
 
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <iostream>
+
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
@@ -92,7 +97,7 @@ void init()
 	for (int i = 0; i < 100; i++)
 	{
 		GameObject* o = new GameObject();
-		o->position = glm::vec3(rand()%30-15, 1, rand()%30-15);
+		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 30 - 15);
 		o->addComponent(new CubeComponent(1));
 		o->addComponent(new MoveToComponent());
 		o->getComponent<MoveToComponent>()->target = o->position;
@@ -133,7 +138,7 @@ void update()
 
 	if (player->collides(movingObject))
 	{
-		std::cout << "Collision!"<<std::endl;
+		std::cout << "Collision!" << std::endl;
 	}
 }
 
@@ -150,7 +155,7 @@ void draw()
 	glm::mat4 projection = glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 1000.0f);
 
 	tigl::shader->setProjectionMatrix(projection);
-	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0,10,10), glm::vec3(0,0,0), glm::vec3(0,1,0)));
+	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0, 10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);
@@ -167,6 +172,7 @@ void draw()
 	for (auto& o : objects)
 		o->draw();
 }
+
 
 
 
