@@ -61,12 +61,9 @@ int main(void)
 
 
 double lastFrameTime = 0;
-std::shared_ptr<GameObject> movingObject;
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
-
-std::shared_ptr<GameObject> player;
-std::shared_ptr<GameChunk> chunk;
+std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
 
 void init()
