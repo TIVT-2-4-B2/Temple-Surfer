@@ -85,7 +85,7 @@ void init()
 	float g = rand() / static_cast<float>(RAND_MAX);
 	float b = rand() / static_cast<float>(RAND_MAX);
 
-	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r,g,b,1))));
+	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r,g,b,1)));
 	player->addComponent(std::make_shared<PlayerComponent>());
 	objects.push_back(player);
 
