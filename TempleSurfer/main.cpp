@@ -8,6 +8,7 @@ using tigl::Vertex;
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "FloorComponent.h"
 #include "GameChunk.h"
 #include "GameScene.h"
 #include "GameObject.h"
@@ -91,6 +92,11 @@ void init()
 	player->addComponent(std::make_shared<PlayerComponent>());
 	scene->addGameObject(player);
 
+	auto o = std::make_shared<GameObject>();
+	o->position = glm::vec3(0, 0, 0);
+	o->addComponent(std::make_shared<FloorComponent>(10));
+	list.push_back(o);
+
 	for (int i = 0; i < 100; i++)
 	{
 		auto o = std::make_shared<GameObject>();
@@ -138,13 +144,13 @@ void draw()
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);
-	//temporary draw floor
-	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCN(glm::vec3(-50, 0, -50), glm::vec4(1, 0, 0, 1), glm::vec3(0,1,0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(-50, 0, 50), glm::vec4(0, 1, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, 50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
-	tigl::end();
+	////temporary draw floor
+	//tigl::begin(GL_QUADS);
+	//tigl::addVertex(Vertex::PCN(glm::vec3(-50, 0, -50), glm::vec4(1, 0, 0, 1), glm::vec3(0,1,0)));
+	//tigl::addVertex(Vertex::PCN(glm::vec3(-50, 0, 50), glm::vec4(0, 1, 0, 1), glm::vec3(0, 1, 0)));
+	//tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, 50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
+	//tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
+	//tigl::end();
 
 	scene->draw();
 }
