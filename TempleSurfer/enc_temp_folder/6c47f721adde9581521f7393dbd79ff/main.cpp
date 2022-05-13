@@ -98,7 +98,7 @@ void init()
 	objects.push_back(player);
 
 	std::list<std::shared_ptr<GameObject>> list;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 100000; i++)
 	{
 		std::shared_ptr<GameObject> o = std::make_shared<GameObject>();
 		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 30 - 15);
