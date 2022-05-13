@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <memory>
 
+#define Z_THRESHOLD 10
+
 class GameChunk {
 private:
 	std::list<std::shared_ptr<GameObject>> gameObjects;
