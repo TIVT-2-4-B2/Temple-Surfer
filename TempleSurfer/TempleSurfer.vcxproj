@@ -167,6 +167,7 @@
     <ClCompile Include="CubeComponent.cpp" />
     <ClCompile Include="DrawComponent.cpp" />
     <ClCompile Include="EnemyComponent.cpp" />
+    <ClCompile Include="FloorComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveToComponent.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="CubeComponent.h" />
     <ClInclude Include="DrawComponent.h" />
     <ClInclude Include="EnemyComponent.h" />
+    <ClInclude Include="FloorComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="MoveToComponent.h" />
     <ClInclude Include="PlayerComponent.h" />

@@ -12,6 +12,7 @@ using tigl::Vertex;
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
+#include "FloorComponent.h"
 #include "MoveToComponent.h"
 #include "SpinComponent.h"
 #include "TimerJumper.h"
@@ -166,6 +167,7 @@ void draw()
 	tigl::addVertex(Vertex::PC(glm::vec3(50, 0, 50), glm::vec4(0, 0, 1, 1)));
 	tigl::addVertex(Vertex::PC(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1)));
 	tigl::end();
+
 
 
 
