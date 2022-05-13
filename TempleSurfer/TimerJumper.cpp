@@ -18,7 +18,7 @@ void TimerJumper::update(float elapsedTime)
 	timer -= elapsedTime;
 	if (timer <= 0)
 	{
-		MoveToComponent* moveTo = gameObject->getComponent<MoveToComponent>();
+		std::shared_ptr<MoveToComponent> moveTo = gameObject->getComponent<MoveToComponent>();
 		moveTo->target.x = targetX;
 		targetX = -targetX;
 

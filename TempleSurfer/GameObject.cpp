@@ -13,20 +13,17 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::addComponent(Component * component)
+void GameObject::addComponent(std::shared_ptr<Component> component)
 {
 	component->setGameObject(this);
 	components.push_back(component);
 
-	if (!drawComponent)
-		drawComponent = dynamic_cast<DrawComponent*>(component);
+	if (drawComponent == nullptr)
+		drawComponent = dynamic_pointer_cast<DrawComponent>(component);
 
-	auto bb = dynamic_cast<BoundingBoxComponent*>(component);
-	if (bb)
-		boundingBox.push_back(bb);
 }
 
-std::list<Component*> GameObject::getComponents()
+std::list<std::shared_ptr<Component>> GameObject::getComponents()
 {
 	return components;
 }
@@ -46,17 +43,6 @@ void GameObject::draw(const glm::mat4 &parentMatrix)
 	
 	tigl::shader->setModelMatrix(modelMatrix);
 	drawComponent->draw();
-}
-
-bool GameObject::collides(GameObject* other)
-{
-	if (boundingBox.empty())
-		return false;
-	for (auto bb : boundingBox)
-		if (bb->collides(other))
-			return true;
-
-	return false;
 }
 
 void GameObject::update(float elapsedTime)

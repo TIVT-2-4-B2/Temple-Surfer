@@ -4,18 +4,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 using tigl::Vertex;
 
-
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include <iostream>
 
 #include "GameChunk.h"
 #include "GameScene.h"
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
-#include "FloorComponent.h"
 #include "MoveToComponent.h"
 #include "SpinComponent.h"
 #include "TimerJumper.h"
@@ -64,15 +61,22 @@ int main(void)
 
 
 double lastFrameTime = 0;
-GameObject* movingObject;
-
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
+std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
 
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
+	tigl::shader->enableLighting(true);
+	tigl::shader->setLightCount(1);
+	tigl::shader->setLightDirectional(0, true);
+	tigl::shader->setLightPosition(0, glm::normalize(glm::vec3(1, 1, 1)));
+	tigl::shader->setLightAmbient(0, glm::vec3(0.5f, 0.5f, 0.5f));
+	tigl::shader->setLightDiffuse(0, glm::vec3(0.5f, 0.5f, 0.5f));
+	tigl::shader->setLightSpecular(0, glm::vec3(1,1,1));
+	tigl::shader->setShinyness(0);
 
 	scene = std::make_shared<GameScene>();
 
@@ -83,22 +87,18 @@ void init()
 	float g = rand() / static_cast<float>(RAND_MAX);
 	float b = rand() / static_cast<float>(RAND_MAX);
 
-	player->addComponent(new CubeComponent(glm::vec3(1,1,5), glm::vec4(r,g,b, 1)));
-	player->addComponent(new PlayerComponent());
+	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r,g,b,1)));
+	player->addComponent(std::make_shared<PlayerComponent>());
 	scene->addGameObject(player);
 
-	std::list<std::shared_ptr<GameObject>> list;
 	for (int i = 0; i < 100; i++)
 	{
-		std::shared_ptr<GameObject> o = std::make_shared<GameObject>();
+		auto o = std::make_shared<GameObject>();
 		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 30 - 15);
 		float r = rand() / static_cast<float>(RAND_MAX);
 		float g = rand() / static_cast<float>(RAND_MAX);
 		float b = rand() / static_cast<float>(RAND_MAX);
-		o->addComponent(new CubeComponent(glm::vec3(1,1,1), glm::vec4(r, g, b, 1)));
-		o->addComponent(new MoveToComponent());
-		o->getComponent<MoveToComponent>()->target = o->position;
-		o->addComponent(new EnemyComponent());
+		o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r, g, b, 1)));
 		list.push_back(o);
 	}
 	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, 0));
@@ -134,21 +134,20 @@ void draw()
 	glm::mat4 projection = glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 1000.0f);
 
 	tigl::shader->setProjectionMatrix(projection);
-	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0, 10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
+	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0,10,10), glm::vec3(0,0,0), glm::vec3(0,1,0)));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);
 	//temporary draw floor
 	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PC(glm::vec3(-50, 0, -50), glm::vec4(1, 0, 0, 1)));
-	tigl::addVertex(Vertex::PC(glm::vec3(-50, 0, 50), glm::vec4(0, 1, 0, 1)));
-	tigl::addVertex(Vertex::PC(glm::vec3(50, 0, 50), glm::vec4(0, 0, 1, 1)));
-	tigl::addVertex(Vertex::PC(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(-50, 0, -50), glm::vec4(1, 0, 0, 1), glm::vec3(0,1,0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(-50, 0, 50), glm::vec4(0, 1, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, 50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
 	tigl::end();
 
 	scene->draw();
 }
-
 
 
 
