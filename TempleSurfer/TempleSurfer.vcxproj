@@ -170,6 +170,7 @@
     <ClCompile Include="GameChunk.cpp" />
     <ClCompile Include="FloorComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveToComponent.cpp" />
     <ClCompile Include="PlayerComponent.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="GameChunk.h" />
     <ClInclude Include="FloorComponent.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GameScene.h" />
     <ClInclude Include="MoveToComponent.h" />
     <ClInclude Include="PlayerComponent.h" />
     <ClInclude Include="SpinComponent.h" />
