@@ -38,6 +38,7 @@ void GameChunk::draw()
 
 void GameChunk::update(float elapsedTime)
 {
+	// Updating componenents.
 	for (auto& object : gameObjects) {
 		object->update(elapsedTime);
 	}

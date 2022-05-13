@@ -4,11 +4,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 using tigl::Vertex;
 
+
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
 
+#include "GameChunk.h"
+#include "GameScene.h"
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
@@ -60,36 +63,20 @@ int main(void)
 }
 
 
-std::list<GameObject*> objects;
 double lastFrameTime = 0;
 GameObject* movingObject;
 
-GameObject* player;
+std::shared_ptr<GameObject> player;
+std::shared_ptr<GameChunk> chunk;
+std::shared_ptr<GameScene> scene;
 
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
 
-	/*for (int x = -10; x < 10; x += 2) {
-		GameObject* o = new GameObject();
-		o->position = glm::vec3(x, 0, 0);
-		o->rotation.y = x*.25f;
-		o->addComponent(new CubeComponent(1));
-		o->addComponent(new SpinComponent(1));
-		objects.push_back(o);
-	}
+	scene = std::make_shared<GameScene>();
 
-
-	movingObject = new GameObject();
-	movingObject->position = glm::vec3(0, 1, 3);
-	movingObject->addComponent(new CubeComponent(1));
-	movingObject->addComponent(new MoveToComponent());
-	movingObject->getComponent<MoveToComponent>()->target = movingObject->position;
-	movingObject->addComponent(new TimerJumper());
-	objects.push_back(movingObject);
-	*/
-
-	player = new GameObject();
+	player = std::make_shared<GameObject>();
 	player->position = glm::vec3(0, 1, 5);
 
 	float r = rand() / static_cast<float>(RAND_MAX);
@@ -98,11 +85,12 @@ void init()
 
 	player->addComponent(new CubeComponent(glm::vec3(1,1,5), glm::vec4(r,g,b, 1)));
 	player->addComponent(new PlayerComponent());
-	objects.push_back(player);
+	scene->addGameObject(player);
 
+	std::list<std::shared_ptr<GameObject>> list;
 	for (int i = 0; i < 100; i++)
 	{
-		GameObject* o = new GameObject();
+		std::shared_ptr<GameObject> o = std::make_shared<GameObject>();
 		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 30 - 15);
 		float r = rand() / static_cast<float>(RAND_MAX);
 		float g = rand() / static_cast<float>(RAND_MAX);
@@ -111,8 +99,11 @@ void init()
 		o->addComponent(new MoveToComponent());
 		o->getComponent<MoveToComponent>()->target = o->position;
 		o->addComponent(new EnemyComponent());
-		objects.push_back(o);
+		list.push_back(o);
 	}
+	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, 0));
+
+	scene->addGameChunk(chunk);
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
@@ -121,34 +112,13 @@ void init()
 		});
 }
 
-std::vector<GameObject*> getColliders(GameObject* src)
-{
-	std::vector<GameObject*> ret;
-	for (auto go : objects) {
-		if (go != src && src->collides(go))
-		{
-			ret.push_back(go);
-		}
-	}
-	return ret;
-}
-
 void update()
 {
 	double currentFrameTime = glfwGetTime();
 	double deltaTime = currentFrameTime - lastFrameTime;
 	lastFrameTime = currentFrameTime;
 
-	for (auto& o : objects)
-		o->update(deltaTime);
-
-
-	std::vector<GameObject*> colliders = getColliders(player);
-
-	if (player->collides(movingObject))
-	{
-		std::cout << "Collision!" << std::endl;
-	}
+	scene->update(deltaTime);
 }
 
 
@@ -176,11 +146,7 @@ void draw()
 	tigl::addVertex(Vertex::PC(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1)));
 	tigl::end();
 
-
-
-
-	for (auto& o : objects)
-		o->draw();
+	scene->draw();
 }
 
 
