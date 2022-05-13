@@ -5,11 +5,14 @@
 #include <glm/glm.hpp>
 #include <memory>
 
+#define Z_THRESHOLD 10
+
 class GameChunk {
 private:
 	std::list<std::shared_ptr<GameObject>> gameObjects;
-	glm::vec3 gamePosition;
+
 public:
+	glm::vec3 gamePosition;
 	GameChunk(std::list<std::shared_ptr<GameObject>> parameterObjects, glm::vec3 position);
 	~GameChunk();
 
