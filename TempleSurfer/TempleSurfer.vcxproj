@@ -168,6 +168,7 @@
     <ClCompile Include="DrawComponent.cpp" />
     <ClCompile Include="EnemyComponent.cpp" />
     <ClCompile Include="GameChunk.cpp" />
+    <ClCompile Include="FloorComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveToComponent.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="DrawComponent.h" />
     <ClInclude Include="EnemyComponent.h" />
     <ClInclude Include="GameChunk.h" />
+    <ClInclude Include="FloorComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="MoveToComponent.h" />
     <ClInclude Include="PlayerComponent.h" />
