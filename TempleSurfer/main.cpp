@@ -78,7 +78,12 @@ void init()
 
 	player = std::make_shared<GameObject>();
 	player->position = glm::vec3(0, 1, 5);
-	player->addComponent(new CubeComponent(1));
+
+	float r = rand() / static_cast<float>(RAND_MAX);
+	float g = rand() / static_cast<float>(RAND_MAX);
+	float b = rand() / static_cast<float>(RAND_MAX);
+
+	player->addComponent(new CubeComponent(glm::vec3(1,1,5), glm::vec4(r,g,b, 1)));
 	player->addComponent(new PlayerComponent());
 	scene->addGameObject(player);
 
@@ -87,7 +92,13 @@ void init()
 	{
 		std::shared_ptr<GameObject> o = std::make_shared<GameObject>();
 		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 30 - 15);
-		o->addComponent(new CubeComponent(1));
+		float r = rand() / static_cast<float>(RAND_MAX);
+		float g = rand() / static_cast<float>(RAND_MAX);
+		float b = rand() / static_cast<float>(RAND_MAX);
+		o->addComponent(new CubeComponent(glm::vec3(1,1,1), glm::vec4(r, g, b, 1)));
+		o->addComponent(new MoveToComponent());
+		o->getComponent<MoveToComponent>()->target = o->position;
+		o->addComponent(new EnemyComponent());
 		list.push_back(o);
 	}
 	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, 0));
