@@ -54,7 +54,13 @@
     <ClCompile Include="BoundingBoxComponent.cpp">
       <Filter>components</Filter>
     </ClCompile>
+    <ClCompile Include="GameChunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FloorComponent.cpp">
       <Filter>components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,8 +95,14 @@
     <ClInclude Include="BoundingBoxComponent.h">
       <Filter>components</Filter>
     </ClInclude>
+    <ClInclude Include="GameChunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>components</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FloorComponent.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
