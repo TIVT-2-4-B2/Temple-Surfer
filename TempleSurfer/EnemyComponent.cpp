@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "MoveToComponent.h"
 
-extern GameObject* player;
+extern std::shared_ptr<GameObject> player;
 
 
 EnemyComponent::EnemyComponent()
