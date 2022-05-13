@@ -9,6 +9,7 @@ using tigl::Vertex;
 #include <opencv2/imgproc.hpp>
 
 #include "GameChunk.h"
+#include "GameScene.h"
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
@@ -59,12 +60,14 @@ int main(void)
 }
 
 
-std::list<std::shared_ptr<GameObject>> objects;
-std::list<std::shared_ptr<GameObject>> chunking;
 double lastFrameTime = 0;
 std::shared_ptr<GameObject> movingObject;
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
+
+std::shared_ptr<GameObject> player;
+std::shared_ptr<GameChunk> chunk;
+std::shared_ptr<GameScene> scene;
 
 void init()
 {
@@ -78,6 +81,8 @@ void init()
 	tigl::shader->setLightSpecular(0, glm::vec3(1,1,1));
 	tigl::shader->setShinyness(0);
 
+	scene = std::make_shared<GameScene>();
+
 	player = std::make_shared<GameObject>();
 	player->position = glm::vec3(0, 1, 5);
 
@@ -87,7 +92,7 @@ void init()
 
 	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r,g,b,1)));
 	player->addComponent(std::make_shared<PlayerComponent>());
-	objects.push_back(player);
+	scene->addGameObject(player);
 
 	for (int i = 0; i < 100; i++)
 	{
@@ -97,10 +102,11 @@ void init()
 		float g = rand() / static_cast<float>(RAND_MAX);
 		float b = rand() / static_cast<float>(RAND_MAX);
 		o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r, g, b, 1)));
-		chunking.push_back(o);
+		list.push_back(o);
 	}
+	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, 0));
 
-	chunk = std::make_shared<GameChunk>(chunking, glm::vec3(0, 0, 0));
+	scene->addGameChunk(chunk);
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
@@ -115,15 +121,7 @@ void update()
 	double deltaTime = currentFrameTime - lastFrameTime;
 	lastFrameTime = currentFrameTime;
 
-	for (auto& o : objects)
-		o->update((float)deltaTime);
-
-	if (chunk != NULL) {
-		chunk->moveChunk(chunk->gamePosition += glm::vec3(0, 0, deltaTime));
-		if (chunk->gamePosition.z > Z_THRESHOLD) {
-			chunk = NULL;
-		}
-	}
+	scene->update(deltaTime);
 }
 
 
@@ -151,13 +149,7 @@ void draw()
 	tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
 	tigl::end();
 
-
-	if (chunk != NULL) {
-		chunk->draw();
-	}
-
-	for (auto& o : objects)
-		o->draw();
+	scene->draw();
 }
 
 
