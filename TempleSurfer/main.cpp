@@ -10,6 +10,7 @@ using tigl::Vertex;
 #include <opencv2/imgproc.hpp>
 #include <iostream>
 
+#include "GameChunk.h"
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
@@ -66,7 +67,7 @@ double lastFrameTime = 0;
 GameObject* movingObject;
 
 GameObject* player;
-
+GameChunk* chunk;
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -96,16 +97,19 @@ void init()
 	player->addComponent(new PlayerComponent());
 	objects.push_back(player);
 
-	for (int i = 0; i < 100; i++)
+	std::list<std::shared_ptr<GameObject>> list;
+	for (int i = 0; i < 100000; i++)
 	{
-		GameObject* o = new GameObject();
+		std::shared_ptr<GameObject> o = std::make_shared<GameObject>();
 		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 30 - 15);
 		o->addComponent(new CubeComponent(1));
-		o->addComponent(new MoveToComponent());
+	/*	o->addComponent(new MoveToComponent());
 		o->getComponent<MoveToComponent>()->target = o->position;
 		o->addComponent(new EnemyComponent());
-		objects.push_back(o);
+		objects.push_back(o);*/
+		list.push_back(o);
 	}
+	chunk = new GameChunk(list, glm::vec3(0, 0, 0));
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
@@ -142,6 +146,15 @@ void update()
 	{
 		std::cout << "Collision!" << std::endl;
 	}
+
+	if (chunk != NULL) {
+		chunk->moveChunk(chunk->gamePosition += glm::vec3(0, 0, deltaTime));
+		if (chunk->gamePosition.z > Z_THRESHOLD) {
+			delete chunk;
+			chunk = NULL;
+		}
+	}
+	
 }
 
 
@@ -169,7 +182,10 @@ void draw()
 	tigl::addVertex(Vertex::PC(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1)));
 	tigl::end();
 
-
+	if (chunk != NULL) {
+		chunk->draw();
+	}
+	
 
 
 	for (auto& o : objects)

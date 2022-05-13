@@ -38,11 +38,6 @@ void GameChunk::draw()
 
 void GameChunk::update(float elapsedTime)
 {
-	// If the values exceeds the threshold, it self destructs.
-	if (gamePosition.z >= Z_THRESHOLD) {
-		GameChunk::~GameChunk();
-	}
-
 	// Updating componenents.
 	for (auto& object : gameObjects) {
 		object->update(elapsedTime);
