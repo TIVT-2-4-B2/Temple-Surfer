@@ -29,6 +29,9 @@ GLFWwindow* window;
 void init();
 void update();
 void draw();
+void drawMenu();
+
+bool isPlaying = false;
 
 int main(void)
 {
@@ -48,6 +51,22 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
+
+		int state = glfwGetKey(window, GLFW_KEY_SPACE);
+
+		if (state == GLFW_PRESS)
+		{
+			isPlaying = !isPlaying;
+		}
+
+		if (!isPlaying)
+		{
+			drawMenu();
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+			continue;
+		}
+
 		update();
 		draw();
 		glfwSwapBuffers(window);
@@ -115,6 +134,7 @@ void init()
 		{
 			if (key == GLFW_KEY_ESCAPE)
 				glfwSetWindowShouldClose(window, true);
+				
 		});
 }
 
@@ -127,11 +147,35 @@ void update()
 	scene->update(deltaTime);
 }
 
+void drawMenu()
+{
+	std::cout << "unfucked" << std::endl;
+	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glm::mat4 projection = glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 1000.0f);
 
+	tigl::shader->setProjectionMatrix(projection);
+	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0, 10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
+	tigl::shader->setModelMatrix(glm::mat4(1.0f));
+
+	tigl::shader->enableColor(true);
+
+	tigl::begin(GL_QUADS);
+	tigl::addVertex(Vertex::PCN(glm::vec3(-100, 0, -100), glm::vec4(0, 0, 0, 1), glm::vec3(0,1,0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(-100, 0, 100), glm::vec4(0, 0, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, 100), glm::vec4(0, 0, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, -100), glm::vec4(0, 0, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::end();
+
+	scene->draw();
+}
 
 void draw()
 {
+	std::cout << "fucked" << std::endl;
 	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
