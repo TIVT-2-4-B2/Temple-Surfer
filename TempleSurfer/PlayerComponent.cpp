@@ -13,16 +13,13 @@ PlayerComponent::~PlayerComponent()
 {
 }
 
-void PlayerComponent::update(float elapsedTime)
+void PlayerComponent::update(float _)
 {
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		gameObject->position.z -= elapsedTime * speed;
+	const float offset = (10.0f * (2.0f / 3.0f));
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		gameObject->position.z += elapsedTime * speed;
+		gameObject->position.x = 0;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		gameObject->position.x -= elapsedTime * speed;
+		gameObject->position.x = -offset;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		gameObject->position.x += elapsedTime * speed;
-
+		gameObject->position.x = offset;
 }
