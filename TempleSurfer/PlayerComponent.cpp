@@ -13,27 +13,16 @@ PlayerComponent::~PlayerComponent()
 {
 }
 
-void PlayerComponent::update(float _)
+void PlayerComponent::update(float elapsedTime)
 {
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		gameObject->position.z -= elapsedTime * speed;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		moveCenter();
+		gameObject->position.z += elapsedTime * speed;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		moveLeft();
+		gameObject->position.x -= elapsedTime * speed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		moveRight();
-}
+		gameObject->position.x += elapsedTime * speed;
 
-void PlayerComponent::moveLeft()
-{
-	gameObject->position.x = -(10.0f * (2.0f / 3.0f));
-}
-
-void PlayerComponent::moveCenter()
-{
-	gameObject->position.x = 0;
-}
-
-void PlayerComponent::moveRight()
-{
-	gameObject->position.x = (10.0f * (2.0f / 3.0f));
 }

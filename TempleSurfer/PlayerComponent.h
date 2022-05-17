@@ -10,8 +10,5 @@ public:
 	~PlayerComponent();
 
 	virtual void update(float elapsedTime) override;
-	void moveLeft();
-	void moveCenter();
-	void moveRight();
 };
 
