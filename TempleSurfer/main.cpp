@@ -159,7 +159,7 @@ void createScene() {
 	//Create floor object
 	auto o = std::make_shared<GameObject>();
 	o->position = glm::vec3(0, 0, 0);
-	o->addComponent(std::make_shared<FloorComponent>(10));
+	o->addComponent(std::make_shared<FloorComponent>());
 	list.push_back(o);
 
 	//Add random blocks with random colors

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "FloorComponent.h"
 
 class PlayerComponent : public Component
 {
