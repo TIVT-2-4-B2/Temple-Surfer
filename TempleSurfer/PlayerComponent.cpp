@@ -1,6 +1,7 @@
 #include "PlayerComponent.h"
 #include "GameObject.h"
 #include <GLFW/glfw3.h>
+#include "MoveToComponent.h"
 
 extern GLFWwindow* window;
 
@@ -25,15 +26,15 @@ void PlayerComponent::update(float _)
 
 void PlayerComponent::moveLeft()
 {
-	gameObject->position.x = -(10.0f * (2.0f / 3.0f));
+	gameObject->getComponent<MoveToComponent>()->target.x = -(10.0f * (2.0f / 3.0f));
 }
 
 void PlayerComponent::moveCenter()
 {
-	gameObject->position.x = 0;
+	gameObject->getComponent<MoveToComponent>()->target.x = 0;
 }
 
 void PlayerComponent::moveRight()
 {
-	gameObject->position.x = (10.0f * (2.0f / 3.0f));
+	gameObject->getComponent<MoveToComponent>()->target.x = (10.0f * (2.0f / 3.0f));
 }
