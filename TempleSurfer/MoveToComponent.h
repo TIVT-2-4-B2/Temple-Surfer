@@ -6,10 +6,10 @@
 class MoveToComponent : public Component
 {
 public:
-	float speed = 0.05f;
+	float speed = 0.005f;
 	glm::vec3 target;
 
-	MoveToComponent();
+	MoveToComponent(glm::vec3 target);
 	~MoveToComponent();
 
 	virtual void update(float elapsedTime) override;
