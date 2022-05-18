@@ -19,7 +19,7 @@ public:
 	void addGameObject(std::shared_ptr<GameObject> &object);
 	void removeGameObject(const std::shared_ptr<GameObject> &object);
 
-	void addGameChunk(std::shared_ptr<GameChunk> &chunk);
+	void addGameChunk(std::shared_ptr<GameChunk> chunk);
 	void removeGameChunk(const std::shared_ptr<GameChunk> &chunk);
 };
 

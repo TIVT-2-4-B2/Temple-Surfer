@@ -31,7 +31,7 @@ void GameScene::removeGameObject(const std::shared_ptr<GameObject>& object)
 	gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), nullptr), gameObjects.end());
 }
 
-void GameScene::addGameChunk(std::shared_ptr<GameChunk>& chunk)
+void GameScene::addGameChunk(std::shared_ptr<GameChunk> chunk)
 {
 	gameChunks.push_back(chunk);
 }

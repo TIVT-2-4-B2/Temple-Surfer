@@ -8,6 +8,7 @@ using tigl::Vertex;
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "ChunkGenerator.h"
 #include "FloorComponent.h"
 #include "GameChunk.h"
 #include "GameScene.h"
@@ -66,6 +67,7 @@ std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
 std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
+ChunkGenerator generator;
 
 void init()
 {
@@ -79,6 +81,9 @@ void init()
 	tigl::shader->setLightSpecular(0, glm::vec3(1,1,1));
 	tigl::shader->setShinyness(0);
 
+	generator = ChunkGenerator();
+	generator.generatorInit();
+
 	scene = std::make_shared<GameScene>();
 
 	player = std::make_shared<GameObject>();
@@ -89,12 +94,12 @@ void init()
 	float g = rand() / static_cast<float>(RAND_MAX);
 	float b = rand() / static_cast<float>(RAND_MAX);
 
-	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r,g,b,1)));
+	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,2,1), glm::vec4(r,g,b,1)));
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
 	player->addComponent(std::make_shared<PlayerComponent>());
 	scene->addGameObject(player);
 
-	auto o = std::make_shared<GameObject>();
+	/*auto o = std::make_shared<GameObject>();
 	o->position = glm::vec3(0, 0, 0);
 	o->addComponent(std::make_shared<FloorComponent>(10));
 	list.push_back(o);
@@ -111,7 +116,8 @@ void init()
 	}
 	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, 0));
 
-	scene->addGameChunk(chunk);
+	scene->addGameChunk(chunk);*/
+	scene->addGameChunk(generator.getChunk());
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{

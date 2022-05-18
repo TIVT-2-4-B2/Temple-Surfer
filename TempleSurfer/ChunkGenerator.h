@@ -2,6 +2,8 @@
 #include "GameChunk.h"
 #include <vector>
 
+#define MATRIX_SIZE 3
+
 /*These are the posible settings for obstacels*/
 enum class ChunkObstacle {
 	NONE,
@@ -12,7 +14,7 @@ enum class ChunkObstacle {
 
 /*These are all the posible locations for these settings*/
 struct ChunkPreset {
-	ChunkObstacle obstacles[3][3];
+	ChunkObstacle obstacles[MATRIX_SIZE][MATRIX_SIZE];
 };
 
 class ChunkGenerator {
