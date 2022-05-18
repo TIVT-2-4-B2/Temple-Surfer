@@ -8,6 +8,7 @@ using tigl::Vertex;
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "ChunkGenerator.h"
 #include "FloorComponent.h"
 #include "GameChunk.h"
 #include "GameScene.h"
@@ -41,6 +42,7 @@ std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
 std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
+ChunkGenerator generator;
 
 int main(void)
 {
@@ -138,11 +140,14 @@ void start() {
 
 //Create a scene
 void createScene() {
+	generator = ChunkGenerator();
+	generator.generatorInit();
+
 	scene = std::make_shared<GameScene>();
 
 	//Create player object
 	player = std::make_shared<GameObject>();
-	auto playerPos = glm::vec3(0, 1, 5);
+	glm::vec3 playerPos = glm::vec3(0, 1, 5);
 	player->position = playerPos;
 
 	//Generate random rgb values;
@@ -157,25 +162,25 @@ void createScene() {
 	scene->addGameObject(player);
 
 	//Create floor object
-	auto o = std::make_shared<GameObject>();
-	o->position = glm::vec3(0, 0, 0);
-	o->addComponent(std::make_shared<FloorComponent>());
-	list.push_back(o);
+	// auto o = std::make_shared<GameObject>();
+	// o->position = glm::vec3(0, 0, 0);
+	// o->addComponent(std::make_shared<FloorComponent>());
+	// list.push_back(o);
 
-	//Add random blocks with random colors
-	for (int i = 0; i < 100; i++)
-	{
-		auto o = std::make_shared<GameObject>();
-		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 20 - 20);
-		float r = rand() / static_cast<float>(RAND_MAX);
-		float g = rand() / static_cast<float>(RAND_MAX);
-		float b = rand() / static_cast<float>(RAND_MAX);
-		o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
-		list.push_back(o);
-	}
-	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, -50));
+	// //Add random blocks with random colors
+	// for (int i = 0; i < 100; i++)
+	// {
+	// 	auto o = std::make_shared<GameObject>();
+	// 	o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 20 - 20);
+	// 	float r = rand() / static_cast<float>(RAND_MAX);
+	// 	float g = rand() / static_cast<float>(RAND_MAX);
+	// 	float b = rand() / static_cast<float>(RAND_MAX);
+	// 	o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
+	// 	list.push_back(o);
+	// }
+	// chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, -50));
 
-	scene->addGameChunk(chunk);
+	scene->addGameChunk(generator.getChunk());
 }
 
 //Draw the main menu
