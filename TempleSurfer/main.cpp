@@ -101,13 +101,15 @@ void init()
 	scene = std::make_shared<GameScene>();
 
 	player = std::make_shared<GameObject>();
-	player->position = glm::vec3(0, 1, 5);
+	auto playerPos = glm::vec3(0, 1, 5);
+	player->position = playerPos;
 
 	float r = rand() / static_cast<float>(RAND_MAX);
 	float g = rand() / static_cast<float>(RAND_MAX);
 	float b = rand() / static_cast<float>(RAND_MAX);
 
 	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r,g,b,1)));
+	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
 	player->addComponent(std::make_shared<PlayerComponent>());
 	scene->addGameObject(player);
 
