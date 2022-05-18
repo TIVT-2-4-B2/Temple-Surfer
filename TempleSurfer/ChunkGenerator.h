@@ -3,7 +3,7 @@
 #include <vector>
 
 /*These are the posible settings for obstacels*/
-enum ChunkObstacle {
+enum class ChunkObstacle {
 	NONE,
 	BLOCK,
 	JUMP,
@@ -18,7 +18,10 @@ struct ChunkPreset {
 class ChunkGenerator {
 public:
 	void generatorInit();
-	GameChunk generateChunk();
+	std::shared_ptr<GameChunk> getChunk();
 private:
 	std::vector<ChunkPreset> presets;
+	std::vector<std::shared_ptr<GameChunk>> chunkPointers;
+
+	std::shared_ptr<GameChunk> buildChunk(ChunkPreset preset);
 };

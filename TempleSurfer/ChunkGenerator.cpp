@@ -1,6 +1,8 @@
 #include "ChunkGenerator.h"
 #include <Time.h>
 
+using enum ChunkObstacle;
+
 void ChunkGenerator::generatorInit()
 {
 	// Seeds the random function
@@ -20,16 +22,21 @@ void ChunkGenerator::generatorInit()
 	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
 			{{BLOCK},{BLOCK},{NONE}},
 			{{JUMP},{NONE},{JUMP}}} });
+
+	//Building chunks with all presets.
+	for (auto& preset : presets)
+	{
+		chunkPointers.push_back(buildChunk(preset));
+	}
 }
 
-GameChunk ChunkGenerator::generateChunk()
+std::shared_ptr<GameChunk> ChunkGenerator::getChunk()
 {
-	// Choosing one of the presets
-	ChunkPreset preset = presets.at(rand() % presets.size());
+	// Returning a random chunk that is generated.
+	return chunkPointers.at(rand() % chunkPointers.size());
+}
 
-	// Building chunk with preset.
-
-
-	// Returning the generated chunk.
-	
+std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
+{
+	return nullptr;
 }
