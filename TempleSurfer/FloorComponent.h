@@ -6,12 +6,14 @@ using tigl::Vertex;
 
 #include <vector>
 
+#define FLOORWIDTH 10.0f
+
 class FloorComponent : public DrawComponent
 {
 	std::vector<Vertex> verts;
 
 public:
-	FloorComponent(float size);
+	FloorComponent();
 	~FloorComponent();
 
 	virtual void draw() override;
