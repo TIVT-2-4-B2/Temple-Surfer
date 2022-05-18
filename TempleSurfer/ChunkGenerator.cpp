@@ -47,7 +47,7 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	// Adding in the floor
 	std::shared_ptr<GameObject> floor = std::make_shared<GameObject>();
 	floor->position = glm::vec3(0, 0, 0);
-	floor->addComponent(std::make_shared<FloorComponent>(10));
+	floor->addComponent(std::make_shared<FloorComponent>());
 	gameObjects.push_back(floor);
 
 	// Adding in the generated config.

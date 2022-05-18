@@ -42,6 +42,7 @@ std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
 std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
+ChunkGenerator generator;
 
 int main(void)
 {
@@ -93,14 +94,6 @@ int main(void)
 
 	return 0;
 }
-
-
-double lastFrameTime = 0;
-std::shared_ptr<GameObject> player;
-std::shared_ptr<GameChunk> chunk;
-std::list<std::shared_ptr<GameObject>> list;
-std::shared_ptr<GameScene> scene;
-ChunkGenerator generator;
 
 //Initiate the game
 void init()
@@ -154,7 +147,7 @@ void createScene() {
 
 	//Create player object
 	player = std::make_shared<GameObject>();
-	auto playerPos = glm::vec3(0, 1, 5);
+	glm::vec3 playerPos = glm::vec3(0, 1, 5);
 	player->position = playerPos;
 
 	//Generate random rgb values;
