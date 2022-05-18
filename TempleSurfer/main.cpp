@@ -32,12 +32,17 @@ void draw();
 void drawMenu();
 
 bool isPlaying = false;
+double lastFrameTime = 0;
+std::shared_ptr<GameObject> player;
+std::shared_ptr<GameChunk> chunk;
+std::list<std::shared_ptr<GameObject>> list;
+std::shared_ptr<GameScene> scene;
 
 int main(void)
 {
 	if (!glfwInit())
 		throw "Could not initialize glwf";
-	window = glfwCreateWindow(1400, 800, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(1000, 800, "Temple Runner", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -52,11 +57,14 @@ int main(void)
 	while (!glfwWindowShouldClose(window))
 	{
 
-		int state = glfwGetKey(window, GLFW_KEY_SPACE);
-
-		if (state == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		{
-			isPlaying = !isPlaying;
+			isPlaying = true;
+			lastFrameTime = glfwGetTime();
+		}
+		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		{
+			isPlaying = false;
 		}
 
 		if (!isPlaying)
@@ -75,16 +83,8 @@ int main(void)
 
 	glfwTerminate();
 
-
 	return 0;
 }
-
-
-double lastFrameTime = 0;
-std::shared_ptr<GameObject> player;
-std::shared_ptr<GameChunk> chunk;
-std::list<std::shared_ptr<GameObject>> list;
-std::shared_ptr<GameScene> scene;
 
 void init()
 {
@@ -119,23 +119,23 @@ void init()
 	for (int i = 0; i < 100; i++)
 	{
 		auto o = std::make_shared<GameObject>();
-		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 30 - 15);
+		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 20 - 20);
 		float r = rand() / static_cast<float>(RAND_MAX);
 		float g = rand() / static_cast<float>(RAND_MAX);
 		float b = rand() / static_cast<float>(RAND_MAX);
 		o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r, g, b, 1)));
 		list.push_back(o);
 	}
-	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, 0));
+	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, -50));
 
 	scene->addGameChunk(chunk);
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-		{
-			if (key == GLFW_KEY_ESCAPE)
-				glfwSetWindowShouldClose(window, true);
-				
-		});
+	{
+		if (key == GLFW_KEY_ESCAPE) {
+			glfwSetWindowShouldClose(window, true);
+		}
+	});
 }
 
 void update()
@@ -149,7 +149,6 @@ void update()
 
 void drawMenu()
 {
-	std::cout << "unfucked" << std::endl;
 	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -164,18 +163,15 @@ void drawMenu()
 	tigl::shader->enableColor(true);
 
 	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCN(glm::vec3(-100, 0, -100), glm::vec4(0, 0, 0, 1), glm::vec3(0,1,0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(-100, 0, 100), glm::vec4(0, 0, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, 100), glm::vec4(0, 0, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, -100), glm::vec4(0, 0, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(-1000, 0, -1000), glm::vec4(1, 0.4, 0, 1), glm::vec3(0,1,0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(-1000, 0, 1000), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(1000, 0, 1000), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(1000, 0, -1000), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 	tigl::end();
-
-	scene->draw();
 }
 
 void draw()
 {
-	std::cout << "fucked" << std::endl;
 	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -188,16 +184,6 @@ void draw()
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);
-	////temporary draw floor
-	//tigl::begin(GL_QUADS);
-	//tigl::addVertex(Vertex::PCN(glm::vec3(-50, 0, -50), glm::vec4(1, 0, 0, 1), glm::vec3(0,1,0)));
-	//tigl::addVertex(Vertex::PCN(glm::vec3(-50, 0, 50), glm::vec4(0, 1, 0, 1), glm::vec3(0, 1, 0)));
-	//tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, 50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
-	//tigl::addVertex(Vertex::PCN(glm::vec3(50, 0, -50), glm::vec4(0, 0, 1, 1), glm::vec3(0, 1, 0)));
-	//tigl::end();
 
 	scene->draw();
 }
-
-
-
