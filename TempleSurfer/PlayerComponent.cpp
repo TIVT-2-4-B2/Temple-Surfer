@@ -14,8 +14,8 @@ PlayerComponent::~PlayerComponent()
 {
 }
 
-void PlayerComponent::update(float elapsedTime)
-{	
+void PlayerComponent::update(float _)
+{
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		moveCenter();
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
