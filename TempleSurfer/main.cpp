@@ -28,11 +28,15 @@ GLFWwindow* window;
 
 void init();
 void update();
+void start();
+void createScene();
 void draw();
 void drawMenu();
 
 bool isPlaying = false;
+
 double lastFrameTime = 0;
+
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
 std::list<std::shared_ptr<GameObject>> list;
@@ -57,8 +61,10 @@ int main(void)
 	while (!glfwWindowShouldClose(window))
 	{
 
-		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		//Check if a key is pressed
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && !isPlaying)
 		{
+			start();
 			isPlaying = true;
 			lastFrameTime = glfwGetTime();
 		}
@@ -67,6 +73,7 @@ int main(void)
 			isPlaying = false;
 		}
 
+		//If the game hasn't been started, draw the menu and not the scene
 		if (!isPlaying)
 		{
 			drawMenu();
@@ -86,6 +93,7 @@ int main(void)
 	return 0;
 }
 
+//Initiate the game
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -98,39 +106,7 @@ void init()
 	tigl::shader->setLightSpecular(0, glm::vec3(1,1,1));
 	tigl::shader->setShinyness(0);
 
-	scene = std::make_shared<GameScene>();
-
-	player = std::make_shared<GameObject>();
-	auto playerPos = glm::vec3(0, 1, 5);
-	player->position = playerPos;
-
-	float r = rand() / static_cast<float>(RAND_MAX);
-	float g = rand() / static_cast<float>(RAND_MAX);
-	float b = rand() / static_cast<float>(RAND_MAX);
-
-	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r,g,b,1)));
-	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
-	player->addComponent(std::make_shared<PlayerComponent>());
-	scene->addGameObject(player);
-
-	auto o = std::make_shared<GameObject>();
-	o->position = glm::vec3(0, 0, 0);
-	o->addComponent(std::make_shared<FloorComponent>());
-	list.push_back(o);
-
-	for (int i = 0; i < 100; i++)
-	{
-		auto o = std::make_shared<GameObject>();
-		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 20 - 20);
-		float r = rand() / static_cast<float>(RAND_MAX);
-		float g = rand() / static_cast<float>(RAND_MAX);
-		float b = rand() / static_cast<float>(RAND_MAX);
-		o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1,1,1), glm::vec4(r, g, b, 1)));
-		list.push_back(o);
-	}
-	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, -50));
-
-	scene->addGameChunk(chunk);
+	createScene();
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
@@ -140,6 +116,7 @@ void init()
 	});
 }
 
+//Update everything in the scene
 void update()
 {
 	double currentFrameTime = glfwGetTime();
@@ -149,6 +126,59 @@ void update()
 	scene->update(deltaTime);
 }
 
+//Start the game (Also supports restarting)
+void start() {
+	scene = nullptr;
+	player = nullptr;
+	chunk = nullptr;
+	list.clear();
+
+	createScene();
+}
+
+//Create a scene
+void createScene() {
+	scene = std::make_shared<GameScene>();
+
+	//Create player object
+	player = std::make_shared<GameObject>();
+	auto playerPos = glm::vec3(0, 1, 5);
+	player->position = playerPos;
+
+	//Generate random rgb values;
+	float r = rand() / static_cast<float>(RAND_MAX);
+	float g = rand() / static_cast<float>(RAND_MAX);
+	float b = rand() / static_cast<float>(RAND_MAX);
+
+	//Add components to player object
+	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
+	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
+	player->addComponent(std::make_shared<PlayerComponent>());
+	scene->addGameObject(player);
+
+	//Create floor object
+	auto o = std::make_shared<GameObject>();
+	o->position = glm::vec3(0, 0, 0);
+	o->addComponent(std::make_shared<FloorComponent>());
+	list.push_back(o);
+
+	//Add random blocks with random colors
+	for (int i = 0; i < 100; i++)
+	{
+		auto o = std::make_shared<GameObject>();
+		o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 20 - 20);
+		float r = rand() / static_cast<float>(RAND_MAX);
+		float g = rand() / static_cast<float>(RAND_MAX);
+		float b = rand() / static_cast<float>(RAND_MAX);
+		o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
+		list.push_back(o);
+	}
+	chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, -50));
+
+	scene->addGameChunk(chunk);
+}
+
+//Draw the main menu
 void drawMenu()
 {
 	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
@@ -158,20 +188,23 @@ void drawMenu()
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glm::mat4 projection = glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 1000.0f);
 
+	//Set camera
 	tigl::shader->setProjectionMatrix(projection);
 	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0, 10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);
 
+	//Draw orange quad for menu
 	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCN(glm::vec3(-1000, 0, -1000), glm::vec4(1, 0.4, 0, 1), glm::vec3(0,1,0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(-1000, 0, 1000), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(1000, 0, 1000), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(1000, 0, -1000), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(-100, 0, -100), glm::vec4(1, 0.4, 0, 1), glm::vec3(0,1,0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(-100, 0, 100), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, 100), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, -100), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 	tigl::end();
 }
 
+//Draw the game scene
 void draw()
 {
 	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
