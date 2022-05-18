@@ -26,7 +26,7 @@ void PlayerComponent::update(float _)
 
 void PlayerComponent::moveLeft()
 {
-	gameObject->getComponent<MoveToComponent>()->target.x = -(10.0f * (2.0f / 3.0f));
+	gameObject->getComponent<MoveToComponent>()->target.x = -(FLOORWIDTH * (2.0f / 3.0f));
 }
 
 void PlayerComponent::moveCenter()
@@ -36,5 +36,5 @@ void PlayerComponent::moveCenter()
 
 void PlayerComponent::moveRight()
 {
-	gameObject->getComponent<MoveToComponent>()->target.x = (10.0f * (2.0f / 3.0f));
+	gameObject->getComponent<MoveToComponent>()->target.x = (FLOORWIDTH * (2.0f / 3.0f));
 }

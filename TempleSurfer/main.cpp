@@ -96,7 +96,7 @@ void init()
 
 	auto o = std::make_shared<GameObject>();
 	o->position = glm::vec3(0, 0, 0);
-	o->addComponent(std::make_shared<FloorComponent>(10));
+	o->addComponent(std::make_shared<FloorComponent>());
 	list.push_back(o);
 
 	for (int i = 0; i < 100; i++)
