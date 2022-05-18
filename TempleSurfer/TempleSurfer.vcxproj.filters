@@ -107,14 +107,14 @@
     <ClInclude Include="GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FloorComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChunkGenerator.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FloorComponent.h">
+      <Filter>components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
