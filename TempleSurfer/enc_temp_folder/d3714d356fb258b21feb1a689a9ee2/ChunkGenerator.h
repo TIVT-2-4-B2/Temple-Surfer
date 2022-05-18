@@ -4,7 +4,7 @@
 
 #define MATRIX_SIZE 3
 
-/*These are the possible settings for obstacles*/
+/*These are the posible settings for obstacels*/
 enum class ChunkObstacle {
 	NONE,
 	BLOCK,
@@ -12,7 +12,7 @@ enum class ChunkObstacle {
 	DUCK
 };
 
-/*These are all the possible locations for these settings*/
+/*These are all the posible locations for these settings*/
 struct ChunkPreset {
 	ChunkObstacle obstacles[MATRIX_SIZE][MATRIX_SIZE];
 };
