@@ -187,12 +187,14 @@ void createScene() {
 	o->addComponent(std::make_shared<FloorComponent>());
 	objectList.push_back(o);
 
-	std::shared_ptr<GameChunk> chunk = std::make_shared<GameChunk>(objectList, glm::vec3(0, 0, -10));
+	std::shared_ptr<GameChunk> chunk = std::make_shared<GameChunk>(objectList, glm::vec3(0, 0, Z_THRESHOLD - (2 * FLOORWIDTH)));
 	scene->addGameChunk(chunk);
-	auto chunk2 = generator.getChunk();
-	chunk2->gamePosition = glm::vec3(0, 0, -30);
-	scene->addGameChunk(chunk2);
-	scene->addGameChunk(generator.getChunk());
+	for (size_t i = 1; i < CHUNKS_ON_SCREEN; i++)
+	{
+		auto nextChunk = generator.getChunk();
+		nextChunk->gamePosition = glm::vec3(0, 0, Z_THRESHOLD - (2 * FLOORWIDTH * (i + 1)));
+		scene->addGameChunk(nextChunk);
+	}
 }
 
 //Draw the main menu
