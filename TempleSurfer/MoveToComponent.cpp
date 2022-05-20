@@ -13,5 +13,5 @@ MoveToComponent::~MoveToComponent()
 
 void MoveToComponent::update(float elapsedTime)
 {
-	gameObject->position = (1 - speed) * gameObject->position + speed * target;
+	gameObject->position = (1 - speed * elapsedTime) * gameObject->position + speed * elapsedTime * target;
 }
