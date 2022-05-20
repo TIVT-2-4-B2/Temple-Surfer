@@ -11,7 +11,7 @@ void ChunkGenerator::generatorInit()
 	// Seeds the random function
 	srand(std::chrono::system_clock::now().time_since_epoch().count());
 
-	// Loading the all possible presets
+	// Loading all the possible presets
 	// TODO make with file IO. Temp solution right here..
 	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
 				{{BLOCK},{BLOCK},{NONE}},
@@ -25,18 +25,12 @@ void ChunkGenerator::generatorInit()
 	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
 			{{BLOCK},{BLOCK},{NONE}},
 			{{JUMP},{NONE},{JUMP}}} });
-
-	//Building chunks with all presets.
-	for (auto& preset : presets)
-	{ 
-		chunkPointers.push_back(buildChunk(preset));
-	}
 }
 
 std::shared_ptr<GameChunk> ChunkGenerator::getChunk()
 {
 	// Returning a random chunk that is generated.
-	return chunkPointers.at(rand() % chunkPointers.size());
+	return buildChunk(presets.at(rand() % presets.size()));
 }
 
 std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
@@ -49,23 +43,26 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	floor->position = glm::vec3(0, 0, 0);
 	floor->addComponent(std::make_shared<FloorComponent>());
 	gameObjects.push_back(floor);
-
+	float xPos;
+	float zPos;
 	// Adding in the generated config.
 	for (int i = 0; i < MATRIX_SIZE; i++)
 	{
+		zPos = ((1.0f / 3.0f) + (2.0f / 3.0f) * i) * FLOORWIDTH;
 		for (int j = 0; j < MATRIX_SIZE; j++) {
 			auto cube = std::make_shared<GameObject>();
+			xPos = -((2.0f / 3.0f) * FLOORWIDTH) + ((2.0f / 3.0f) * FLOORWIDTH) * j;  // X
 			switch (preset.obstacles[i][j]) {
 				case BLOCK:
-					cube->position = glm::vec3(-6.6666f + (2.0f / 3.0f * 10.0f) * j, 1, -4.0f * i);
+					cube->position = glm::vec3(xPos, 2, zPos);
 					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1)));
 					break;
 				case JUMP:
-					cube->position = glm::vec3(-6.6666f + (2.0f / 3.0f * 10.0f) * j, 1, -4.0f * i);
+					cube->position = glm::vec3(xPos, 1, zPos);
 					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0,  1)));
 					break;
 				case DUCK:
-					cube->position = glm::vec3(-6.6666f + (2.0f / 3.0f * 10.0f) * j, 2, -4.0f * i);
+					cube->position = glm::vec3(xPos, 2, zPos);
 					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(1.0f,0, 1.0f, 1)));
 					break;
 				case NONE:
@@ -75,8 +72,7 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 		}
 	}
 
-
 	// Filling the chunk
-	std::shared_ptr<GameChunk> chunkPointer = std::make_shared<GameChunk>(gameObjects, glm::vec3(0, 0, 0));
+	std::shared_ptr<GameChunk> chunkPointer = std::make_shared<GameChunk>(gameObjects, glm::vec3(0, 0, -50));
 	return chunkPointer;
 }
