@@ -62,7 +62,7 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0,  1)));
 					break;
 				case DUCK:
-					cube->position = glm::vec3(xPos, 2, zPos);
+					cube->position = glm::vec3(xPos, 3, zPos);
 					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(1.0f,0, 1.0f, 1)));
 					break;
 				case NONE:
