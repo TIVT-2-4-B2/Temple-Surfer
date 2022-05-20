@@ -3,7 +3,7 @@
 #include <vector>
 
 #define MATRIX_SIZE 3
-#define CHUNKS_ON_SCREEN 3
+#define CHUNKS_ON_SCREEN 4
 
 /*These are the possible settings for obstacles*/
 enum class ChunkObstacle {
