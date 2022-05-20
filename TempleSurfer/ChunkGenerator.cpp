@@ -48,10 +48,10 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	// Adding in the generated config.
 	for (int i = 0; i < MATRIX_SIZE; i++)
 	{
-		zPos = ((1.0f / 3.0f) + (2.0f / 3.0f) * i) * FLOORWIDTH;
+		zPos = ((1.0f / 6.0f) + (1.0f / 3.0f) * i) * FLOOR_LENGTH;
 		for (int j = 0; j < MATRIX_SIZE; j++) {
 			auto cube = std::make_shared<GameObject>();
-			xPos = -((2.0f / 3.0f) * FLOORWIDTH) + ((2.0f / 3.0f) * FLOORWIDTH) * j;  // X
+			xPos = -((2.0f / 3.0f) * FLOOR_WIDTH) + ((2.0f / 3.0f) * FLOOR_WIDTH) * j;  // X
 			switch (preset.obstacles[i][j]) {
 				case BLOCK:
 					cube->position = glm::vec3(xPos, 2, zPos);
@@ -73,6 +73,6 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	}
 
 	// Filling the chunk
-	std::shared_ptr<GameChunk> chunkPointer = std::make_shared<GameChunk>(gameObjects, glm::vec3(0, 0, Z_THRESHOLD - (CHUNKS_ON_SCREEN * FLOORWIDTH * 2)));
+	std::shared_ptr<GameChunk> chunkPointer = std::make_shared<GameChunk>(gameObjects, glm::vec3(0, 0, Z_THRESHOLD - (CHUNKS_ON_SCREEN * FLOOR_LENGTH)));
 	return chunkPointer;
 }

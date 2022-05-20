@@ -147,7 +147,7 @@ void createScene() {
 
 	//Create player object
 	player = std::make_shared<GameObject>();
-	glm::vec3 playerPos = glm::vec3(0, 1, 5);
+	glm::vec3 playerPos = glm::vec3(0, 1, 3);
 	player->position = playerPos;
 
 	//Generate random rgb values;
@@ -187,12 +187,12 @@ void createScene() {
 	o->addComponent(std::make_shared<FloorComponent>());
 	objectList.push_back(o);
 
-	std::shared_ptr<GameChunk> chunk = std::make_shared<GameChunk>(objectList, glm::vec3(0, 0, Z_THRESHOLD - (2 * FLOORWIDTH)));
+	std::shared_ptr<GameChunk> chunk = std::make_shared<GameChunk>(objectList, glm::vec3(0, 0, Z_THRESHOLD - FLOOR_LENGTH));
 	scene->addGameChunk(chunk);
 	for (size_t i = 1; i < CHUNKS_ON_SCREEN; i++)
 	{
 		auto nextChunk = generator.getChunk();
-		nextChunk->gamePosition = glm::vec3(0, 0, Z_THRESHOLD - (2 * FLOORWIDTH * (i + 1)));
+		nextChunk->gamePosition = glm::vec3(0, 0, Z_THRESHOLD - (FLOOR_LENGTH * (i + 1)));
 		scene->addGameChunk(nextChunk);
 	}
 }
@@ -234,7 +234,7 @@ void draw()
 	glm::mat4 projection = glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 1000.0f);
 
 	tigl::shader->setProjectionMatrix(projection);
-	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0,10,10), glm::vec3(0,0,0), glm::vec3(0,1,0)));
+	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(player->position.x,7,12), glm::vec3(player->position.x,0,0), glm::vec3(0,1,0)));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);

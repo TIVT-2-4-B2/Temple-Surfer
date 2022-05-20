@@ -6,7 +6,8 @@ using tigl::Vertex;
 
 #include <vector>
 
-#define FLOORWIDTH 10.0f
+#define FLOOR_WIDTH 10.0f
+#define FLOOR_LENGTH 30.0f
 
 class FloorComponent : public DrawComponent
 {
