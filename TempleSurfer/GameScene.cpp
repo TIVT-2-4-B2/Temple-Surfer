@@ -1,7 +1,12 @@
 #include "GameScene.h"
+#include "ChunkGenerator.h"
 
+ChunkGenerator chunkGenerator = ChunkGenerator();
+
+//TODO create more chunks and possibly add mist.
 GameScene::GameScene()
 {
+	chunkGenerator.generatorInit();
 }
 
 GameScene::~GameScene()
@@ -54,7 +59,11 @@ void GameScene::update(float elapsedTime)
 
 		chunk->moveChunk(chunk->gamePosition += glm::vec3(0, 0, 2* elapsedTime));
 		chunk->update(elapsedTime);
-		if (chunk->gamePosition.z > Z_THRESHOLD) removeGameChunk(chunk);
+		if (chunk->gamePosition.z > Z_THRESHOLD)
+		{
+			removeGameChunk(chunk);
+			addGameChunk(chunkGenerator.getChunk());
+		}
 	}
 	for (auto& c : gameObjects) c->update(elapsedTime);
 }

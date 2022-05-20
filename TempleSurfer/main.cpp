@@ -179,7 +179,19 @@ void createScene() {
 	// 	list.push_back(o);
 	// }
 	// chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, -50));
+	std::list<std::shared_ptr<GameObject>> objectList;
+	
+	//Create floor object
+	auto o = std::make_shared<GameObject>();
+	o->position = glm::vec3(0, 0, 0);
+	o->addComponent(std::make_shared<FloorComponent>());
+	objectList.push_back(o);
 
+	std::shared_ptr<GameChunk> chunk = std::make_shared<GameChunk>(objectList, glm::vec3(0, 0, -10));
+	scene->addGameChunk(chunk);
+	auto chunk2 = generator.getChunk();
+	chunk2->gamePosition = glm::vec3(0, 0, -30);
+	scene->addGameChunk(chunk2);
 	scene->addGameChunk(generator.getChunk());
 }
 
