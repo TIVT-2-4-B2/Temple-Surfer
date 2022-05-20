@@ -102,7 +102,7 @@ void init()
 	tigl::shader->enableLighting(true);
 	tigl::shader->setLightCount(1);
 	tigl::shader->setLightDirectional(0, true);
-	tigl::shader->setLightPosition(0, glm::normalize(glm::vec3(1, 1, 1)));
+	tigl::shader->setLightPosition(0, (glm::vec3(0, 7, 12)));
 	tigl::shader->setLightAmbient(0, glm::vec3(0.5f, 0.5f, 0.5f));
 	tigl::shader->setLightDiffuse(0, glm::vec3(0.5f, 0.5f, 0.5f));
 	tigl::shader->setLightSpecular(0, glm::vec3(1,1,1));
