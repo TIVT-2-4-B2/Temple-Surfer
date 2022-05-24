@@ -3,7 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
+#include <memory>
+#include <list>
 #include "tigl.h"
 #include "TextureComponent.h"
 
@@ -88,7 +89,7 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 		return;
 	}
 
-	MaterialInfo* currentMaterial = NULL;
+	std::shared_ptr<MaterialInfo> currentMaterial = NULL;
 
 	while (!pFile.eof())
 	{
@@ -107,7 +108,7 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 			{
 				materials.push_back(currentMaterial);
 			}
-			currentMaterial = new MaterialInfo();
+			currentMaterial = std::make_shared<MaterialInfo>();
 			currentMaterial->name = params[1];
 		}
 		else if (params[0] == "map_kd")
@@ -119,7 +120,7 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 				tex = tex.substr(tex.rfind("\\") + 1);
 			//TODO
 			if (currentMaterial != NULL) {
-				currentMaterial->texture = new Texture(dirName + "/" + tex);
+				currentMaterial->texture = std::make_shared<TextureComponent>(dirName + "/" + tex);
 			}
 		}
 		else if (params[0] == "kd")
@@ -155,8 +156,102 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 		materials.push_back(currentMaterial);
 }
 
-OBJComponent::OBJComponent(const std::string& filename)
+OBJComponent::OBJComponent(const std::string& fileName)
 {
+	std::cout << "Loading " << fileName << std::endl;
+	std::string dirName = fileName;
+	if (dirName.rfind("/") != std::string::npos)
+		dirName = dirName.substr(0, dirName.rfind("/"));
+	if (dirName.rfind("\\") != std::string::npos)
+		dirName = dirName.substr(0, dirName.rfind("\\"));
+	if (fileName == dirName)
+		dirName = "";
+
+
+	std::ifstream pFile(fileName.c_str());
+
+	if (!pFile.is_open())
+	{
+		std::cout << "Could not open file " << fileName << std::endl;
+		return;
+	}
+
+
+	std::shared_ptr<ObjGroup> currentGroup = std::make_shared<ObjGroup>();
+	currentGroup->materialIndex = -1;
+
+
+	while (!pFile.eof())
+	{
+		std::string line;
+		std::getline(pFile, line);
+		line = cleanLine(line);
+		if (line == "" || line[0] == '#') //skip empty or commented line
+			continue;
+
+		std::vector<std::string> params = split(line, " ");
+		params[0] = toLower(params[0]);
+
+		if (params[0] == "v")
+			vertices.push_back(glm::vec3((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str())));
+		else if (params[0] == "vn")
+			normals.push_back(glm::vec3((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str())));
+		else if (params[0] == "vt")
+			texcoords.push_back(glm::vec2((float)atof(params[1].c_str()), 1 - (float)atof(params[2].c_str())));
+		else if (params[0] == "f")
+		{
+			for (size_t ii = 4; ii <= params.size(); ii++)
+			{
+				FaceCollection face;
+
+				for (size_t i = ii - 3; i < ii; i++)	//magische forlus om van quads triangles te maken ;)
+				{
+					VertexIndex vertex;
+					std::vector<std::string> indices = split(params[i == (ii - 3) ? 1 : i], "/");
+					if (indices.size() >= 1)	//er is een positie
+						vertex.position = atoi(indices[0].c_str()) - 1;
+					if (indices.size() == 2)		//alleen texture
+						vertex.texcoord = atoi(indices[1].c_str()) - 1;
+					if (indices.size() == 3)		//v/t/n of v//n
+					{
+						if (indices[1] != "")
+							vertex.texcoord = atoi(indices[1].c_str()) - 1;
+						vertex.normal = atoi(indices[2].c_str()) - 1;
+					}
+					face.vertices.push_back(vertex);
+				}
+				currentGroup->faces.push_back(face);
+			}
+		}
+		else if (params[0] == "s")
+		{//smoothing groups
+		}
+		else if (params[0] == "mtllib")
+		{
+			loadMaterialFile(dirName + "/" + params[1], dirName);
+		}
+		else if (params[0] == "usemtl")
+		{
+			if (currentGroup->faces.size() != 0)
+				groups.push_back(currentGroup);
+			currentGroup = std::make_shared<ObjGroup>();
+			currentGroup->materialIndex = -1;
+
+			for (size_t i = 0; i < materials.size(); i++)
+			{
+				std::shared_ptr<MaterialInfo> info = materials.at(i);
+				if (info->name == params[1])
+				{
+					currentGroup->materialIndex = i;
+					break;
+				}
+			}
+			if (currentGroup->materialIndex == -1)
+				std::cout << "Could not find material name " << params[1] << std::endl;
+		}
+	}
+	groups.push_back(currentGroup);
+
 }
 
 OBJComponent::~OBJComponent(void)
@@ -165,4 +260,15 @@ OBJComponent::~OBJComponent(void)
 
 void OBJComponent::draw()
 {
+	tigl::begin(GL_TRIANGLES);
+	for (std::shared_ptr<ObjGroup> group : groups) {
+		std::shared_ptr<MaterialInfo> matinfo = materials.at(group->materialIndex);
+		matinfo->texture->bind();
+		for (FaceCollection face : group->faces) {
+			for (VertexIndex vert : face.vertices) {
+				tigl::addVertex(tigl::Vertex::PTN(vertices.at(vert.position), texcoords.at(vert.texcoord), normals.at(vert.normal)));
+			}
+		}
+	}
+	tigl::end();
 }
