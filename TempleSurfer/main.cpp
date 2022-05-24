@@ -15,6 +15,7 @@ using tigl::Vertex;
 #include "GameChunk.h"
 #include "GameScene.h"
 #include "GameObject.h"
+#include "Presets.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
 #include "TextureComponent.h"
@@ -179,17 +180,9 @@ void createScene() {
 	glm::vec3 playerPos = glm::vec3(0, 1, 3);
 	player->position = playerPos;
 
-	//Generate random rgb values;
-	float r = rand() / static_cast<float>(RAND_MAX);
-	float g = rand() / static_cast<float>(RAND_MAX);
-	float b = rand() / static_cast<float>(RAND_MAX);
-
 	//Add components to player object
-	//player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
-	/*player->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));*/
 	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
-
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
 	player->rotation = glm::vec3(0, -1.57079633f, 0);
@@ -198,10 +191,7 @@ void createScene() {
 	std::list<std::shared_ptr<GameObject>> objectList;
 	
 	//Create floor object
-	auto o = std::make_shared<GameObject>();
-	o->position = glm::vec3(0, 0, 0);
-	o->addComponent(std::make_shared<FloorComponent>());
-	objectList.push_back(o);
+	AddFloor(objectList);
 
 	std::shared_ptr<GameChunk> chunk = std::make_shared<GameChunk>(objectList, glm::vec3(0, 0, Z_THRESHOLD - FLOOR_LENGTH));
 	scene->addGameChunk(chunk);

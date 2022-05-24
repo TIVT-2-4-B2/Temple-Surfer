@@ -175,7 +175,9 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveToComponent.cpp" />
     <ClCompile Include="OBJComponent.cpp" />
+    <ClCompile Include="PaneComponent.cpp" />
     <ClCompile Include="PlayerComponent.cpp" />
+    <ClCompile Include="Presets.cpp" />
     <ClCompile Include="SpinComponent.cpp" />
     <ClCompile Include="TextureComponent.cpp" />
     <ClCompile Include="tigl.cpp" />
@@ -195,7 +197,9 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="MoveToComponent.h" />
     <ClInclude Include="OBJComponent.h" />
+    <ClInclude Include="PaneComponent.h" />
     <ClInclude Include="PlayerComponent.h" />
+    <ClInclude Include="Presets.h" />
     <ClInclude Include="SpinComponent.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TextureComponent.h" />

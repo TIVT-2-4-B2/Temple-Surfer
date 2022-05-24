@@ -55,8 +55,10 @@ void CubeComponent::draw()
 	if (tex != NULL)
 	{
 		tigl::shader->enableTexture(true);
+		tigl::shader->enableColor(false);
 		tex->bind();
 	}
 	tigl::drawVertices(GL_QUADS, verts);
 	tigl::shader->enableTexture(false);
+	tigl::shader->enableColor(true);
 }
