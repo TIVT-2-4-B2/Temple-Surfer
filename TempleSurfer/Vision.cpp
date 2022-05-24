@@ -27,17 +27,16 @@ Vision::~Vision()
 
 void Vision::visionUpdate() {
 
-    //while (true)
-    //{
-        cap.read(img);
-        faceCascade.detectMultiScale(img, faces, 1.1, 10);
-        for (int i = 0; i < faces.size(); i++)
-        {
-            rectangle(img, faces[i].tl(), faces[i].br(), Scalar(255, 0, 0), 3);
-        }
-        imshow("Image", img);
-        waitKey(1);
-    //}
+    cap.read(img);
+    faceCascade.detectMultiScale(img, faces, 1.2, 10, 0, Size(50, 50));
+    for (int i = 0; i < faces.size(); i++)
+    {
+        int x = faces[i].x + (faces[i].width / 2);
+        int y = faces[i].y + (faces[i].height / 2) + 10;
 
+        line(img, Point(x, y), Point(x, y), Scalar(0, 0, 255), 50);
+    }
+    imshow("Image", img);
+    waitKey(1);
 }
 
