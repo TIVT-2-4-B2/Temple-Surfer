@@ -177,6 +177,7 @@
     <ClCompile Include="OBJComponent.cpp" />
     <ClCompile Include="PlayerComponent.cpp" />
     <ClCompile Include="SpinComponent.cpp" />
+    <ClCompile Include="TextureComponent.cpp" />
     <ClCompile Include="tigl.cpp" />
     <ClCompile Include="TimerJumper.cpp" />
   </ItemGroup>
@@ -196,6 +197,7 @@
     <ClInclude Include="PlayerComponent.h" />
     <ClInclude Include="SpinComponent.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="TextureComponent.h" />
     <ClInclude Include="tigl.h" />
     <ClInclude Include="TimerJumper.h" />
   </ItemGroup>
