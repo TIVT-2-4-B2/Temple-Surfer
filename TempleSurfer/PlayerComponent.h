@@ -14,5 +14,8 @@ public:
 	void moveLeft();
 	void moveCenter();
 	void moveRight();
+	void jump();
+	void crouch();
+	void resetY();
 };
 
