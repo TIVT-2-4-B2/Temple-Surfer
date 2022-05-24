@@ -2,8 +2,6 @@
 #include "GameObject.h"
 #include <GLFW/glfw3.h>
 #include "MoveToComponent.h"
-#include <thread>
-#include <chrono>
 
 extern GLFWwindow* window;
 
@@ -18,6 +16,16 @@ PlayerComponent::~PlayerComponent()
 
 void PlayerComponent::update(float _)
 {
+	if (jumpOrCrouch)
+	{
+		std::chrono::system_clock::duration duration = std::chrono::system_clock::now() - lastTime;
+		std::chrono::milliseconds mSeconds = std::chrono::duration_cast<std::chrono::milliseconds> (duration);
+		if(mSeconds.count() > 200)
+		{
+			resetY();
+			jumpOrCrouch = false;
+		}
+	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		moveCenter();
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
@@ -48,17 +56,18 @@ void PlayerComponent::moveRight()
 void PlayerComponent::jump()
 {
 	gameObject->getComponent<MoveToComponent>()->target.y = 2;
-	std::thread (resetY).detach();
+	jumpOrCrouch = true;
+	lastTime = std::chrono::system_clock::now();
 }
 
 void PlayerComponent::crouch()
 {
 	gameObject->getComponent<MoveToComponent>()->target.y = 0;
-	std::thread (resetY).detach();
+	jumpOrCrouch = true;
+	lastTime = std::chrono::system_clock::now();
 }
 
 void PlayerComponent::resetY()
 {
-	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	gameObject->getComponent<MoveToComponent>()->target.y = 1;
 }
