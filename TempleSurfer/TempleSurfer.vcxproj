@@ -178,6 +178,7 @@
     <ClCompile Include="SpinComponent.cpp" />
     <ClCompile Include="tigl.cpp" />
     <ClCompile Include="TimerJumper.cpp" />
+    <ClCompile Include="Vision.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoundingBoxComponent.h" />
@@ -195,6 +196,10 @@
     <ClInclude Include="SpinComponent.h" />
     <ClInclude Include="tigl.h" />
     <ClInclude Include="TimerJumper.h" />
+    <ClInclude Include="Vision.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="haarcascade_frontalface_default.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

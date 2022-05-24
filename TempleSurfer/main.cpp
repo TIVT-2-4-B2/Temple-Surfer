@@ -19,7 +19,11 @@ using tigl::Vertex;
 #include "SpinComponent.h"
 #include "TimerJumper.h"
 #include "EnemyComponent.h"
+
+#include "Vision.h"
+
 #include <iostream>
+#include <thread>
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -46,48 +50,52 @@ ChunkGenerator generator;
 
 int main(void)
 {
-	if (!glfwInit())
-		throw "Could not initialize glwf";
-	window = glfwCreateWindow(1000, 800, "Temple Runner", NULL, NULL);
-	if (!window)
-	{
-		glfwTerminate();
-		throw "Could not initialize glwf";
-	}
-	glfwMakeContextCurrent(window);
+	//if (!glfwInit())
+	//	throw "Could not initialize glwf";
+	//window = glfwCreateWindow(1000, 800, "Temple Runner", NULL, NULL);
+	//if (!window)
+	//{
+	//	glfwTerminate();
+	//	throw "Could not initialize glwf";
+	//}
+	//glfwMakeContextCurrent(window);
 
-	tigl::init();
+	//tigl::init();
 
-	init();
+	//init();
+
+	Vision vision;
 
 	while (!glfwWindowShouldClose(window))
 	{
+		vision = Vision();
+		vision.visionUpdate();
 
 		//Check if a key is pressed
-		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && !isPlaying)
-		{
-			start();
-			isPlaying = true;
-			lastFrameTime = glfwGetTime();
-		}
-		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		{
-			isPlaying = false;
-		}
+		//if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && !isPlaying)
+		//{
+		//	start();
+		//	isPlaying = true;
+		//	lastFrameTime = glfwGetTime();
+		//}
+		//else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		//{
+		//	isPlaying = false;
+		//}
 
-		//If the game hasn't been started, draw the menu and not the scene
-		if (!isPlaying)
-		{
-			drawMenu();
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-			continue;
-		}
+		////If the game hasn't been started, draw the menu and not the scene
+		//if (!isPlaying)
+		//{
+		//	drawMenu();
+		//	glfwSwapBuffers(window);
+		//	glfwPollEvents();
+		//	continue;
+		//}
 
-		update();
-		draw();
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		//update();
+		//draw();
+		//glfwSwapBuffers(window);
+		//glfwPollEvents();
 	}
 
 	glfwTerminate();
@@ -118,6 +126,7 @@ void init()
 			glfwSetWindowShouldClose(window, true);
 		}
 	});
+
 }
 
 //Update everything in the scene
@@ -126,6 +135,8 @@ void update()
 	double currentFrameTime = glfwGetTime();
 	double deltaTime = currentFrameTime - lastFrameTime;
 	lastFrameTime = currentFrameTime;
+
+	std::cout << 1 / deltaTime << " FPS" << std::endl;
 
 	scene->update(deltaTime);
 }
