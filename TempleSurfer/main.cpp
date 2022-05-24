@@ -51,8 +51,9 @@ ChunkGenerator generator;
 
 int main(void)
 {
-	if (!glfwInit())
+	if (!glfwInit()) {
 		throw "Could not initialize glwf";
+	}	
 	window = glfwCreateWindow(1000, 800, "Temple Runner", NULL, NULL);
 	if (!window)
 	{
@@ -146,9 +147,9 @@ void update()
 	double deltaTime = currentFrameTime - lastFrameTime;
 	lastFrameTime = currentFrameTime;
 
-#ifdef FPSDEBUG
+#ifdef FPS_DEBUG
 	std::cout << 1 / deltaTime << " FPS" << std::endl;
-#endif // FPSDEBUG
+#endif // FPS_DEBUG
 
 	scene->update(deltaTime);
 }
