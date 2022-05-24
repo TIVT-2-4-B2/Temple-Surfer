@@ -55,16 +55,22 @@ void PlayerComponent::moveRight()
 
 void PlayerComponent::jump()
 {
-	gameObject->getComponent<MoveToComponent>()->target.y = 3.3f;
-	jumpOrCrouch = true;
-	lastTime = std::chrono::system_clock::now();
+	if (!jumpOrCrouch)
+	{
+		gameObject->getComponent<MoveToComponent>()->target.y = 3.3f;
+		jumpOrCrouch = true;
+		lastTime = std::chrono::system_clock::now();
+	}
 }
 
 void PlayerComponent::crouch()
 {
-	gameObject->getComponent<MoveToComponent>()->target.y = 0;
-	jumpOrCrouch = true;
-	lastTime = std::chrono::system_clock::now();
+	if (!jumpOrCrouch)
+	{
+		gameObject->getComponent<MoveToComponent>()->target.y = 0;
+		jumpOrCrouch = true;
+		lastTime = std::chrono::system_clock::now();
+	}
 }
 
 void PlayerComponent::resetY()
