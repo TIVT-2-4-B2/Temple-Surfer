@@ -16,12 +16,26 @@ PlayerComponent::~PlayerComponent()
 
 void PlayerComponent::update(float _)
 {
+	if (jumpOrCrouch)
+	{
+		std::chrono::system_clock::duration duration = std::chrono::system_clock::now() - lastTime;
+		std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds> (duration);
+		if(seconds.count() > 1)
+		{
+			resetY();
+			jumpOrCrouch = false;
+		}
+	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		moveCenter();
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		moveLeft();
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		moveRight();
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		jump();
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		crouch();
 }
 
 void PlayerComponent::moveLeft()
@@ -37,4 +51,29 @@ void PlayerComponent::moveCenter()
 void PlayerComponent::moveRight()
 {
 	gameObject->getComponent<MoveToComponent>()->target.x = (FLOOR_WIDTH * (2.0f / 3.0f));
+}
+
+void PlayerComponent::jump()
+{
+	if (!jumpOrCrouch)
+	{
+		gameObject->getComponent<MoveToComponent>()->target.y = 3.3f;
+		jumpOrCrouch = true;
+		lastTime = std::chrono::system_clock::now();
+	}
+}
+
+void PlayerComponent::crouch()
+{
+	if (!jumpOrCrouch)
+	{
+		gameObject->getComponent<MoveToComponent>()->target.y = 0;
+		jumpOrCrouch = true;
+		lastTime = std::chrono::system_clock::now();
+	}
+}
+
+void PlayerComponent::resetY()
+{
+	gameObject->getComponent<MoveToComponent>()->target.y = 1;
 }
