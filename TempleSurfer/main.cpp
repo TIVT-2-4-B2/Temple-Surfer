@@ -15,6 +15,7 @@ using tigl::Vertex;
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
+#include "TextureComponent.h"
 #include "MoveToComponent.h"
 #include "SpinComponent.h"
 #include "TimerJumper.h"
@@ -160,6 +161,7 @@ void createScene() {
 	//Add components to player object
 	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
+	player->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));
 	player->addComponent(std::make_shared<PlayerComponent>());
 	scene->addGameObject(player);
 
