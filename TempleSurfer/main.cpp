@@ -23,7 +23,11 @@ using tigl::Vertex;
 #include "SpinComponent.h"
 #include "TimerJumper.h"
 #include "EnemyComponent.h"
+
+#include "Vision.h"
+
 #include <iostream>
+#include <thread>
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -39,6 +43,7 @@ void draw();
 void drawMenu();
 
 bool isPlaying = false;
+bool initialized = false;
 
 double lastFrameTime = 0;
 
@@ -50,8 +55,9 @@ ChunkGenerator generator;
 
 int main(void)
 {
-	if (!glfwInit())
+	if (!glfwInit()) {
 		throw "Could not initialize glwf";
+	}	
 	window = glfwCreateWindow(1000, 800, "Temple Runner", NULL, NULL);
 	if (!window)
 	{
@@ -63,6 +69,8 @@ int main(void)
 	tigl::init();
 
 	init();
+
+	Vision vision;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -92,6 +100,15 @@ int main(void)
 		draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		if (!initialized)
+		{
+			vision = Vision(player->getComponent<PlayerComponent>());
+			initialized = true;
+		}
+		
+		vision.visionUpdate();
+
 	}
 
 	glfwTerminate();
@@ -122,6 +139,9 @@ void init()
 			glfwSetWindowShouldClose(window, true);
 		}
 	});
+
+	update();
+
 }
 
 //Update everything in the scene
@@ -130,6 +150,10 @@ void update()
 	double currentFrameTime = glfwGetTime();
 	double deltaTime = currentFrameTime - lastFrameTime;
 	lastFrameTime = currentFrameTime;
+
+#ifdef FPS_DEBUG
+	std::cout << 1 / deltaTime << " FPS" << std::endl;
+#endif // FPS_DEBUG
 
 	scene->update(deltaTime);
 }
@@ -164,25 +188,6 @@ void createScene() {
 	player->rotation = glm::vec3(0, -1.57079633f, 0);
 	scene->addGameObject(player);
 
-
-	//Create floor object
-	// auto o = std::make_shared<GameObject>();
-	// o->position = glm::vec3(0, 0, 0);
-	// o->addComponent(std::make_shared<FloorComponent>());
-	// list.push_back(o);
-
-	// //Add random blocks with random colors
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	auto o = std::make_shared<GameObject>();
-	// 	o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 20 - 20);
-	// 	float r = rand() / static_cast<float>(RAND_MAX);
-	// 	float g = rand() / static_cast<float>(RAND_MAX);
-	// 	float b = rand() / static_cast<float>(RAND_MAX);
-	// 	o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
-	// 	list.push_back(o);
-	// }
-	// chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, -50));
 	std::list<std::shared_ptr<GameObject>> objectList;
 	
 	//Create floor object
