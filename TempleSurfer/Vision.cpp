@@ -48,6 +48,8 @@ void Vision::visionUpdate() {
         return;
     }
 
+
+#define VIS_DEBUG
 #ifdef VIS_DEBUG
     //Show all detected faces
     for (int i = 0; i < faces.size(); i++)
@@ -94,6 +96,21 @@ void Vision::visionUpdate() {
     {
         playerComponent->moveCenter();
         xPos = CENTER;
+    }
+
+    if (yPos != DUCK && y < 175)
+    {
+        playerComponent->crouch();
+        yPos = DUCK;
+    }
+    else if (yPos != JUMP && y > 290)
+    {
+        playerComponent->jump();
+        yPos = JUMP;
+    }
+    else if (yPos != STAND && y > 175 && y < 290)
+    {
+        yPos = STAND;
     }
 
 }

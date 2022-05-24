@@ -14,7 +14,15 @@ private:
 		RIGHT = 2
 	};
 
+	enum yPosition
+	{
+		JUMP = 0,
+		STAND = 1,
+		DUCK = 2
+	};
+
 	xPosition xPos = CENTER;
+	yPosition yPos = STAND;
 
 public:
 	Vision();
