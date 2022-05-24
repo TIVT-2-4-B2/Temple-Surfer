@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "ChunkGenerator.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 ChunkGenerator chunkGenerator = ChunkGenerator();
 

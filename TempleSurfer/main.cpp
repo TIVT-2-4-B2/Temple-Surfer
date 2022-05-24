@@ -164,11 +164,13 @@ void createScene() {
 	//player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
 	/*player->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));*/
+	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
 
 	player->addComponent(std::make_shared<PlayerComponent>());
+	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
+	player->rotation = glm::vec3(0, -1.57079633f, 0);
 	scene->addGameObject(player);
 
-	player->addComponent(std::make_shared<OBJComponent>("models/bloemetje/PrimRoseP.obj"));
 
 	//Create floor object
 	// auto o = std::make_shared<GameObject>();
