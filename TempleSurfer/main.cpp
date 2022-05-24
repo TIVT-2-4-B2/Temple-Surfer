@@ -3,6 +3,8 @@
 #include "tigl.h"
 #include <glm/gtc/matrix_transform.hpp>
 using tigl::Vertex;
+#include "OBJComponent.h"
+#include <memory>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -15,6 +17,7 @@ using tigl::Vertex;
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
+#include "TextureComponent.h"
 #include "MoveToComponent.h"
 #include "SpinComponent.h"
 #include "TimerJumper.h"
@@ -182,9 +185,14 @@ void createScene() {
 	float b = rand() / static_cast<float>(RAND_MAX);
 
 	//Add components to player object
-	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
+	//player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
+	/*player->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));*/
+	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
+
 	player->addComponent(std::make_shared<PlayerComponent>());
+	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
+	player->rotation = glm::vec3(0, -1.57079633f, 0);
 	scene->addGameObject(player);
 
 	std::list<std::shared_ptr<GameObject>> objectList;
