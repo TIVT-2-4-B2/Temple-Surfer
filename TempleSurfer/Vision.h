@@ -2,17 +2,23 @@
 
 #include "Vision.h"
 
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/objdetect.hpp>
-#include <iostream>
-#include<windows.h>
+#include "PlayerComponent.h"
 
 class Vision
 {
+private:	
+	enum xPosition
+	{
+		LEFT = 0,
+		CENTER = 1,
+		RIGHT = 2
+	};
+
+	xPosition xPos = CENTER;
+
 public:
 	Vision();
+	Vision(std::shared_ptr<PlayerComponent> playerComponent);
 	~Vision();
 
 	void visionUpdate();

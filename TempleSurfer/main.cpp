@@ -39,6 +39,7 @@ void draw();
 void drawMenu();
 
 bool isPlaying = false;
+bool initialized = false;
 
 double lastFrameTime = 0;
 
@@ -65,12 +66,9 @@ int main(void)
 	init();
 
 	Vision vision;
-	vision = Vision();
 
 	while (!glfwWindowShouldClose(window))
 	{
-
-		vision.visionUpdate();
 
 		//Check if a key is pressed
 		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && !isPlaying)
@@ -97,6 +95,15 @@ int main(void)
 		draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		if (!initialized)
+		{
+			vision = Vision(player->getComponent<PlayerComponent>());
+			initialized = true;
+		}
+		
+		vision.visionUpdate();
+
 	}
 
 	glfwTerminate();
@@ -128,6 +135,8 @@ void init()
 		}
 	});
 
+	update();
+
 }
 
 //Update everything in the scene
@@ -137,7 +146,9 @@ void update()
 	double deltaTime = currentFrameTime - lastFrameTime;
 	lastFrameTime = currentFrameTime;
 
-	//std::cout << 1 / deltaTime << " FPS" << std::endl;
+#ifdef FPSDEBUG
+	std::cout << 1 / deltaTime << " FPS" << std::endl;
+#endif // FPSDEBUG
 
 	scene->update(deltaTime);
 }
@@ -175,24 +186,6 @@ void createScene() {
 	player->addComponent(std::make_shared<PlayerComponent>());
 	scene->addGameObject(player);
 
-	//Create floor object
-	// auto o = std::make_shared<GameObject>();
-	// o->position = glm::vec3(0, 0, 0);
-	// o->addComponent(std::make_shared<FloorComponent>());
-	// list.push_back(o);
-
-	// //Add random blocks with random colors
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	auto o = std::make_shared<GameObject>();
-	// 	o->position = glm::vec3(rand() % 30 - 15, 1, rand() % 20 - 20);
-	// 	float r = rand() / static_cast<float>(RAND_MAX);
-	// 	float g = rand() / static_cast<float>(RAND_MAX);
-	// 	float b = rand() / static_cast<float>(RAND_MAX);
-	// 	o->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
-	// 	list.push_back(o);
-	// }
-	// chunk = std::make_shared<GameChunk>(list, glm::vec3(0, 0, -50));
 	std::list<std::shared_ptr<GameObject>> objectList;
 	
 	//Create floor object
