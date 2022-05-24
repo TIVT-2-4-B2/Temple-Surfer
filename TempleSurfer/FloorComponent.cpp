@@ -1,6 +1,6 @@
 #include "FloorComponent.h"
 
-#define OVERLAP 0.001f
+#define OVERLAP 0.01f
 
 FloorComponent::FloorComponent()
 {
