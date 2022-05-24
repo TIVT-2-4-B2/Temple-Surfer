@@ -15,6 +15,8 @@ Mat img;
 CascadeClassifier faceCascade;
 std::vector<Rect> faces;
 
+int frames = 0;
+
 Vision::Vision()
 {
     faceCascade.load("Resources/haarcascade_frontalface_default.xml");
@@ -28,7 +30,12 @@ Vision::~Vision()
 void Vision::visionUpdate() {
 
     cap.read(img);
-    faceCascade.detectMultiScale(img, faces, 1.2, 10, 0, Size(50, 50));
+
+    if (frames % 10 == 0)
+    {
+        faceCascade.detectMultiScale(img, faces, 1.2, 10, 0, Size(50, 50));
+    }
+    
     for (int i = 0; i < faces.size(); i++)
     {
         int x = faces[i].x + (faces[i].width / 2);
@@ -38,5 +45,6 @@ void Vision::visionUpdate() {
     }
     imshow("Image", img);
     waitKey(1);
+    frames++;
 }
 

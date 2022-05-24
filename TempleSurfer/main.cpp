@@ -137,7 +137,7 @@ void update()
 	double deltaTime = currentFrameTime - lastFrameTime;
 	lastFrameTime = currentFrameTime;
 
-	std::cout << 1 / deltaTime << " FPS" << std::endl;
+	//std::cout << 1 / deltaTime << " FPS" << std::endl;
 
 	scene->update(deltaTime);
 }
