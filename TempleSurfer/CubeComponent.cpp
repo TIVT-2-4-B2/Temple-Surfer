@@ -51,16 +51,12 @@ CubeComponent::~CubeComponent()
 
 void CubeComponent::draw()
 {
-	/*tigl::begin(GL_QUADS);
-	for (Vertex &vert : verts) {
-		tigl::addVertex(vert);
-	}*/
 	std::shared_ptr<TextureComponent> tex = gameObject->getComponent<TextureComponent>();
-	if (tex != NULL) {
+	if (tex != NULL)
+	{
 		tigl::shader->enableTexture(true);
 		tex->bind();
 	}
-	//tigl::end();
 	tigl::drawVertices(GL_QUADS, verts);
 	tigl::shader->enableTexture(false);
 }
