@@ -252,6 +252,11 @@ OBJComponent::OBJComponent(const std::string& fileName)
 	}
 	groups.push_back(currentGroup);
 
+	std::cout << "Amount of vertices: " << vertices.size() << std::endl;
+	std::cout << "Amount of normals: " << normals.size() << std::endl;
+	std::cout << "Amount of textures: " << materials.size() << std::endl;
+	std::cout << "Amount of texcoords: " << texcoords.size() << std::endl;
+	std::cout << "Amount of groups: " << groups.size() << std::endl;
 }
 
 OBJComponent::~OBJComponent(void)
@@ -260,6 +265,9 @@ OBJComponent::~OBJComponent(void)
 
 void OBJComponent::draw()
 {
+	std::cout << "Frame" << std::endl;
+	tigl::shader->enableTexture(true);
+
 	tigl::begin(GL_TRIANGLES);
 	for (std::shared_ptr<ObjGroup> group : groups) {
 		std::shared_ptr<MaterialInfo> matinfo = materials.at(group->materialIndex);
@@ -271,4 +279,6 @@ void OBJComponent::draw()
 		}
 	}
 	tigl::end();
+
+	tigl::shader->enableTexture(false);
 }

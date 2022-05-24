@@ -8,7 +8,7 @@
 #include <Vector>
 #include <glm/glm.hpp>
 
-class OBJComponent : DrawComponent {
+class OBJComponent : public DrawComponent {
 private:
 	class VertexIndex
 	{
@@ -51,5 +51,6 @@ private:
 public:
 	OBJComponent(const std::string& fileName);
 	~OBJComponent();
-	virtual void draw();
+
+	virtual void draw() override;
 };
