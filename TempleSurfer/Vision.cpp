@@ -36,10 +36,9 @@ Vision::~Vision()
 
 void Vision::visionUpdate() {
 
-    cap.read(img);
-
     if (frames % 10 == 0)
     {
+        cap.read(img);
         faceCascade.detectMultiScale(img, faces, 1.2, 10, 0, Size(50, 50));
     }
     
