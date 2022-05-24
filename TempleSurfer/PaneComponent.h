@@ -6,17 +6,13 @@ using tigl::Vertex;
 
 #include <vector>
 
-#define FLOOR_WIDTH 10.0f
-#define FLOOR_LENGTH 30.0f
-#define FLOOR_OVERLAP 0.001f
-
-class FloorComponent : public DrawComponent
+class PaneComponent : public DrawComponent
 {
 	std::vector<Vertex> verts;
 
 public:
-	FloorComponent();
-	~FloorComponent();
+	PaneComponent(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 v4, glm::vec4 color);
+	~PaneComponent();
 
 	virtual void draw() override;
 };

@@ -69,11 +69,17 @@
     <ClCompile Include="ChunkGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OBJComponent.cpp">
+    <ClCompile Include="Presets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PaneComponent.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="OBJComponent.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
     <ClCompile Include="TextureComponent.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,11 +131,17 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OBJComponent.h">
+    <ClInclude Include="Presets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PaneComponent.h">
+      <Filter>components</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJComponent.h">
+      <Filter>components</Filter>
+    </ClInclude>
     <ClInclude Include="TextureComponent.h">
-      <Filter>Header Files</Filter>
+      <Filter>components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

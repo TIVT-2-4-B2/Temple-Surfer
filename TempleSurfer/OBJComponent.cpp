@@ -265,7 +265,7 @@ OBJComponent::~OBJComponent(void)
 
 void OBJComponent::draw()
 {
-	std::cout << "Frame" << std::endl;
+	//std::cout << "Frame" << std::endl;
 	tigl::shader->enableTexture(true);
 
 	tigl::begin(GL_TRIANGLES);

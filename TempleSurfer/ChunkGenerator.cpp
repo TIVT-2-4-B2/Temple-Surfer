@@ -2,6 +2,8 @@
 
 #include "FloorComponent.h"
 #include "CubeComponent.h"
+#include "TextureComponent.h"
+#include "Presets.h"
 #include <chrono>
 
 using enum ChunkObstacle;
@@ -39,10 +41,7 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	std::list<std::shared_ptr<GameObject>> gameObjects;
 
 	// Adding in the floor
-	std::shared_ptr<GameObject> floor = std::make_shared<GameObject>();
-	floor->position = glm::vec3(0, 0, 0);
-	floor->addComponent(std::make_shared<FloorComponent>());
-	gameObjects.push_back(floor);
+	AddFloor(gameObjects);
 	float xPos;
 	float zPos;
 	// Adding in the generated config.
