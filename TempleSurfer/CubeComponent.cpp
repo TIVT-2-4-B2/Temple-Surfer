@@ -1,4 +1,6 @@
 #include "CubeComponent.h"
+#include "TextureComponent.h"
+#include "GameObject.h"
 
 CubeComponent::CubeComponent(glm::vec3 dimensions, glm::vec4 color)
 {
@@ -49,5 +51,12 @@ CubeComponent::~CubeComponent()
 
 void CubeComponent::draw()
 {
+	std::shared_ptr<TextureComponent> tex = gameObject->getComponent<TextureComponent>();
+	if (tex != NULL)
+	{
+		tigl::shader->enableTexture(true);
+		tex->bind();
+	}
 	tigl::drawVertices(GL_QUADS, verts);
+	tigl::shader->enableTexture(false);
 }

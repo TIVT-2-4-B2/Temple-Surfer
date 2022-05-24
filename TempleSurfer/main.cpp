@@ -15,6 +15,7 @@ using tigl::Vertex;
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CubeComponent.h"
+#include "TextureComponent.h"
 #include "MoveToComponent.h"
 #include "SpinComponent.h"
 #include "TimerJumper.h"
@@ -106,6 +107,8 @@ void init()
 	tigl::shader->setLightAmbient(0, glm::vec3(0.5f, 0.5f, 0.5f));
 	tigl::shader->setLightDiffuse(0, glm::vec3(0.5f, 0.5f, 0.5f));
 	tigl::shader->setLightSpecular(0, glm::vec3(1,1,1));
+	//tigl::shader->setFogColor(glm::vec3(0.3f, 0.4f, 0.6f));
+	tigl::shader->setFogExp2(0.04f);
 	tigl::shader->setShinyness(0);
 
 	createScene();
@@ -158,6 +161,7 @@ void createScene() {
 	//Add components to player object
 	player->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(r, g, b, 1)));
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
+	player->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));
 	player->addComponent(std::make_shared<PlayerComponent>());
 	scene->addGameObject(player);
 
@@ -213,6 +217,7 @@ void drawMenu()
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);
+	tigl::shader->enableFog(false);
 
 	//Draw orange quad for menu
 	tigl::begin(GL_QUADS);
@@ -226,6 +231,7 @@ void drawMenu()
 //Draw the game scene
 void draw()
 {
+	tigl::shader->enableFog(true);
 	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

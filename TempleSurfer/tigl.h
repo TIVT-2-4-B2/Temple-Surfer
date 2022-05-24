@@ -62,7 +62,8 @@ namespace tigl
 			// Enables alpha testing. Will stop rendering everything with a low alpha value
 			virtual void enableAlphaTest(bool enabled) = 0;
 
-			// Enables fog
+			// Enables 
+
 			virtual void enableFog(bool enabled) = 0;
 
 			// Sets the fog to linear

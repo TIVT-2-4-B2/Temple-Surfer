@@ -200,7 +200,7 @@ uniform bool useAlphaTest = false;
 uniform bool useFog = false;
 //parameters
 uniform vec4 colorMult = vec4(1,1,1,1);
-uniform vec3 fogColor = vec3(1.0);
+uniform vec3 fogColor = vec3(0.3f, 0.4f, 0.6f);
 uniform vec3 cameraPosition;
 
 uniform int fogType = 0;
