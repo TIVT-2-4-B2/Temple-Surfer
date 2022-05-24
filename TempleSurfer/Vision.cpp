@@ -48,8 +48,7 @@ void Vision::visionUpdate() {
         return;
     }
 
-#define VISIONDEBUG
-#ifdef VISIONDEBUG
+#ifdef VIS_DEBUG
     //Show all detected faces
     for (int i = 0; i < faces.size(); i++)
     {
@@ -66,10 +65,8 @@ void Vision::visionUpdate() {
     line(img, Point(xd, yd), Point(xd, yd), Scalar(0, 255, 0), 50);
 
     //Debug for face coordinates
-    //std::cout << "X:" << xd << " Y:" << yd << std::endl;
-#endif // VISIONDEBUG
-
-
+    std::cout << "X:" << xd << " Y:" << yd << std::endl;
+#endif // VIS_DEBUG
 
     imshow("Image", img);
     waitKey(1);
