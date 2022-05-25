@@ -12,6 +12,6 @@ public:
 
 	virtual void update(float elapsedTime) {};
 
-	inline void setGameObject(GameObject* gameObject) { this->gameObject = gameObject; }
+	inline void setGameObject(GameObject* gameObject) { this->gameObject = gameObject; };
 };
 

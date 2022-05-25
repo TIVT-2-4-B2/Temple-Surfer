@@ -18,27 +18,32 @@ void ChunkGenerator::generatorInit()
 
 	// Loading all the possible presets
 	std::string line;
-  	std::ifstream presetFile ("presets.txt");
+  	std::ifstream presetFile ("Resources/Presets.txt");
+	int iteration = 1;
+	
   	if (presetFile.is_open())
   	{
-		int itteration = 1;
+		
 		ChunkPreset preset;
     	while ( getline (presetFile,line) )
     	{
-			if (itteration % 4 != 0)
+			
+			if (iteration % 4 != 0)
 			{
 				int presetValue = stoi(line.substr(0, 1));
-				preset.obstacles[itteration - 1][0] = getObstacleFromInt(presetValue);
-				int presetValue = stoi(line.substr(2, 1));
-				preset.obstacles[itteration - 1][1] = getObstacleFromInt(presetValue);
-				int presetValue = stoi(line.substr(4, 1));
-				preset.obstacles[itteration - 1][2] = getObstacleFromInt(presetValue);
+				preset.obstacles[iteration - 1][0] = getObstacleFromInt(presetValue);
+				presetValue = stoi(line.substr(2, 1));
+				preset.obstacles[iteration - 1][1] = getObstacleFromInt(presetValue);
+				presetValue = stoi(line.substr(4, 1));
+				preset.obstacles[iteration - 1][2] = getObstacleFromInt(presetValue);
+				iteration++;
 			}
 			else
 			{
 				presets.push_back(preset);
+				iteration++;
 			}
-			itteration++;
+			iteration++;
     	}
     	presetFile.close();
   	}
@@ -103,7 +108,7 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	return chunkPointer;
 }
 
-ChunkObstacle::getObstacleFromInt(int index)
+ChunkObstacle ChunkGenerator::getObstacleFromInt(int index)
 {
 	switch (index)
 	{
@@ -117,3 +122,4 @@ ChunkObstacle::getObstacleFromInt(int index)
 		return DUCK;
 	}
 }
+

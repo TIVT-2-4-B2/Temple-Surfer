@@ -26,5 +26,5 @@ private:
 	std::vector<ChunkPreset> presets;
 
 	std::shared_ptr<GameChunk> buildChunk(ChunkPreset preset);
-	ChunkObstacle::getObstacleFromInt(int index)
+	ChunkObstacle getObstacleFromInt(int index);
 };
