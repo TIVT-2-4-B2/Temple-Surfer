@@ -27,7 +27,7 @@ void ChunkGenerator::generatorInit()
 	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
 					{{BLOCK},{BLOCK},{NONE}},
 					{{JUMP},{NONE},{JUMP}}} });
-	presets.push_back({ {{{BLOCK},{JUMP},{NONE}}, //first
+	presets.push_back({ {{{BLOCK},{JUMP},{NONE}},
 					{{NONE},{NONE},{NONE}},
 					{{NONE},{DUCK},{BLOCK}}} });
 	presets.push_back({ {{{BLOCK},{NONE},{BLOCK}},
