@@ -8,7 +8,7 @@
 
 #include "PlayerComponent.h"
 
-#define VIS_DEBUG
+//#define VIS_DEBUG
 
 using namespace cv;
 
