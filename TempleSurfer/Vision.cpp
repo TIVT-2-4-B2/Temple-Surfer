@@ -8,6 +8,8 @@
 
 #include "PlayerComponent.h"
 
+//#define VIS_DEBUG
+
 using namespace cv;
 
 VideoCapture cap(0);
@@ -64,7 +66,17 @@ void Vision::visionUpdate() {
     line(img, Point(xd, yd), Point(xd, yd), Scalar(0, 255, 0), 50);
 
     //Debug for face coordinates
-    std::cout << "X:" << xd << " Y:" << yd << std::endl;
+    //std::cout << "X:" << xd << " Y:" << yd << std::endl;
+
+    //Drawing boundary lines
+    //Horizontal
+    line(img, Point(0, 175), Point(650, 175), Scalar(0, 0, 255), 5); 
+    line(img, Point(0, 290), Point(650, 290), Scalar(0, 0, 255), 5);
+
+    //Vertical
+    line(img, Point(225, 0), Point(225, 500), Scalar(0, 0, 255), 5);
+    line(img, Point(415, 0), Point(415, 500), Scalar(0, 0, 255), 5);
+
 #endif // VIS_DEBUG
 
     imshow("Image", img);
