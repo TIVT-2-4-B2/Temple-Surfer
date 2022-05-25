@@ -7,9 +7,12 @@
 #include <Memory>
 #include <Vector>
 #include <glm/glm.hpp>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 class OBJComponent : public DrawComponent {
 private:
+	// Used to create the vertex list for VBO
 	class VertexIndex
 	{
 	public:
@@ -31,12 +34,14 @@ private:
 		std::shared_ptr<TextureComponent> texture;
 	};
 
+	// Used for rendering the VBO.
 	class ObjGroup
 	{
 	public:
 		std::string name;
 		int materialIndex;
 		std::list<FaceCollection> faces;
+		VBO* vbo;
 	};
 
 
