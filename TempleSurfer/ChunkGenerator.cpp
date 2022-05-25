@@ -19,31 +19,23 @@ void ChunkGenerator::generatorInit()
 	// Loading all the possible presets
 	std::string line;
   	std::ifstream presetFile ("Resources/Presets.txt");
-	int iteration = 1;
 	
   	if (presetFile.is_open())
   	{
-		
 		ChunkPreset preset;
     	while ( getline (presetFile,line) )
     	{
 			
-			if (iteration % 4 != 0)
+			for (int i = 0; i < 3; i++)
 			{
-				int presetValue = stoi(line.substr(0, 1));
-				preset.obstacles[iteration - 1][0] = getObstacleFromInt(presetValue);
-				presetValue = stoi(line.substr(2, 1));
-				preset.obstacles[iteration - 1][1] = getObstacleFromInt(presetValue);
-				presetValue = stoi(line.substr(4, 1));
-				preset.obstacles[iteration - 1][2] = getObstacleFromInt(presetValue);
-				iteration++;
+				int presetValue = stoi(line.substr(6 * i, 1));
+				preset.obstacles[i][0] = getObstacleFromInt(presetValue);
+				presetValue = stoi(line.substr(6 * i + 2, 1));
+				preset.obstacles[i][1] = getObstacleFromInt(presetValue);
+				presetValue = stoi(line.substr(6 * i + 4, 1));
+				preset.obstacles[i][2] = getObstacleFromInt(presetValue);
 			}
-			else
-			{
-				presets.push_back(preset);
-				iteration++;
-			}
-			iteration++;
+			presets.push_back(preset);
     	}
     	presetFile.close();
   	}
