@@ -5,6 +5,9 @@
 #include "TextureComponent.h"
 #include "Presets.h"
 #include <chrono>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 using enum ChunkObstacle;
 
@@ -14,19 +17,40 @@ void ChunkGenerator::generatorInit()
 	srand(std::chrono::system_clock::now().time_since_epoch().count());
 
 	// Loading all the possible presets
-	// TODO make with file IO. Temp solution right here..
-	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-				{{BLOCK},{BLOCK},{NONE}},
-				{{NONE},{NONE},{DUCK}}}});
-	presets.push_back({ {{{NONE},{NONE},{BLOCK}},
-			{{BLOCK},{NONE},{NONE}},
-			{{NONE},{NONE},{BLOCK}}} });
-	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-			{{NONE},{BLOCK},{BLOCK}},
-			{{NONE},{NONE},{BLOCK}}} });
-	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-			{{BLOCK},{BLOCK},{NONE}},
-			{{JUMP},{NONE},{JUMP}}} });
+	std::string line;
+  	std::ifstream presetFile ("Resources/Presets.txt");
+	
+  	if (presetFile.is_open())
+  	{
+		ChunkPreset preset;
+    	while ( getline (presetFile,line) )
+    	{
+			
+			for (int i = 0; i < 3; i++)
+			{
+				int presetValue = stoi(line.substr(6 * i, 1));
+				preset.obstacles[i][0] = getObstacleFromInt(presetValue);
+				presetValue = stoi(line.substr(6 * i + 2, 1));
+				preset.obstacles[i][1] = getObstacleFromInt(presetValue);
+				presetValue = stoi(line.substr(6 * i + 4, 1));
+				preset.obstacles[i][2] = getObstacleFromInt(presetValue);
+			}
+			presets.push_back(preset);
+    	}
+    	presetFile.close();
+  	}
+  	else
+	{
+		presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
+						{{BLOCK},{BLOCK},{NONE}},
+						{{NONE},{NONE},{DUCK}}}});
+		presets.push_back({ {{{NONE},{NONE},{BLOCK}},
+						{{BLOCK},{NONE},{NONE}},
+						{{NONE},{NONE},{BLOCK}}} });
+		presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
+						{{NONE},{BLOCK},{BLOCK}},
+						{{NONE},{NONE},{BLOCK}}} });
+	}
 }
 
 std::shared_ptr<GameChunk> ChunkGenerator::getChunk()
@@ -75,3 +99,19 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	std::shared_ptr<GameChunk> chunkPointer = std::make_shared<GameChunk>(gameObjects, glm::vec3(0, 0, Z_THRESHOLD - (CHUNKS_ON_SCREEN * FLOOR_LENGTH)));
 	return chunkPointer;
 }
+
+ChunkObstacle ChunkGenerator::getObstacleFromInt(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return NONE;
+	case 1:
+		return BLOCK;
+	case 2:
+		return JUMP;
+	case 3:
+		return DUCK;
+	}
+}
+
