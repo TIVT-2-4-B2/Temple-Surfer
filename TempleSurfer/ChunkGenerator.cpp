@@ -16,17 +16,29 @@ void ChunkGenerator::generatorInit()
 	// Loading all the possible presets
 	// TODO make with file IO. Temp solution right here..
 	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-				{{BLOCK},{BLOCK},{NONE}},
-				{{NONE},{NONE},{DUCK}}}});
+					{{BLOCK},{BLOCK},{NONE}},
+					{{NONE},{NONE},{DUCK}}}});
 	presets.push_back({ {{{NONE},{NONE},{BLOCK}},
-			{{BLOCK},{NONE},{NONE}},
-			{{NONE},{NONE},{BLOCK}}} });
+					{{BLOCK},{NONE},{NONE}},
+					{{NONE},{NONE},{BLOCK}}} });
 	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-			{{NONE},{BLOCK},{BLOCK}},
-			{{NONE},{NONE},{BLOCK}}} });
+					{{NONE},{BLOCK},{BLOCK}},
+					{{NONE},{NONE},{BLOCK}}} });
 	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-			{{BLOCK},{BLOCK},{NONE}},
-			{{JUMP},{NONE},{JUMP}}} });
+					{{BLOCK},{BLOCK},{NONE}},
+					{{JUMP},{NONE},{JUMP}}} });
+	presets.push_back({ {{{BLOCK},{JUMP},{NONE}}, //first
+					{{NONE},{NONE},{NONE}},
+					{{NONE},{DUCK},{BLOCK}}} });
+	presets.push_back({ {{{BLOCK},{NONE},{BLOCK}},
+					{{NONE},{DUCK},{BLOCK}},
+					{{BLOCK},{NONE},{NONE}}} });
+	presets.push_back({ {{{JUMP},{BLOCK},{NONE}},
+					{{NONE},{BLOCK},{NONE}},
+					{{NONE},{BLOCK},{JUMP}}} });
+	presets.push_back({ {{{BLOCK},{JUMP},{BLOCK}},
+					{{NONE},{NONE},{NONE}},
+					{{NONE},{BLOCK},{NONE}}} });
 }
 
 std::shared_ptr<GameChunk> ChunkGenerator::getChunk()
