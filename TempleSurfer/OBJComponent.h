@@ -41,7 +41,7 @@ private:
 		std::string name;
 		int materialIndex;
 		std::list<FaceCollection> faces;
-		VBO* vbo;
+	/*	VBO* vbo;*/
 	};
 
 
