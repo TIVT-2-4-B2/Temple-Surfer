@@ -5,6 +5,9 @@
 #include "TextureComponent.h"
 #include "Presets.h"
 #include <chrono>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 using enum ChunkObstacle;
 
@@ -14,31 +17,43 @@ void ChunkGenerator::generatorInit()
 	srand(std::chrono::system_clock::now().time_since_epoch().count());
 
 	// Loading all the possible presets
-	// TODO make with file IO. Temp solution right here..
-	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-					{{BLOCK},{BLOCK},{NONE}},
-					{{NONE},{NONE},{DUCK}}}});
-	presets.push_back({ {{{NONE},{NONE},{BLOCK}},
-					{{BLOCK},{NONE},{NONE}},
-					{{NONE},{NONE},{BLOCK}}} });
-	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-					{{NONE},{BLOCK},{BLOCK}},
-					{{NONE},{NONE},{BLOCK}}} });
-	presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
-					{{BLOCK},{BLOCK},{NONE}},
-					{{JUMP},{NONE},{JUMP}}} });
-	presets.push_back({ {{{BLOCK},{JUMP},{NONE}},
-					{{NONE},{NONE},{NONE}},
-					{{NONE},{DUCK},{BLOCK}}} });
-	presets.push_back({ {{{BLOCK},{NONE},{BLOCK}},
-					{{NONE},{DUCK},{BLOCK}},
-					{{BLOCK},{NONE},{NONE}}} });
-	presets.push_back({ {{{JUMP},{BLOCK},{NONE}},
-					{{NONE},{BLOCK},{NONE}},
-					{{NONE},{BLOCK},{JUMP}}} });
-	presets.push_back({ {{{BLOCK},{JUMP},{BLOCK}},
-					{{NONE},{NONE},{NONE}},
-					{{NONE},{BLOCK},{NONE}}} });
+	std::string line;
+  	std::ifstream presetFile ("presets.txt");
+  	if (presetFile.is_open())
+  	{
+		int itteration = 1;
+		ChunkPreset preset;
+    	while ( getline (presetFile,line) )
+    	{
+			if (itteration % 4 != 0)
+			{
+				int presetValue = stoi(line.substr(0, 1));
+				preset.obstacles[itteration - 1][0] = getObstacleFromInt(presetValue);
+				int presetValue = stoi(line.substr(2, 1));
+				preset.obstacles[itteration - 1][1] = getObstacleFromInt(presetValue);
+				int presetValue = stoi(line.substr(4, 1));
+				preset.obstacles[itteration - 1][2] = getObstacleFromInt(presetValue);
+			}
+			else
+			{
+				presets.push_back(preset);
+			}
+			itteration++;
+    	}
+    	presetFile.close();
+  	}
+  	else
+	{
+		presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
+						{{BLOCK},{BLOCK},{NONE}},
+						{{NONE},{NONE},{DUCK}}}});
+		presets.push_back({ {{{NONE},{NONE},{BLOCK}},
+						{{BLOCK},{NONE},{NONE}},
+						{{NONE},{NONE},{BLOCK}}} });
+		presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
+						{{NONE},{BLOCK},{BLOCK}},
+						{{NONE},{NONE},{BLOCK}}} });
+	}
 }
 
 std::shared_ptr<GameChunk> ChunkGenerator::getChunk()
@@ -86,4 +101,19 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	// Filling the chunk
 	std::shared_ptr<GameChunk> chunkPointer = std::make_shared<GameChunk>(gameObjects, glm::vec3(0, 0, Z_THRESHOLD - (CHUNKS_ON_SCREEN * FLOOR_LENGTH)));
 	return chunkPointer;
+}
+
+ChunkObstacle::getObstacleFromInt(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return NONE;
+	case 1:
+		return BLOCK;
+	case 2:
+		return JUMP;
+	case 3:
+		return DUCK;
+	}
 }
