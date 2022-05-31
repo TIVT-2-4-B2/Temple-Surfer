@@ -144,7 +144,7 @@ void init()
 	update();
 
 }
-
+#define FPS_DEBUG
 //Update everything in the scene
 void update()
 {
