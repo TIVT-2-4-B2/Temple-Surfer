@@ -275,12 +275,13 @@ OBJComponent::~OBJComponent()
 
 void OBJComponent::draw()
 {
-	// Enabling textures because standard disabled
-	tigl::shader->enableTexture(true);
-
 	// Looping through list of obj-groups
 	for (std::shared_ptr<ObjectGroup> group : groups) {
-		materials.at(group->materialIndex)->texture->bind();
+		if (materials.at(group->materialIndex)->texture != nullptr) {
+			// Enabling textures because standard disabled
+			tigl::shader->enableTexture(true);
+			materials.at(group->materialIndex)->texture->bind();
+		}
 		if (group->bufferedObjectVertices != nullptr)
 			tigl::drawVertices(GL_TRIANGLES, group->bufferedObjectVertices);
 	}
