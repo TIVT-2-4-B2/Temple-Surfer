@@ -191,11 +191,6 @@ namespace tigl
 		}
 	}
 
-
-
-
-
-
 	ShaderImpl::ShaderImpl()
 	{
 		this->programId = glCreateProgram();
@@ -238,7 +233,7 @@ uniform bool useAlphaTest = false;
 uniform bool useFog = false;
 //parameters
 uniform vec4 colorMult = vec4(1,1,1,1);
-uniform vec3 fogColor = vec3(1.0);
+uniform vec3 fogColor = vec3(1.0f);
 uniform vec3 cameraPosition;
 
 uniform int fogType = 0;
@@ -510,9 +505,4 @@ void main()
 	{
 		return position == other.position && normal == other.normal && color == other.color && texcoord == other.texcoord;
 	}
-
-
-
-
-
 }
