@@ -9,49 +9,34 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "tigl.h"
 
 class OBJComponent : public DrawComponent {
 private:
-	// Used to create the vertex list for VBO
-	class VertexIndex
-	{
+	// This holds the vertices.
+	class ObjectGroup {
 	public:
-		int position;
-		int normal;
-		int texcoord;
+		std::string name;					// Object group name
+		tigl::VBO* bufferedObjectVertices;	// List of vertices
+		int materialIndex;					// Index for the texture file
 	};
 
-	class FaceCollection
-	{
-	public:
-		std::list<VertexIndex> vertices;
-	};
-	class MaterialInfo
-	{
+	// Holds the texture data.
+	class MaterialInfo {
 	public:
 		MaterialInfo();
 		std::string name;
 		std::shared_ptr<TextureComponent> texture;
 	};
 
-	// Used for rendering the VBO.
-	class ObjGroup
-	{
-	public:
-		std::string name;
-		int materialIndex;
-		std::list<FaceCollection> faces;
-	/*	VBO* vbo;*/
-	};
-
-
-	std::vector<glm::vec3>	vertices;
-	std::vector<glm::vec3>	normals;
-	std::vector<glm::vec2>	texcoords;
-	std::vector<std::shared_ptr<ObjGroup>> groups;
+	// Holds the object
+	std::vector<std::shared_ptr<ObjectGroup>> groups;
 	std::vector<std::shared_ptr<MaterialInfo>> materials;
 
+	// Loads in the texture data.
 	void loadMaterialFile(const std::string& fileName, const std::string& dirName);
+
+public:
 
 public:
 	OBJComponent(const std::string& fileName);

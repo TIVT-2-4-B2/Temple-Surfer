@@ -1,13 +1,8 @@
 #include "OBJComponent.h"
-#include <fstream>
 #include <iostream>
-#include <vector>
+#include <fstream>
+#include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
-#include <memory>
-#include <list>
-#include "tigl.h"
-#include "TextureComponent.h"
-
 
 /**
 * Replaces a substring in a string
@@ -74,11 +69,9 @@ static inline std::string cleanLine(std::string line)
 	return line;
 }
 
-OBJComponent::MaterialInfo::MaterialInfo()
-{
-	texture = NULL;
-}
-
+/**
+* Reads a material file
+*/
 void OBJComponent::loadMaterialFile(const std::string& fileName, const std::string& dirName)
 {
 	std::cout << "Loading " << fileName << std::endl;
@@ -118,19 +111,9 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 				tex = tex.substr(tex.rfind("/") + 1);
 			if (tex.find("\\"))
 				tex = tex.substr(tex.rfind("\\") + 1);
-			//TODO
 			if (currentMaterial != NULL) {
 				currentMaterial->texture = std::make_shared<TextureComponent>(dirName + "/" + tex);
 			}
-		}
-		else if (params[0] == "kd")
-		{//TODO, diffuse color
-		}
-		else if (params[0] == "ka")
-		{//TODO, ambient color
-		}
-		else if (params[0] == "ks")
-		{//TODO, specular color
 		}
 		else if (
 			params[0] == "illum" ||
@@ -145,6 +128,9 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 			params[0] == "td" ||
 			params[0] == "tf" ||
 			params[0] == "tr" ||
+			params[0] == "ka" ||
+			params[0] == "kd" ||
+			params[0] == "ks" ||
 			false)
 		{
 			//these values are usually not used for rendering at this time, so ignore them
@@ -156,8 +142,10 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 		materials.push_back(currentMaterial);
 }
 
-OBJComponent::OBJComponent(const std::string& fileName)
+
+OBJComponent::OBJComponent(const std::string& fileName) 
 {
+	// Checking wheter the file actually exists
 	std::cout << "Loading " << fileName << std::endl;
 	std::string dirName = fileName;
 	if (dirName.rfind("/") != std::string::npos)
@@ -167,7 +155,7 @@ OBJComponent::OBJComponent(const std::string& fileName)
 	if (fileName == dirName)
 		dirName = "";
 
-
+	// Opening file
 	std::ifstream pFile(fileName.c_str());
 
 	if (!pFile.is_open())
@@ -176,10 +164,15 @@ OBJComponent::OBJComponent(const std::string& fileName)
 		return;
 	}
 
-
-	std::shared_ptr<ObjGroup> currentGroup = std::make_shared<ObjGroup>();
+	// The object groups.
+	std::shared_ptr<ObjectGroup> currentGroup = std::make_shared<ObjectGroup>();
 	currentGroup->materialIndex = -1;
 
+	// Information for building the object
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec2> texcoords;
+	std::vector<tigl::Vertex> renderData;
 
 	while (!pFile.eof())
 	{
@@ -192,39 +185,40 @@ OBJComponent::OBJComponent(const std::string& fileName)
 		std::vector<std::string> params = split(line, " ");
 		params[0] = toLower(params[0]);
 
+		// Location coordinate
 		if (params[0] == "v")
 			vertices.push_back(glm::vec3((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str())));
+		// Normal coordinate
 		else if (params[0] == "vn")
 			normals.push_back(glm::vec3((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str())));
+		// Texture coordinate
 		else if (params[0] == "vt")
 			texcoords.push_back(glm::vec2((float)atof(params[1].c_str()), 1 - (float)atof(params[2].c_str())));
+
+		// Structure data
 		else if (params[0] == "f")
 		{
 			for (size_t ii = 4; ii <= params.size(); ii++)
 			{
-				FaceCollection face;
-
-				for (size_t i = ii - 3; i < ii; i++)	//magische forlus om van quads triangles te maken ;)
+				for (size_t i = ii - 3; i < ii; i++)
 				{
-					VertexIndex vertex;
+					int position;
+					int normal;
+					int texcoord;
 					std::vector<std::string> indices = split(params[i == (ii - 3) ? 1 : i], "/");
 					if (indices.size() >= 1)	//er is een positie
-						vertex.position = atoi(indices[0].c_str()) - 1;
+						position = atoi(indices[0].c_str()) - 1;
 					if (indices.size() == 2)		//alleen texture
-						vertex.texcoord = atoi(indices[1].c_str()) - 1;
+						texcoord = atoi(indices[1].c_str()) - 1;
 					if (indices.size() == 3)		//v/t/n of v//n
 					{
 						if (indices[1] != "")
-							vertex.texcoord = atoi(indices[1].c_str()) - 1;
-						vertex.normal = atoi(indices[2].c_str()) - 1;
+							texcoord = atoi(indices[1].c_str()) - 1;
+						normal = atoi(indices[2].c_str()) - 1;
 					}
-					face.vertices.push_back(vertex);
+					renderData.push_back(tigl::Vertex::PTN(vertices.at(position), texcoords.at(texcoord), normals.at(normal)));
 				}
-				currentGroup->faces.push_back(face);
 			}
-		}
-		else if (params[0] == "s")
-		{//smoothing groups
 		}
 		else if (params[0] == "mtllib")
 		{
@@ -232,9 +226,16 @@ OBJComponent::OBJComponent(const std::string& fileName)
 		}
 		else if (params[0] == "usemtl")
 		{
-			if (currentGroup->faces.size() != 0)
-				groups.push_back(currentGroup);
-			currentGroup = std::make_shared<ObjGroup>();
+			if (renderData.size() > 0) {
+				std::cout << "Adding to groups";
+				currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
+				if (currentGroup->bufferedObjectVertices != nullptr) {
+					groups.push_back(currentGroup);
+					renderData.clear();
+				}
+			}
+
+			currentGroup = std::make_shared<ObjectGroup>();
 			currentGroup->materialIndex = -1;
 
 			for (size_t i = 0; i < materials.size(); i++)
@@ -250,8 +251,17 @@ OBJComponent::OBJComponent(const std::string& fileName)
 				std::cout << "Could not find material name " << params[1] << std::endl;
 		}
 	}
-	groups.push_back(currentGroup);
 
+	if (renderData.size() > 0) {
+		std::cout << "Adding to groups";
+		currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
+		if (currentGroup->bufferedObjectVertices != nullptr) {
+			groups.push_back(currentGroup);
+			renderData.clear();
+		}
+	}
+
+	// Printing debug information 
 	std::cout << "Amount of vertices: " << vertices.size() << std::endl;
 	std::cout << "Amount of normals: " << normals.size() << std::endl;
 	std::cout << "Amount of textures: " << materials.size() << std::endl;
@@ -259,26 +269,27 @@ OBJComponent::OBJComponent(const std::string& fileName)
 	std::cout << "Amount of groups: " << groups.size() << std::endl;
 }
 
-OBJComponent::~OBJComponent(void)
+OBJComponent::~OBJComponent()
 {
 }
 
 void OBJComponent::draw()
 {
-	//std::cout << "Frame" << std::endl;
+	// Enabling textures because standard disabled
 	tigl::shader->enableTexture(true);
 
-	tigl::begin(GL_TRIANGLES);
-	for (std::shared_ptr<ObjGroup> group : groups) {
-		std::shared_ptr<MaterialInfo> matinfo = materials.at(group->materialIndex);
-		matinfo->texture->bind();
-		for (FaceCollection face : group->faces) {
-			for (VertexIndex vert : face.vertices) {
-				tigl::addVertex(tigl::Vertex::PTN(vertices.at(vert.position), texcoords.at(vert.texcoord), normals.at(vert.normal)));
-			}
-		}
+	// Looping through list of obj-groups
+	for (std::shared_ptr<ObjectGroup> group : groups) {
+		materials.at(group->materialIndex)->texture->bind();
+		if (group->bufferedObjectVertices != nullptr)
+			tigl::drawVertices(GL_TRIANGLES, group->bufferedObjectVertices);
 	}
-	tigl::end();
 
+	// Disabling textures else components with colors will get textures
 	tigl::shader->enableTexture(false);
+}
+
+OBJComponent::MaterialInfo::MaterialInfo()
+{
+	texture = NULL;
 }
