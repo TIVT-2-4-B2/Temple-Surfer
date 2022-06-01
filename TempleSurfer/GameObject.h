@@ -5,6 +5,8 @@
 #include <list>
 #include <memory>
 
+#define COLLISION_DEBUG
+
 class Component;
 class DrawComponent;
 class BoundingBoxComponent;
@@ -26,6 +28,7 @@ public:
 	void addComponent(std::shared_ptr<Component> component);
 	std::list<std::shared_ptr<Component>> getComponents();
 	void update(float elapsedTime);
+	void update(float elapsedTime, const glm::vec3& parentMatrix);
 	void draw(const glm::mat4& = glm::mat4(1.0f));
 
 

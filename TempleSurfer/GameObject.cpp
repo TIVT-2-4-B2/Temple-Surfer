@@ -29,7 +29,7 @@ std::list<std::shared_ptr<Component>> GameObject::getComponents()
 }
 
 
-void GameObject::draw(const glm::mat4 &parentMatrix)
+void GameObject::draw(const glm::mat4& parentMatrix)
 {
 	if (!drawComponent)
 		return;
@@ -40,13 +40,29 @@ void GameObject::draw(const glm::mat4 &parentMatrix)
 	modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0, 1, 0));
 	modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0, 0, 1));
 	modelMatrix = glm::scale(modelMatrix, scale);
-	
+
 	tigl::shader->setModelMatrix(modelMatrix);
+
+#ifdef COLLISION_DEBUG
+	for (auto& c : components) {
+		std::shared_ptr<DrawComponent> dc = dynamic_pointer_cast<DrawComponent>(c);
+		if (dc != nullptr)
+			dc->draw();
+	}
+#else	
 	drawComponent->draw();
+#endif
+
 }
 
 void GameObject::update(float elapsedTime)
 {
-	for (auto &c : components)
+	for (auto& c : components)
 		c->update(elapsedTime);
+}
+
+void GameObject::update(float elapsedTime, const glm::vec3& parentMatrix)
+{
+	for (auto& c : components)
+		c->update(elapsedTime, parentMatrix);
 }

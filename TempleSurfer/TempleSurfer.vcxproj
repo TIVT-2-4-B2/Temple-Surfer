@@ -167,6 +167,7 @@
   <ItemGroup>
     <ClCompile Include="BoundingBoxComponent.cpp" />
     <ClCompile Include="ChunkGenerator.cpp" />
+    <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="CubeComponent.cpp" />
     <ClCompile Include="DrawComponent.cpp" />
@@ -190,6 +191,7 @@
   <ItemGroup>
     <ClInclude Include="BoundingBoxComponent.h" />
     <ClInclude Include="ChunkGenerator.h" />
+    <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="CubeComponent.h" />
     <ClInclude Include="DrawComponent.h" />

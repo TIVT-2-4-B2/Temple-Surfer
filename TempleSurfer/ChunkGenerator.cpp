@@ -3,6 +3,7 @@
 #include "FloorComponent.h"
 #include "CubeComponent.h"
 #include "TextureComponent.h"
+#include "CollisionComponent.h"
 #include "Presets.h"
 #include <chrono>
 #include <iostream>

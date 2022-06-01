@@ -27,6 +27,9 @@ private:
 		MaterialInfo();
 		std::string name;
 		std::shared_ptr<TextureComponent> texture;
+		glm::vec4 specular;
+		glm::vec4 ambient;
+		glm::vec4 diffuse;
 	};
 
 	// Holds the object
