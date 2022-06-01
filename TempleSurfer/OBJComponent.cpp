@@ -115,6 +115,18 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 				currentMaterial->texture = std::make_shared<TextureComponent>(dirName + "/" + tex);
 			}
 		}
+		else if (params[0] == "kd")
+		{
+			currentMaterial->diffuse = glm::vec4((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str()), 1.0f);
+		}
+		else if (params[0] == "ka")
+		{
+			currentMaterial->ambient = glm::vec4((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str()), 1.0f);
+		}
+		else if (params[0] == "ks")
+		{
+			currentMaterial->specular = glm::vec4((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str()), 1.0f);
+		}
 		else if (
 			params[0] == "illum" ||
 			params[0] == "map_bump" ||
@@ -128,9 +140,6 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 			params[0] == "td" ||
 			params[0] == "tf" ||
 			params[0] == "tr" ||
-			params[0] == "ka" ||
-			params[0] == "kd" ||
-			params[0] == "ks" ||
 			false)
 		{
 			//these values are usually not used for rendering at this time, so ignore them
@@ -216,7 +225,7 @@ OBJComponent::OBJComponent(const std::string& fileName)
 							texcoord = atoi(indices[1].c_str()) - 1;
 						normal = atoi(indices[2].c_str()) - 1;
 					}
-					renderData.push_back(tigl::Vertex::PTN(vertices.at(position), texcoords.at(texcoord), normals.at(normal)));
+					renderData.push_back(tigl::Vertex::PCTN(vertices.at(position), materials.at(currentGroup->materialIndex)->diffuse, texcoords.at(texcoord), normals.at(normal)));
 				}
 			}
 		}
@@ -227,7 +236,6 @@ OBJComponent::OBJComponent(const std::string& fileName)
 		else if (params[0] == "usemtl")
 		{
 			if (renderData.size() > 0) {
-				std::cout << "Adding to groups";
 				currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
 				if (currentGroup->bufferedObjectVertices != nullptr) {
 					groups.push_back(currentGroup);
@@ -253,7 +261,6 @@ OBJComponent::OBJComponent(const std::string& fileName)
 	}
 
 	if (renderData.size() > 0) {
-		std::cout << "Adding to groups";
 		currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
 		if (currentGroup->bufferedObjectVertices != nullptr) {
 			groups.push_back(currentGroup);
