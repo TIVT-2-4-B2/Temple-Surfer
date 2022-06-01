@@ -13,6 +13,11 @@
 
 class OBJComponent : public DrawComponent {
 private:
+	// Animation data
+	float animationDelay;
+	float animationTime;
+	int animationIndex = 0;
+
 	// This holds the vertices.
 	class ObjectGroup {
 	public:
@@ -32,18 +37,26 @@ private:
 		glm::vec4 diffuse;
 	};
 
-	// Holds the object
-	std::vector<std::shared_ptr<ObjectGroup>> groups;
-	std::vector<std::shared_ptr<MaterialInfo>> materials;
+	// Holds a object file
+	class ObjectFile {
+	public:
+		// Holds the object
+		std::vector<std::shared_ptr<ObjectGroup>> groups;
+		std::vector<std::shared_ptr<MaterialInfo>> materials;
+	};
+	
+	// Holds the information about the object
+	std::vector<std::shared_ptr<ObjectFile>> objectData;
 
 	// Loads in the texture data.
-	void loadMaterialFile(const std::string& fileName, const std::string& dirName);
-
-public:
-
+	void loadObjectFile(const std::string& fileName);
+	void loadMaterialFile(const std::string& fileName, const std::string& dirName, std::shared_ptr<ObjectFile>& file);
+	void objectDrawer(std::shared_ptr<ObjectFile> file);
 public:
 	OBJComponent(const std::string& fileName);
+	OBJComponent(const std::string& folderName, float animationDelay);
 	~OBJComponent();
 
 	virtual void draw() override;
+	virtual void update(float elapsedTime) override;
 };

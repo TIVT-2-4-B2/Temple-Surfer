@@ -325,7 +325,8 @@ void OBJComponent::objectDrawer(std::shared_ptr<ObjectFile> file) {
 
 void OBJComponent::update(float elapsedTime)
 {
-	if ((animationTime += elapsedTime) % animationDelay == 0) {
+	if ((animationTime += elapsedTime) > animationDelay) {
+		animationTime = 0;
 		std::cout << animationIndex << std::endl;
 		animationIndex++;
 		if (animationIndex >= objectData.size()) {
