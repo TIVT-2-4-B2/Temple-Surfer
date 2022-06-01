@@ -29,7 +29,6 @@ using tigl::Vertex;
 #include <iostream>
 #include <thread>
 
-
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
@@ -46,6 +45,14 @@ void drawMenu();
 bool isPlaying = false;
 bool initialized = false;
 
+#define W_WIDTH 1000.0f
+#define W_HEIGHT 800.0f
+
+#define C_WIDTH 300.0f
+#define C_HEIGHT 300.0f
+#define C_XPOS 0.0f
+#define C_YPOS 0.0f
+
 double lastFrameTime = 0;
 
 std::shared_ptr<GameObject> player;
@@ -59,7 +66,7 @@ int main(void)
 	if (!glfwInit()) {
 		throw "Could not initialize glwf";
 	}	
-	window = glfwCreateWindow(1000, 800, "Temple Runner", NULL, NULL);
+	window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "Temple Runner", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -249,4 +256,60 @@ void draw()
 	tigl::shader->enableColor(true);
 
 	scene->draw();
+
+	glDisable(GL_DEPTH_TEST);
+
+	//glMatrixMode(GL_PROJECTION);
+	//glPushMatrix();
+	//glLoadIdentity();
+	// set a 2D orthographic projection
+
+	projection = glm::ortho(0.0f, W_WIDTH, 0.0f, W_HEIGHT, 0.0f, 200.0f);
+	tigl::shader->setProjectionMatrix(projection);
+	//tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
+
+	//gluOrtho2D(0, 256, 0, 144);
+	// invert the y axis, down is positive
+	//glScalef(1, -1, 1);
+	// mover the origin from the bottom left corner
+	// to the upper left corner
+	//glTranslatef(0, -144, 0);
+	//glMatrixMode(GL_MODELVIEW);
+
+	//glm::mat4 matProjection = glm::lookAt(glm::vec3(player->position.x, 7, 12), glm::vec3(player->position.x, 0, 0), glm::vec3(0, 1, 0)) * projection;
+
+	//glm::mat4 matInverse = glm::inverse(matProjection);
+
+
+	//float in[4];
+	//float winZ = 1.0;
+
+	//in[0] = (2.0f * ((float)(0 - 0) / (W_WIDTH - 0))) - 1.0f,
+	//in[1] = 1.0f - (2.0f * ((float)(0 - 0) / (W_HEIGHT - 0)));
+	//in[2] = 2.0 * winZ - 1.0;
+	//in[3] = 1.0;
+
+	//glm::vec4 vIn = glm::vec4(in[0], in[1], in[2], in[3]);
+	//glm::vec4 pos = vIn * matInverse;
+
+	//pos.w = 1.0 / pos.w;
+
+	//pos.x *= pos.w;
+	//pos.y *= pos.w;
+	//pos.z *= pos.w;
+
+	tigl::begin(GL_QUADS);
+	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS, C_YPOS), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS + C_WIDTH, C_YPOS), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS + C_WIDTH, C_YPOS + C_HEIGHT), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS, C_YPOS + C_HEIGHT), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 1), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, 1), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(100, 100, 1), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, 100, 1), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::end();
+
+	glEnable(GL_DEPTH_TEST);
+
 }
