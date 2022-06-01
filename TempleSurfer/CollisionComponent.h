@@ -14,6 +14,6 @@ public:
 	CollisionComponent(glm::vec3 hitbox);
 	~CollisionComponent();
 
-	void intersect(glm::vec3 playerHitbox, glm::vec3 playerPosition);
-    virtual void update(float elapsedTime) override;
+	void intersect(glm::vec3 playerHitbox, glm::vec3 playerPosition, const glm::vec3& parentMatrix);
+    virtual void update(float elapsedTime, const glm::vec3& parentMatrix) override;
 };

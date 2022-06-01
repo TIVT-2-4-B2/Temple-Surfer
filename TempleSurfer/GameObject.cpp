@@ -50,3 +50,9 @@ void GameObject::update(float elapsedTime)
 	for (auto &c : components)
 		c->update(elapsedTime);
 }
+
+void GameObject::update(float elapsedTime, const glm::vec3& parentMatrix)
+{
+	for (auto& c : components)
+		c->update(elapsedTime, parentMatrix);
+}
