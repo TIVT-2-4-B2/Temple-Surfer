@@ -1,7 +1,10 @@
 #pragma once
 
-#include "Component.h"
+#include "DrawComponent.h"
 #include <glm/glm.hpp>
+#include <vector>
+#include "tigl.h"
+using tigl::Vertex;
 
 class CollisionComponent : public DrawComponent
 {

@@ -5,6 +5,8 @@
 #include <list>
 #include <memory>
 
+#define COLLISION_DEBUG
+
 class Component;
 class DrawComponent;
 class BoundingBoxComponent;
