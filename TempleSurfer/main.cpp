@@ -183,7 +183,7 @@ void createScene() {
 
 	//Add components to player object
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
-	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
+	player->addComponent(std::make_shared<OBJComponent>("models/evergiven/EverGiven.obj"));
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
 	player->rotation = glm::vec3(0, -1.57079633f, 0);
