@@ -2,6 +2,10 @@
 #include "FloorComponent.h"
 #include "TextureComponent.h"
 #include "PaneComponent.h"
+#include "MoveToComponent.h"
+#include "OBJComponent.h"
+#include "CubeComponent.h"
+#include "CollisionComponent.h"
 
 void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects)
 {
@@ -33,4 +37,29 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects)
 		glm::vec4(0, 0, 0, 1)));
 	rightSide->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));
 	gameObjects.push_back(rightSide);
+}
+
+void AddTugboat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos)
+{
+	std::shared_ptr<GameObject> boat = std::make_shared<GameObject>();
+	glm::vec3 boatPos = pos;
+	boat->position = boatPos;
+
+	//Add components to player object
+	boat->addComponent(std::make_shared<MoveToComponent>(boatPos));
+	boat->addComponent(std::make_shared<OBJComponent>("models/tugboat/12218_tugboat_v1_L2.obj"));
+	boat->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
+	boat->scale = glm::vec3(0.001f, 0.001f, 0.001f);
+	std::vector<float> leftRight = { 0.0f, 3.14f };
+	boat->rotation = glm::vec3(-1.57079633f, 0, leftRight.at(rand() % leftRight.size()));
+	gameObjects.push_back(boat);
+}
+
+void AddCube(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
+{
+	std::shared_ptr<GameObject> cube = std::make_shared<GameObject>();
+	cube->position = pos;
+	cube->addComponent(std::make_shared<CubeComponent>(size, color));
+	cube->addComponent(std::make_shared<CollisionComponent>(size));
+	gameObjects.push_back(cube);
 }
