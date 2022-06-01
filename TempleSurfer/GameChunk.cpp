@@ -42,5 +42,8 @@ void GameChunk::update(float elapsedTime)
 	for (auto& object : gameObjects) {
 		object->update(elapsedTime);
 	}
+	for (auto& object : gameObjects) {
+		object->update(elapsedTime, gamePosition);
+	}
 }
 

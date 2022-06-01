@@ -3,6 +3,7 @@
 #include "FloorComponent.h"
 #include "CubeComponent.h"
 #include "TextureComponent.h"
+#include "CollisionComponent.h"
 #include "Presets.h"
 #include <chrono>
 #include <iostream>
@@ -79,14 +80,17 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 				case BLOCK:
 					cube->position = glm::vec3(xPos, 2, zPos);
 					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1)));
+					cube->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 2, 1)));
 					break;
 				case JUMP:
 					cube->position = glm::vec3(xPos, 1, zPos);
 					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0,  1)));
+					cube->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
 					break;
 				case DUCK:
 					cube->position = glm::vec3(xPos, 3, zPos);
 					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(1.0f,0, 1.0f, 1)));
+					cube->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
 					break;
 				case NONE:
 					continue;
