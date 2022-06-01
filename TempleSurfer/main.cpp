@@ -23,6 +23,7 @@ using tigl::Vertex;
 #include "SpinComponent.h"
 #include "TimerJumper.h"
 #include "EnemyComponent.h"
+#include "CollisionComponent.h"
 
 #include "Vision.h"
 
@@ -185,6 +186,7 @@ void createScene() {
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
 	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
 	player->addComponent(std::make_shared<PlayerComponent>());
+	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1))); //ToDo change to accurate hitbox.
 	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
 	player->rotation = glm::vec3(0, -1.57079633f, 0);
 	scene->addGameObject(player);
