@@ -14,8 +14,8 @@
 class OBJComponent : public DrawComponent {
 private:
 	// Animation data
-	float animationDelay;
-	float animationTime;
+	float animationDelay = 0;
+	float animationTime = 0;
 	int animationIndex = 0;
 
 	// This holds the vertices.
@@ -49,7 +49,7 @@ private:
 	std::vector<std::shared_ptr<ObjectFile>> objectData;
 
 	// Loads in the texture data.
-	void loadObjectFile(const std::string& fileName);
+	void loadObjectFile(const std::string fileName);
 	void loadMaterialFile(const std::string& fileName, const std::string& dirName, std::shared_ptr<ObjectFile>& file);
 	void objectDrawer(std::shared_ptr<ObjectFile> file);
 public:

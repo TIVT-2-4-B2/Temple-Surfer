@@ -4,6 +4,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
 #include <filesystem>
+#include <thread>
+#include <mutex>
+
+std::mutex mutexThisOBJ;
 
 /**
 * Replaces a substring in a string
@@ -71,7 +75,7 @@ static inline std::string cleanLine(std::string line)
 }
 
 /*Loads the objectfile and adds it to the list of objects for the animation*/
-void OBJComponent::loadObjectFile(const std::string& fileName)
+void OBJComponent::loadObjectFile(const std::string fileName)
 {
 	// Checking wheter the file actually exists
 	std::cout << "Loading " << fileName << std::endl;
@@ -155,6 +159,7 @@ void OBJComponent::loadObjectFile(const std::string& fileName)
 		}
 		else if (params[0] == "usemtl")
 		{
+			mutexThisOBJ.lock();
 			if (renderData.size() > 0) {
 				currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
 				if (currentGroup->bufferedObjectVertices != nullptr) {
@@ -162,6 +167,7 @@ void OBJComponent::loadObjectFile(const std::string& fileName)
 					renderData.clear();
 				}
 			}
+			mutexThisOBJ.unlock();
 
 			currentGroup = std::make_shared<ObjectGroup>();
 			currentGroup->materialIndex = -1;
@@ -180,6 +186,7 @@ void OBJComponent::loadObjectFile(const std::string& fileName)
 		}
 	}
 
+	mutexThisOBJ.lock();
 	if (renderData.size() > 0) {
 		currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
 		if (currentGroup->bufferedObjectVertices != nullptr) {
@@ -188,8 +195,11 @@ void OBJComponent::loadObjectFile(const std::string& fileName)
 		}
 	}
 
+
+
 	// File is done
 	objectData.push_back(file);
+	//mutexThisOBJ.unlock();
 
 	// Printing debug information 
 	std::cout << "Amount of vertices: " << vertices.size() << std::endl;
@@ -288,12 +298,18 @@ OBJComponent::OBJComponent(const std::string& fileName)
 }
 
 
-OBJComponent::OBJComponent(const std::string& folderName, float animationDelay)
+OBJComponent::OBJComponent(const std::string& folderName, float animationDelayIn)
 {
+	animationDelay = animationDelayIn;
+	std::vector<std::shared_ptr<std::thread>> workers;
 	for (const auto& entry : std::filesystem::directory_iterator(folderName)) {
 		if (entry.path().extension().string()._Equal(".obj")){
-			loadObjectFile(entry.path().string());
+			workers.push_back(std::make_shared<std::thread>(&OBJComponent::loadObjectFile, this, entry.path().string()));
 		}
+	}
+
+	for (std::shared_ptr<std::thread>  t : workers) {
+		if (t->joinable())t->join();
 	}
 }
 
@@ -326,7 +342,6 @@ void OBJComponent::objectDrawer(std::shared_ptr<ObjectFile> file) {
 void OBJComponent::update(float elapsedTime)
 {
 	if ((animationTime += elapsedTime) > animationDelay) {
-		animationTime = 0;
 		std::cout << animationIndex << std::endl;
 		animationIndex++;
 		if (animationIndex >= objectData.size()) {
