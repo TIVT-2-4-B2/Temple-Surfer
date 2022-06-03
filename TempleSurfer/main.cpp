@@ -66,7 +66,21 @@ int main(void)
 	if (!glfwInit()) {
 		throw "Could not initialize glwf";
 	}	
-	window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "Temple Runner", NULL, NULL);
+
+	int count;
+
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
+
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+	/*GLFWwindow* */window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", monitors[0], NULL);
+
+	//window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "Temple Runner", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
