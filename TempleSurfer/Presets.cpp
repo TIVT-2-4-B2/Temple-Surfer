@@ -55,6 +55,22 @@ void AddTugboat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 p
 	gameObjects.push_back(boat);
 }
 
+void AddContainer(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos)
+{
+	std::shared_ptr<GameObject> container = std::make_shared<GameObject>();
+	glm::vec3 contianerPos = pos + glm::vec3(1, -0.5f, 0);
+	container->position = contianerPos;
+
+	//Add components to player object
+	container->addComponent(std::make_shared<MoveToComponent>(contianerPos));
+	container->addComponent(std::make_shared<OBJComponent>("models/container_v2/12281_Container_v2_L2.obj"));
+	container->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.007f)));
+	container->scale = glm::vec3(0.007f);
+	std::vector<float> leftRight = { 0.0f, 3.14f };
+	container->rotation = glm::vec3(-1.57079633f, -1.57079633f, leftRight.at(rand() % leftRight.size()));
+	gameObjects.push_back(container);
+}
+
 void AddCube(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
 {
 	std::shared_ptr<GameObject> cube = std::make_shared<GameObject>();

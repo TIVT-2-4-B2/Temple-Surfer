@@ -5,7 +5,7 @@
 #include <list>
 #include <memory>
 
-#define COLLISION_DEBUG
+//#define COLLISION_DEBUG
 
 class Component;
 class DrawComponent;
