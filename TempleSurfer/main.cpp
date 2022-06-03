@@ -60,7 +60,22 @@ int main(void)
 	if (!glfwInit()) {
 		throw "Could not initialize glwf";
 	}	
-	window = glfwCreateWindow(1000, 800, "Temple Runner", NULL, NULL);
+
+	int count;
+
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
+
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+	//Place null at monitors[0] 
+	window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", NULL, NULL);
+	//window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", monitors[0], NULL);
+
 	if (!window)
 	{
 		glfwTerminate();
@@ -83,6 +98,7 @@ int main(void)
 			start();
 			isPlaying = true;
 			lastFrameTime = glfwGetTime();
+			vision = Vision(player->getComponent<PlayerComponent>());
 		}
 		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		{
@@ -103,13 +119,16 @@ int main(void)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		if (!initialized)
-		{
-			vision = Vision(player->getComponent<PlayerComponent>());
-			initialized = true;
-		}
+		//if (!initialized)
+		//{
+		//	vision = Vision(player->getComponent<PlayerComponent>());
+		//	initialized = true;
+		//}
 		
-		vision.visionUpdate();
+		if (isPlaying)
+		{
+			vision.visionUpdate();
+		}
 
 	}
 
