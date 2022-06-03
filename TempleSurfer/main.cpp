@@ -45,7 +45,6 @@ void draw();
 void drawMenu();
 
 bool isPlaying = false;
-bool initialized = false;
 
 double lastFrameTime = 0;
 
@@ -118,12 +117,6 @@ int main(void)
 		draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-		//if (!initialized)
-		//{
-		//	vision = Vision(player->getComponent<PlayerComponent>());
-		//	initialized = true;
-		//}
 		
 		if (isPlaying)
 		{
