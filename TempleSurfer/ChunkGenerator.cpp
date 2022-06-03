@@ -77,10 +77,12 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 			xPos = -((2.0f / 3.0f) * FLOOR_WIDTH) + ((2.0f / 3.0f) * FLOOR_WIDTH) * j;  // X
 			switch (preset.obstacles[i][j]) {
 				case BLOCK:
-					AddTugboat(gameObjects, glm::vec3(xPos, 2, zPos));
-					//AddCube(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1));
+					//AddTugboat(gameObjects, glm::vec3(xPos, 2, zPos));
+					//AddContainer(gameObjects, glm::vec3(xPos, 2, zPos));
+					AddCube(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1));
 					break;
 				case JUMP:
+					//AddContainer(gameObjects, glm::vec3(xPos, 1, zPos));
 					AddCube(gameObjects, glm::vec3(xPos, 1, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0, 1));
 					break;
 				case DUCK:
