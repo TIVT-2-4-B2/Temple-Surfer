@@ -61,6 +61,9 @@ std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
 ChunkGenerator generator;
 
+int W_W;
+int W_H;
+
 int main(void)
 {
 	if (!glfwInit()) {
@@ -72,15 +75,16 @@ int main(void)
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
 
 	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
+	W_W = mode->width;
+	W_H = mode->height;
 
 	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-	/*GLFWwindow* */window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", monitors[0], NULL);
+	window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", monitors[0], NULL);
 
-	//window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "Temple Runner", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -252,6 +256,40 @@ void drawMenu()
 	tigl::end();
 }
 
+//int w1;
+//int h1;
+//
+//void orthogonalStart() {
+//		glDisable(GL_DEPTH_TEST);
+//	//First of all, we need to switch to our projection matrix
+//		glMatrixMode(GL_PROJECTION);
+//	//Start our projection modifications
+//		glPushMatrix();
+//	//Then we need to clear it of all previous information
+//		glLoadIdentity();
+//	//Now I am calling : gluOrtho2D instead of the previous gluPerspective
+//	//	which was in our reshape function.This takes our parameters which
+//	//	set the view space from 0, 0 in the window, to the widthand height of the
+//	//	window which we collect in our reshape function
+//		gluOrtho2D(0, w1, 0, h1);
+//	//Now we need to flip our scene upside down
+//		glScalef(1, -1, 1);
+//	//And translate it to display our scene correctly
+//		glTranslatef(0, -h1, 0);
+//	//Now we switch back to our model matrix so we can draw our 2D shapes
+//		glMatrixMode(GL_MODELVIEW);
+//}
+//
+//void orthogonalEnd() {
+//	//Switch back to our projection mode
+//		glMatrixMode(GL_PROJECTION);
+//	//Finish our calls above
+//		glPopMatrix();
+//	//Switch back to our model matrix to continue with out 3D scene
+//		glMatrixMode(GL_MODELVIEW);
+//		glEnable(GL_DEPTH_TEST);
+//}
+
 //Draw the game scene
 void draw()
 {
@@ -271,15 +309,15 @@ void draw()
 
 	scene->draw();
 
-	glDisable(GL_DEPTH_TEST);
-
 	//glMatrixMode(GL_PROJECTION);
 	//glPushMatrix();
 	//glLoadIdentity();
 	// set a 2D orthographic projection
 
-	projection = glm::ortho(0.0f, W_WIDTH, 0.0f, W_HEIGHT, 0.0f, 200.0f);
-	tigl::shader->setProjectionMatrix(projection);
+	//orthogonalStart();
+
+	////projection = glm::ortho(0, W_W, W_H, 0, 0, 500);
+	////tigl::shader->setProjectionMatrix(projection);
 	//tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
 
 	//gluOrtho2D(0, 256, 0, 144);
@@ -311,19 +349,19 @@ void draw()
 	//pos.x *= pos.w;
 	//pos.y *= pos.w;
 	//pos.z *= pos.w;
-
-	tigl::begin(GL_QUADS);
+	////glDisable(GL_DEPTH_TEST);
+	////tigl::begin(GL_QUADS);
 	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS, C_YPOS), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS + C_WIDTH, C_YPOS), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS + C_WIDTH, C_YPOS + C_HEIGHT), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS, C_YPOS + C_HEIGHT), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 1), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, 1), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(100, 100, 1), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, 100, 1), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::end();
-
-	glEnable(GL_DEPTH_TEST);
+	////tigl::addVertex(Vertex::PCN(glm::vec3(0, 1000, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	////tigl::addVertex(Vertex::PCN(glm::vec3(1000, 1000, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	////tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	////tigl::addVertex(Vertex::PCN(glm::vec3(1000, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	////tigl::end();
+	////glEnable(GL_DEPTH_TEST);
+	//orthogonalEnd();
 
 }
