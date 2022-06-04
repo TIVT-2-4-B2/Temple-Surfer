@@ -63,9 +63,10 @@ private:
 	std::vector<std::shared_ptr<ObjectFile>> objectData;
 
 	// Loads in the texture data.
-	void loadObjectFile(const std::string fileName, std::shared_ptr<ObjectBuilder> context);
+	void loadObjectFile(const std::string fileName, std::shared_ptr<ObjectBuilder> context, int listIndex);
 	void loadMaterialFile(const std::string& fileName, const std::string& dirName, std::shared_ptr<ObjectFile>& file);
 	void objectDrawer(std::shared_ptr<ObjectFile> file);
+	tigl::VBO* asyncObjectVBOCall(std::vector<tigl::Vertex> vertices, std::shared_ptr<ObjectBuilder> context);
 public:
 	OBJComponent(const std::string& fileName);
 	OBJComponent(const std::string& folderName, float animationDelay);
