@@ -20,7 +20,7 @@ void PlayerComponent::update(float _)
 	{
 		std::chrono::system_clock::duration duration = std::chrono::system_clock::now() - lastTime;
 		std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds> (duration);
-		if(seconds.count() > 1)
+		if(seconds.count() > 3)
 		{
 			resetY();
 			jumpOrCrouch = false;

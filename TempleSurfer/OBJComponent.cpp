@@ -319,6 +319,7 @@ tigl::VBO* OBJComponent::asyncObjectVBOCall(std::vector<tigl::Vertex> vertices, 
 OBJComponent::OBJComponent(const std::string& fileName)
 {
 	std::shared_ptr<ObjectBuilder> build = std::make_shared<ObjectBuilder>();
+	amountWorkers = 1;
 	std::thread thread(&OBJComponent::loadObjectFile, this, fileName, build, 0);
 
 	// Awaiting vbo add calls.

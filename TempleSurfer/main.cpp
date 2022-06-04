@@ -23,6 +23,7 @@ using tigl::Vertex;
 #include "SpinComponent.h"
 #include "TimerJumper.h"
 #include "EnemyComponent.h"
+#include "CollisionComponent.h"
 
 #include "Vision.h"
 
@@ -44,7 +45,6 @@ void draw();
 void drawMenu();
 
 bool isPlaying = false;
-bool initialized = false;
 
 double lastFrameTime = 0;
 
@@ -59,7 +59,22 @@ int main(void)
 	if (!glfwInit()) {
 		throw "Could not initialize glwf";
 	}	
-	window = glfwCreateWindow(1000, 800, "Temple Runner", NULL, NULL);
+
+	int count;
+
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
+
+	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
+
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+	//Place null at monitors[0] 
+	window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", NULL, NULL);
+	//window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", monitors[0], NULL);
+
 	if (!window)
 	{
 		glfwTerminate();
@@ -82,6 +97,7 @@ int main(void)
 			start();
 			isPlaying = true;
 			lastFrameTime = glfwGetTime();
+			vision = Vision(player->getComponent<PlayerComponent>());
 		}
 		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		{
@@ -101,14 +117,11 @@ int main(void)
 		draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-		if (!initialized)
-		{
-			vision = Vision(player->getComponent<PlayerComponent>());
-			initialized = true;
-		}
 		
-		vision.visionUpdate();
+		if (isPlaying)
+		{
+			vision.visionUpdate();
+		}
 
 	}
 
@@ -183,7 +196,10 @@ void createScene() {
 
 	//Add components to player object
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
-	player->addComponent(std::make_shared<OBJComponent>("models/dolphin/", 1.0f));
+#ifndef COLLISION_DEBUG
+	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
+#endif
+	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1))); //ToDo change to accurate hitbox.
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(1.0f, 1.0f, 1.0f);
 	player->rotation = glm::vec3(0, -1.57079633f, 0);

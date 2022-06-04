@@ -3,6 +3,7 @@
 #include "FloorComponent.h"
 #include "CubeComponent.h"
 #include "TextureComponent.h"
+#include "CollisionComponent.h"
 #include "Presets.h"
 #include <chrono>
 #include <iostream>
@@ -73,25 +74,23 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	{
 		zPos = ((1.0f / 6.0f) + (1.0f / 3.0f) * i) * FLOOR_LENGTH;
 		for (int j = 0; j < MATRIX_SIZE; j++) {
-			auto cube = std::make_shared<GameObject>();
 			xPos = -((2.0f / 3.0f) * FLOOR_WIDTH) + ((2.0f / 3.0f) * FLOOR_WIDTH) * j;  // X
 			switch (preset.obstacles[i][j]) {
 				case BLOCK:
-					cube->position = glm::vec3(xPos, 2, zPos);
-					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1)));
+					//AddTugboat(gameObjects, glm::vec3(xPos, 2, zPos));
+					//AddContainer(gameObjects, glm::vec3(xPos, 2, zPos));
+					AddCube(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1));
 					break;
 				case JUMP:
-					cube->position = glm::vec3(xPos, 1, zPos);
-					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0,  1)));
+					//AddContainer(gameObjects, glm::vec3(xPos, 1, zPos));
+					AddCube(gameObjects, glm::vec3(xPos, 1, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0, 1));
 					break;
 				case DUCK:
-					cube->position = glm::vec3(xPos, 3, zPos);
-					cube->addComponent(std::make_shared<CubeComponent>(glm::vec3(1, 1, 1), glm::vec4(1.0f,0, 1.0f, 1)));
+					AddCube(gameObjects, glm::vec3(xPos, 3, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
 					break;
 				case NONE:
 					continue;
 			}
-			gameObjects.push_back(cube);
 		}
 	}
 
