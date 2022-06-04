@@ -196,9 +196,9 @@ void OBJComponent::loadObjectFile(const std::string fileName, std::shared_ptr<Ob
 
 	// File is done
 	objectDataLock.lock();
-	objectData.push_back( file);
+	file->animationIndex = listIndex;
+	objectData.push_back(file);
 	objectDataLock.unlock();
-	//mutexThisOBJ.unlock();
 
 	amountWorkers--;
 
@@ -384,7 +384,13 @@ OBJComponent::~OBJComponent()
 void OBJComponent::draw()
 {
 	if (objectData.size() == 1) objectDrawer(objectData.at(1));
-	else objectDrawer(objectData.at(animationIndex));
+	else {
+		for (std::shared_ptr<ObjectFile> file : objectData) {
+			if (file->animationIndex == animationIndex) {
+				objectDrawer(file);
+			}
+		}
+	}
 }
 
 void OBJComponent::objectDrawer(std::shared_ptr<ObjectFile> file) {

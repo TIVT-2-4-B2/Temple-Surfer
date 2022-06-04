@@ -45,6 +45,7 @@ private:
 		// Holds the object
 		std::vector<std::shared_ptr<ObjectGroup>> groups;
 		std::vector<std::shared_ptr<MaterialInfo>> materials;
+		int animationIndex;
 	};
 
 	// Object that is created when building to communicate with gl thread.
