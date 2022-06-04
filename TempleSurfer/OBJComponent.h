@@ -9,7 +9,9 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <queue>
 #include "tigl.h"
+#include <mutex>
 
 class OBJComponent : public DrawComponent {
 private:
@@ -44,12 +46,24 @@ private:
 		std::vector<std::shared_ptr<ObjectGroup>> groups;
 		std::vector<std::shared_ptr<MaterialInfo>> materials;
 	};
+
+	// Object that is created when building to communicate with gl thread.
+	class ObjectBuilder {
+	public:
+		std::mutex buildLock;
+		std::queue<std::vector<tigl::Vertex>> pushQueue;
+		std::queue<tigl::VBO *> pollQueue;
+	};
+
+	// Holds the amount of working threads.
+	int amountWorkers = 0;
 	
 	// Holds the information about the object
+	std::mutex objectDataLock;
 	std::vector<std::shared_ptr<ObjectFile>> objectData;
 
 	// Loads in the texture data.
-	void loadObjectFile(const std::string fileName);
+	void loadObjectFile(const std::string fileName, std::shared_ptr<ObjectBuilder> context);
 	void loadMaterialFile(const std::string& fileName, const std::string& dirName, std::shared_ptr<ObjectFile>& file);
 	void objectDrawer(std::shared_ptr<ObjectFile> file);
 public:

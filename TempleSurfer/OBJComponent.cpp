@@ -7,7 +7,7 @@
 #include <thread>
 #include <mutex>
 
-std::mutex mutexThisOBJ;
+
 
 /**
 * Replaces a substring in a string
@@ -75,7 +75,7 @@ static inline std::string cleanLine(std::string line)
 }
 
 /*Loads the objectfile and adds it to the list of objects for the animation*/
-void OBJComponent::loadObjectFile(const std::string fileName)
+void OBJComponent::loadObjectFile(const std::string fileName, std::shared_ptr<ObjectBuilder> context)
 {
 	// Checking wheter the file actually exists
 	std::cout << "Loading " << fileName << std::endl;
@@ -159,7 +159,6 @@ void OBJComponent::loadObjectFile(const std::string fileName)
 		}
 		else if (params[0] == "usemtl")
 		{
-			mutexThisOBJ.lock();
 			if (renderData.size() > 0) {
 				currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
 				if (currentGroup->bufferedObjectVertices != nullptr) {
@@ -167,7 +166,6 @@ void OBJComponent::loadObjectFile(const std::string fileName)
 					renderData.clear();
 				}
 			}
-			mutexThisOBJ.unlock();
 
 			currentGroup = std::make_shared<ObjectGroup>();
 			currentGroup->materialIndex = -1;
@@ -186,7 +184,6 @@ void OBJComponent::loadObjectFile(const std::string fileName)
 		}
 	}
 
-	mutexThisOBJ.lock();
 	if (renderData.size() > 0) {
 		currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
 		if (currentGroup->bufferedObjectVertices != nullptr) {
@@ -198,8 +195,12 @@ void OBJComponent::loadObjectFile(const std::string fileName)
 
 
 	// File is done
+	objectDataLock.lock();
 	objectData.push_back(file);
+	objectDataLock.unlock();
 	//mutexThisOBJ.unlock();
+
+	amountWorkers--;
 
 	// Printing debug information 
 	std::cout << "Amount of vertices: " << vertices.size() << std::endl;
@@ -294,7 +295,20 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 
 OBJComponent::OBJComponent(const std::string& fileName)
 {
-	loadObjectFile(fileName);
+	std::shared_ptr<ObjectBuilder> build = std::make_shared<ObjectBuilder>();
+	std::thread thread(&OBJComponent::loadObjectFile, this, fileName, build);
+
+	// Awaiting vbo add calls.
+	while (amountWorkers > 0) {
+			build->buildLock.lock();
+			if (!build->pushQueue.empty()) {
+				build->pollQueue.emplace(tigl::createVbo(build->pushQueue.front()));
+				build->pushQueue.pop();
+			}
+			build->buildLock.unlock();
+	}
+
+	thread.join();
 }
 
 
@@ -302,18 +316,36 @@ OBJComponent::OBJComponent(const std::string& folderName, float animationDelayIn
 {
 	// Setting variables
 	animationDelay = animationDelayIn;
+	amountWorkers = 0;
 
 	// Booting up threads
-	std::vector<std::shared_ptr<std::thread>> workers;
+	std::vector<std::shared_ptr<ObjectBuilder>> builders;
+	std::vector<std::thread> threads;
 	for (const auto& entry : std::filesystem::directory_iterator(folderName)) {
 		if (entry.path().extension().string()._Equal(".obj")){
-			workers.push_back(std::make_shared<std::thread>(&OBJComponent::loadObjectFile, this, entry.path().string()));
+			amountWorkers++;
+			std::shared_ptr<ObjectBuilder> build = std::make_shared<ObjectBuilder>();
+			builders.push_back(build);
+			threads.push_back(std::thread(&OBJComponent::loadObjectFile, this, entry.path().string(), build));
 		}
 	}
 
 	// Awaiting vbo add calls.
-	while()
-	
+	while (amountWorkers > 0) {
+		for (std::shared_ptr<ObjectBuilder> b : builders) {
+			b->buildLock.lock();
+			if (!b->pushQueue.empty()) {
+				b->pollQueue.emplace(tigl::createVbo(b->pushQueue.front()));
+				b->pushQueue.pop();
+			}
+			b->buildLock.unlock();
+		}
+	}
+
+	// Joining threads;
+	for (std::thread& t : threads) {
+		t.join();
+	}
 }
 
 OBJComponent::~OBJComponent()
