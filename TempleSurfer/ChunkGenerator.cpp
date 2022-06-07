@@ -72,18 +72,19 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 
 	// List of block objects
 	PresetList blockList;
-	blockList.emplace_back(AddContainer);
+	//blockList.emplace_back(AddContainer);
 	//blockList.emplace_back(AddTugboat);
 	blockList.emplace_back(AddCube);
 
 	// List of jump objects
 	PresetList jumpList;
-	jumpList.emplace_back(AddContainer);
+	//jumpList.emplace_back(AddContainer);
 	jumpList.emplace_back(AddCube);
 
 	// List of duck objects
 	PresetList duckList;
 	duckList.emplace_back(AddCube);
+	//duckList.emplace_back(AddBoat);
 
 	// Adding in the generated config.
 	for (int i = 0; i < MATRIX_SIZE; i++)
