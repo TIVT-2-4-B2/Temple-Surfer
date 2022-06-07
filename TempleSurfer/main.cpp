@@ -83,7 +83,7 @@ int main(void)
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-	window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", monitors[0], NULL);
+	window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", NULL, NULL);
 
 	if (!window)
 	{
@@ -235,60 +235,27 @@ void drawMenu()
 	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	int viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glm::mat4 projection = glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 1000.0f);
+	tigl::shader->enableFog(false);
+	tigl::shader->enableTexture(false);
+	tigl::shader->enableColor(true);
 
-	//Set camera
+	glm::mat4 projection = glm::ortho(0.0f, (float)W_W, (float)W_H, 0.0f, -500.0f, 500.0f);
 	tigl::shader->setProjectionMatrix(projection);
-	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0, 10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
+	tigl::shader->setViewMatrix(glm::mat4(1.0f));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
-	tigl::shader->enableColor(true);
-	tigl::shader->enableFog(false);
+	glDisable(GL_DEPTH_TEST);
 
 	//Draw orange quad for menu
 	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCN(glm::vec3(-100, 0, -100), glm::vec4(1, 0.4, 0, 1), glm::vec3(0,1,0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(-100, 0, 100), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, 100), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(100, 0, -100), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, W_W, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(W_W, W_H, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(W_W, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 	tigl::end();
-}
 
-//int w1;
-//int h1;
-//
-//void orthogonalStart() {
-//		glDisable(GL_DEPTH_TEST);
-//	//First of all, we need to switch to our projection matrix
-//		glMatrixMode(GL_PROJECTION);
-//	//Start our projection modifications
-//		glPushMatrix();
-//	//Then we need to clear it of all previous information
-//		glLoadIdentity();
-//	//Now I am calling : gluOrtho2D instead of the previous gluPerspective
-//	//	which was in our reshape function.This takes our parameters which
-//	//	set the view space from 0, 0 in the window, to the widthand height of the
-//	//	window which we collect in our reshape function
-//		gluOrtho2D(0, w1, 0, h1);
-//	//Now we need to flip our scene upside down
-//		glScalef(1, -1, 1);
-//	//And translate it to display our scene correctly
-//		glTranslatef(0, -h1, 0);
-//	//Now we switch back to our model matrix so we can draw our 2D shapes
-//		glMatrixMode(GL_MODELVIEW);
-//}
-//
-//void orthogonalEnd() {
-//	//Switch back to our projection mode
-//		glMatrixMode(GL_PROJECTION);
-//	//Finish our calls above
-//		glPopMatrix();
-//	//Switch back to our model matrix to continue with out 3D scene
-//		glMatrixMode(GL_MODELVIEW);
-//		glEnable(GL_DEPTH_TEST);
-//}
+	glEnable(GL_DEPTH_TEST);
+}
 
 //Draw the game scene
 void draw()
@@ -309,59 +276,23 @@ void draw()
 
 	scene->draw();
 
-	//glMatrixMode(GL_PROJECTION);
-	//glPushMatrix();
-	//glLoadIdentity();
-	// set a 2D orthographic projection
+	tigl::shader->enableFog(false);
+	tigl::shader->enableTexture(false);
 
-	//orthogonalStart();
+	projection = glm::ortho(0.0f, (float)W_W, (float)W_H, 0.0f, -500.0f, 500.0f);
+	tigl::shader->setProjectionMatrix(projection);
+	tigl::shader->setViewMatrix(glm::mat4(1.0f));
+	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
-	////projection = glm::ortho(0, W_W, W_H, 0, 0, 500);
-	////tigl::shader->setProjectionMatrix(projection);
-	//tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)));
+	glDisable(GL_DEPTH_TEST);
+	
+	tigl::begin(GL_QUADS);
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, W_H/5, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(W_W/5, W_H/5, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(W_W/5, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::end();
 
-	//gluOrtho2D(0, 256, 0, 144);
-	// invert the y axis, down is positive
-	//glScalef(1, -1, 1);
-	// mover the origin from the bottom left corner
-	// to the upper left corner
-	//glTranslatef(0, -144, 0);
-	//glMatrixMode(GL_MODELVIEW);
-
-	//glm::mat4 matProjection = glm::lookAt(glm::vec3(player->position.x, 7, 12), glm::vec3(player->position.x, 0, 0), glm::vec3(0, 1, 0)) * projection;
-
-	//glm::mat4 matInverse = glm::inverse(matProjection);
-
-
-	//float in[4];
-	//float winZ = 1.0;
-
-	//in[0] = (2.0f * ((float)(0 - 0) / (W_WIDTH - 0))) - 1.0f,
-	//in[1] = 1.0f - (2.0f * ((float)(0 - 0) / (W_HEIGHT - 0)));
-	//in[2] = 2.0 * winZ - 1.0;
-	//in[3] = 1.0;
-
-	//glm::vec4 vIn = glm::vec4(in[0], in[1], in[2], in[3]);
-	//glm::vec4 pos = vIn * matInverse;
-
-	//pos.w = 1.0 / pos.w;
-
-	//pos.x *= pos.w;
-	//pos.y *= pos.w;
-	//pos.z *= pos.w;
-	////glDisable(GL_DEPTH_TEST);
-	////tigl::begin(GL_QUADS);
-	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS, C_YPOS), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS + C_WIDTH, C_YPOS), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS + C_WIDTH, C_YPOS + C_HEIGHT), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	//tigl::addVertex(Vertex::PCN(glm::vec3(0, C_XPOS, C_YPOS + C_HEIGHT), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-
-	////tigl::addVertex(Vertex::PCN(glm::vec3(0, 1000, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	////tigl::addVertex(Vertex::PCN(glm::vec3(1000, 1000, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	////tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	////tigl::addVertex(Vertex::PCN(glm::vec3(1000, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	////tigl::end();
-	////glEnable(GL_DEPTH_TEST);
-	//orthogonalEnd();
+	glEnable(GL_DEPTH_TEST);
 
 }
