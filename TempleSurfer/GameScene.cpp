@@ -4,7 +4,6 @@
 
 ChunkGenerator chunkGenerator = ChunkGenerator();
 
-//TODO create more chunks and possibly add mist.
 GameScene::GameScene()
 {
 	chunkGenerator.generatorInit();
@@ -60,6 +59,18 @@ void GameScene::update(float elapsedTime)
 
 		chunk->moveChunk(chunk->gamePosition += glm::vec3(0, 0, 2* elapsedTime));
 		chunk->update(elapsedTime);
+
+		const int scoreIncrementValue = 10;
+		if (!scoreReset && chunk->gamePosition.z % scoreIncrementValue < 0.1f)
+		{
+			scoreReset = true;
+			score++;
+			cout << score << endl;
+		}
+		else if(scoreReset)
+		{
+			scoreReset = false;
+		}
 		if (chunk->gamePosition.z > Z_THRESHOLD)
 		{
 			removeGameChunk(chunk);
