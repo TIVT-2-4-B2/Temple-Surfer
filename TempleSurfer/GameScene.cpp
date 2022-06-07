@@ -1,6 +1,8 @@
 #include "GameScene.h"
 #include "ChunkGenerator.h"
+#include "FloorComponent.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 ChunkGenerator chunkGenerator = ChunkGenerator();
 
@@ -57,20 +59,25 @@ void GameScene::update(float elapsedTime)
 {
 	for (auto& chunk : gameChunks) {
 
-		chunk->moveChunk(chunk->gamePosition += glm::vec3(0, 0, 2* elapsedTime));
+		chunk->moveChunk(chunk->gamePosition += glm::vec3(0, 0, 2 * elapsedTime));
 		chunk->update(elapsedTime);
 
-		const int scoreIncrementValue = 10;
-		if (!scoreReset && std::abs(chunk->gamePosition.z % scoreIncrementValue) < 0.1f)
-		{
-			scoreReset = true;
-			score++;
-			std::cout << score << std::endl;
+		//std::cout << chunk->gamePosition.z << std::endl;
+		if (chunk->gamePosition.z > -(FLOOR_LENGTH-Z_THRESHOLD)) {
+
+			const int scoreIncrementValue = 10;
+			if (!scoreReset && std::abs(((int)chunk->gamePosition.z) % scoreIncrementValue) == 0)
+			{
+				scoreReset = true;
+				score++;
+				std::cout << score << std::endl;
+			}
+			else if (scoreReset && (std::abs(((int)chunk->gamePosition.z) % scoreIncrementValue) != 0))
+			{
+				scoreReset = false;
+			}
 		}
-		else if(scoreReset)
-		{
-			scoreReset = false;
-		}
+
 		if (chunk->gamePosition.z > Z_THRESHOLD)
 		{
 			removeGameChunk(chunk);
