@@ -61,11 +61,11 @@ void GameScene::update(float elapsedTime)
 		chunk->update(elapsedTime);
 
 		const int scoreIncrementValue = 10;
-		if (!scoreReset && chunk->gamePosition.z % scoreIncrementValue < 0.1f)
+		if (!scoreReset && std::abs(chunk->gamePosition.z % scoreIncrementValue) < 0.1f)
 		{
 			scoreReset = true;
 			score++;
-			cout << score << endl;
+			std::cout << score << std::endl;
 		}
 		else if(scoreReset)
 		{
