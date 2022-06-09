@@ -51,9 +51,23 @@ private:
 	// Object that is created when building to communicate with gl thread.
 	class ObjectBuilder {
 	public:
+		tigl::VBO* asyncObjectVBOCall(std::vector<tigl::Vertex> vertices);
+		std::shared_ptr<TextureComponent> asyncObjectTextureCall(std::string path);
+		void awaitObjectGLCall();
+	private:
+		// Used for operation safety on objects.
 		std::mutex buildLock;
-		std::queue<std::vector<tigl::Vertex>> pushQueue;
-		std::queue<tigl::VBO *> pollQueue;
+		bool inputGiven = false;
+		bool outputGiven = false;
+		int operation = -1;
+
+		// Used for VBO create calls.
+		std::vector<tigl::Vertex> verticesRequest;
+		tigl::VBO* vboResponse;
+
+		// Used for texure create calls.
+		std::string pathRequest;
+		std::shared_ptr<TextureComponent> textureResponse;
 	};
 
 	// Holds the amount of working threads.
@@ -65,9 +79,8 @@ private:
 
 	// Loads in the texture data.
 	void loadObjectFile(const std::string fileName, std::shared_ptr<ObjectBuilder> context, int listIndex);
-	void loadMaterialFile(const std::string& fileName, const std::string& dirName, std::shared_ptr<ObjectFile>& file);
+	void loadMaterialFile(const std::string& fileName, const std::string& dirName, std::shared_ptr<ObjectFile>& file, std::shared_ptr<ObjectBuilder> context);
 	void objectDrawer(std::shared_ptr<ObjectFile> file);
-	tigl::VBO* asyncObjectVBOCall(std::vector<tigl::Vertex> vertices, std::shared_ptr<ObjectBuilder> context);
 public:
 	OBJComponent(const std::string& fileName);
 	OBJComponent(const std::string& folderName, float animationDelay);
