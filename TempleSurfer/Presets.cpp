@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "Presets.h"
 #include "FloorComponent.h"
 #include "TextureComponent.h"
@@ -15,13 +17,16 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	floor->addComponent(std::make_shared<TextureComponent>("models/floor/sand2.jpg"));
 	gameObjects.push_back(floor);
 
+	const int xOffset = 8;
+	const int yCoordinate = 4;
+
 	//Adding sides
 	std::shared_ptr<GameObject> leftSide = std::make_shared<GameObject>();
 	leftSide->position = glm::vec3(0, 0, 0);
 	leftSide->addComponent(std::make_shared<PaneComponent>(
 		glm::vec3(FLOOR_WIDTH, 0, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(FLOOR_WIDTH + 8, -4, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(FLOOR_WIDTH + 8, -4, 0),
+		glm::vec3(FLOOR_WIDTH + xOffset, -yCoordinate, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH + xOffset, -yCoordinate, 0),
 		glm::vec3(FLOOR_WIDTH, 0, 0),
 		glm::vec4(0, 0, 0, 1)));
 	leftSide->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));
@@ -31,8 +36,8 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	rightSide->position = glm::vec3(0, 0, 0);
 	rightSide->addComponent(std::make_shared<PaneComponent>(
 		glm::vec3(-FLOOR_WIDTH, 0, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(-FLOOR_WIDTH - 8, -4, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(-FLOOR_WIDTH - 8, -4, 0),
+		glm::vec3(-FLOOR_WIDTH - xOffset, -yCoordinate, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(-FLOOR_WIDTH - xOffset, -yCoordinate, 0),
 		glm::vec3(-FLOOR_WIDTH, 0, 0),
 		glm::vec4(0, 0, 0, 1)));
 	rightSide->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));
@@ -66,7 +71,7 @@ void AddBoat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos,
 	boat->addComponent(std::make_shared<OBJComponent>("models/boat/12219_boat_v2_L2.obj"));
 	boat->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
 	boat->scale = glm::vec3(0.002f);
-	std::vector<float> leftRight = { 0.0f, 3.14f };
+	std::vector<float> leftRight = { 0.0f, (float)M_PI };
 	boat->rotation = glm::vec3(-1.57079633f, 0, leftRight.at(rand() % leftRight.size()));
 	gameObjects.push_back(boat);
 }
@@ -82,7 +87,7 @@ void AddContainer(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3
 	container->addComponent(std::make_shared<OBJComponent>("models/container_v2/12281_Container_v2_L2.obj"));
 	container->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.007f)));
 	container->scale = glm::vec3(0.007f);
-	std::vector<float> leftRight = { 0.0f, 3.14f };
+	std::vector<float> leftRight = { 0.0f, (float)M_PI };
 	container->rotation = glm::vec3(-1.57079633f, -1.57079633f, leftRight.at(rand() % leftRight.size()));
 	gameObjects.push_back(container);
 }
