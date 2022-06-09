@@ -41,6 +41,13 @@ Vision::~Vision()
 {
 }
 
+cv::Mat Vision::getImage() {
+    Mat image;
+    cap.read(image);
+    flip(image, image, 1);
+    return image;
+}
+
 void Vision::visionUpdate() {
 
     if (frames % 10 == 0)
@@ -90,10 +97,11 @@ void Vision::visionUpdate() {
     line(img, Point(lowerXThreshold, 0), Point(lowerXThreshold, cameraHeight), Scalar(0, 0, 255), 5);
     line(img, Point(upperXThreshold, 0), Point(upperXThreshold, cameraHeight), Scalar(0, 0, 255), 5);
 
+    imshow("Debug", img);
+    waitKey(1);
+
 #endif // VIS_DEBUG
 
-    imshow("Image", img);
-    waitKey(1);
     frames++;
 
     if (faces.size() > 1)
