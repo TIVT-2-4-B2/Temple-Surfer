@@ -26,10 +26,10 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	std::shared_ptr<GameObject> leftSide = std::make_shared<GameObject>();
 	leftSide->position = glm::vec3(0, 0, 0);
 	leftSide->addComponent(std::make_shared<PaneComponent>(
-		glm::vec3(FLOOR_WIDTH, 0, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(FLOOR_WIDTH + xOffset, -yCoordinate, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(FLOOR_WIDTH + xOffset, -yCoordinate, 0),
-		glm::vec3(FLOOR_WIDTH, 0, 0),
+		glm::vec3(FLOOR_WIDTH, -1, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH + xOffset, yCoordinate, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH + xOffset, yCoordinate, 0),
+		glm::vec3(FLOOR_WIDTH, -1, 0),
 		glm::vec4(0, 0, 0, 1)));
 	leftSide->addComponent(std::make_shared<TextureComponent>("models/floor/sand2.jpg"));
 	gameObjects.push_back(leftSide);
@@ -37,10 +37,10 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	std::shared_ptr<GameObject> rightSide = std::make_shared<GameObject>();
 	rightSide->position = glm::vec3(0, 0, 0);
 	rightSide->addComponent(std::make_shared<PaneComponent>(
-		glm::vec3(-FLOOR_WIDTH, 0, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(-FLOOR_WIDTH - xOffset, -yCoordinate, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(-FLOOR_WIDTH - xOffset, -yCoordinate, 0),
-		glm::vec3(-FLOOR_WIDTH, 0, 0),
+		glm::vec3(-FLOOR_WIDTH, -1, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(-FLOOR_WIDTH - xOffset, yCoordinate, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(-FLOOR_WIDTH - xOffset, yCoordinate, 0),
+		glm::vec3(-FLOOR_WIDTH, -1, 0),
 		glm::vec4(0, 0, 0, 1)));
 	rightSide->addComponent(std::make_shared<TextureComponent>("models/floor/sand2.jpg"));
 	gameObjects.push_back(rightSide);
