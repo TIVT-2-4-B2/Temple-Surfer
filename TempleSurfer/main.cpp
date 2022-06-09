@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include "tigl.h"
 #include <glm/gtc/matrix_transform.hpp>
-using tigl::Vertex;
+
 #include "OBJComponent.h"
 #include <memory>
 
@@ -29,6 +29,9 @@ using tigl::Vertex;
 #include <iostream>
 #include <thread>
 
+using tigl::Vertex;
+using namespace cv;
+
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
@@ -41,17 +44,11 @@ void start();
 void createScene();
 void draw();
 void drawMenu();
+void drawGUI();
+void BindTexture(cv::Mat& image);
 
 bool isPlaying = false;
 bool initialized = false;
-
-#define W_WIDTH 1000.0f
-#define W_HEIGHT 800.0f
-
-#define C_WIDTH 300.0f
-#define C_HEIGHT 300.0f
-#define C_XPOS 0.0f
-#define C_YPOS 0.0f
 
 double lastFrameTime = 0;
 
@@ -59,10 +56,11 @@ std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
 std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
+std::shared_ptr<Vision> vision;
 ChunkGenerator generator;
 
-int W_W;
-int W_H;
+int WindowWidth;
+int WindowHeight;
 
 int main(void)
 {
@@ -71,12 +69,11 @@ int main(void)
 	}	
 
 	int count;
-
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
 
 	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
-	W_W = mode->width;
-	W_H = mode->height;
+	WindowWidth = mode->width;
+	WindowHeight = mode->height;
 
 	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
@@ -95,8 +92,6 @@ int main(void)
 	tigl::init();
 
 	init();
-
-	Vision vision;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -122,18 +117,18 @@ int main(void)
 			continue;
 		}
 
+		if (!initialized)
+		{
+			vision = std::make_shared<Vision>(player->getComponent<PlayerComponent>());
+			initialized = true;
+		}
+
 		update();
 		draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-		if (!initialized)
-		{
-			vision = Vision(player->getComponent<PlayerComponent>());
-			initialized = true;
-		}
 		
-		vision.visionUpdate();
+		vision->visionUpdate();
 
 	}
 
@@ -169,6 +164,7 @@ void init()
 	update();
 
 }
+
 //#define FPS_DEBUG
 //Update everything in the scene
 void update()
@@ -239,7 +235,7 @@ void drawMenu()
 	tigl::shader->enableTexture(false);
 	tigl::shader->enableColor(true);
 
-	glm::mat4 projection = glm::ortho(0.0f, (float)W_W, (float)W_H, 0.0f, -500.0f, 500.0f);
+	glm::mat4 projection = glm::ortho(0.0f, (float)WindowWidth, (float)WindowHeight, 0.0f, -500.0f, 500.0f);
 	tigl::shader->setProjectionMatrix(projection);
 	tigl::shader->setViewMatrix(glm::mat4(1.0f));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
@@ -248,9 +244,9 @@ void drawMenu()
 
 	//Draw orange quad for menu
 	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, W_W, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(W_W, W_H, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(W_W, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, WindowWidth, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(WindowWidth, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
 	tigl::end();
 
@@ -276,23 +272,73 @@ void draw()
 
 	scene->draw();
 
-	tigl::shader->enableFog(false);
-	tigl::shader->enableTexture(false);
+	drawGUI();
 
-	projection = glm::ortho(0.0f, (float)W_W, (float)W_H, 0.0f, -500.0f, 500.0f);
+}
+
+void drawGUI() {
+	tigl::shader->enableFog(false);
+
+	//Draw UI
+	glm::mat4 projection = glm::ortho(0.0f, (float)WindowWidth, (float)WindowHeight, 0.0f, -500.0f, 500.0f);
 	tigl::shader->setProjectionMatrix(projection);
 	tigl::shader->setViewMatrix(glm::mat4(1.0f));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
+	tigl::shader->enableTexture(true);
+	tigl::shader->enableColor(false);
+
+	//Get image from vision
+	cv::Mat img = vision->getImage();
+
+	//Load image as texture
+	BindTexture(img);
+
 	glDisable(GL_DEPTH_TEST);
-	
+
+	//Draw camera corner
 	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, W_H/5, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(W_W/5, W_H/5, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(W_W/5, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(0, img.rows / 2, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(img.cols / 2, img.rows / 2, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(img.cols / 2, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
 	tigl::end();
 
-	glEnable(GL_DEPTH_TEST);
+	tigl::shader->enableTexture(false);
+	tigl::shader->enableColor(true);
 
+	glEnable(GL_DEPTH_TEST);
+}
+
+void BindTexture(cv::Mat& image)
+{
+	GLuint id;
+
+	if (image.empty()) {
+		std::cout << "image empty" << std::endl;
+	}
+	else {
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+		glGenTextures(1, &id);
+		glBindTexture(GL_TEXTURE_2D, id);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+		cv::cvtColor(image, image, COLOR_RGB2BGR);
+
+		glTexImage2D(GL_TEXTURE_2D,     // Type of texture
+			0,							// Pyramid level (for mip-mapping) - 0 is the top level
+			GL_RGB,						// Internal colour format to convert to
+			image.cols,					// Image width  i.e. 640 for Kinect in standard mode
+			image.rows,					// Image height i.e. 480 for Kinect in standard mode
+			0,							// Border width in pixels (can either be 1 or 0)
+			GL_RGB,						// Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+			GL_UNSIGNED_BYTE,			// Image data type
+			image.ptr());				// The actual image data itself
+	}
 }

@@ -2,6 +2,11 @@
 
 #include "Vision.h"
 
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/objdetect.hpp>
+
 #include "PlayerComponent.h"
 
 class Vision
@@ -25,10 +30,12 @@ private:
 	yPosition yPos = STAND;
 
 public:
+
 	Vision();
 	Vision(std::shared_ptr<PlayerComponent> playerComponent);
 	~Vision();
 
+	cv::Mat getImage();
 	void visionUpdate();
 };
 
