@@ -3,6 +3,11 @@
 #include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
+#include <filesystem>
+#include <thread>
+#include <mutex>
+
+
 
 /**
 * Replaces a substring in a string
@@ -69,10 +74,146 @@ static inline std::string cleanLine(std::string line)
 	return line;
 }
 
+/*Loads the objectfile and adds it to the list of objects for the animation*/
+void OBJComponent::loadObjectFile(const std::string fileName, std::shared_ptr<ObjectBuilder> context, int listIndex)
+{
+	// Checking wheter the file actually exists
+	std::cout << "Loading " << fileName << std::endl;
+	std::string dirName = fileName;
+	if (dirName.rfind("/") != std::string::npos)
+		dirName = dirName.substr(0, dirName.rfind("/"));
+	if (dirName.rfind("\\") != std::string::npos)
+		dirName = dirName.substr(0, dirName.rfind("\\"));
+	if (fileName == dirName)
+		dirName = "";
+
+	// Opening file
+	std::ifstream pFile(fileName.c_str());
+
+	if (!pFile.is_open())
+	{
+		std::cout << "Could not open file " << fileName << std::endl;
+		return;
+	}
+
+	// The object groups.
+	std::shared_ptr<ObjectGroup> currentGroup = std::make_shared<ObjectGroup>();
+	currentGroup->materialIndex = -1;
+
+	// Information for building the object
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec2> texcoords;
+	std::vector<tigl::Vertex> renderData;
+	std::shared_ptr<ObjectFile> file = std::make_shared<ObjectFile>();
+
+	while (!pFile.eof())
+	{
+		std::string line;
+		std::getline(pFile, line);
+		line = cleanLine(line);
+		if (line == "" || line[0] == '#') //skip empty or commented line
+			continue;
+
+		std::vector<std::string> params = split(line, " ");
+		params[0] = toLower(params[0]);
+
+		// Location coordinate
+		if (params[0] == "v")
+			vertices.push_back(glm::vec3((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str())));
+		// Normal coordinate
+		else if (params[0] == "vn")
+			normals.push_back(glm::vec3((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str())));
+		// Texture coordinate
+		else if (params[0] == "vt")
+			texcoords.push_back(glm::vec2((float)atof(params[1].c_str()), 1 - (float)atof(params[2].c_str())));
+
+		// Structure data
+		else if (params[0] == "f")
+		{
+			for (size_t ii = 4; ii <= params.size(); ii++)
+			{
+				for (size_t i = ii - 3; i < ii; i++)
+				{
+					int position;
+					int normal;
+					int texcoord = -1;
+					std::vector<std::string> indices = split(params[i == (ii - 3) ? 1 : i], "/");
+					if (indices.size() >= 1)	//er is een positie
+						position = atoi(indices[0].c_str()) - 1;
+					if (indices.size() == 2)		//alleen texture
+						texcoord = atoi(indices[1].c_str()) - 1;
+					if (indices.size() == 3)		//v/t/n of v//n
+					{
+						if (indices[1] != "")
+							texcoord = atoi(indices[1].c_str()) - 1;
+						normal = atoi(indices[2].c_str()) - 1;
+					}
+					renderData.push_back(tigl::Vertex::PCTN(vertices.at(position), file->materials.at(currentGroup->materialIndex)->diffuse, (texcoord == -1? glm::vec3(0): texcoords.at(texcoord)), normals.at(normal)));
+				}
+			}
+		}
+		else if (params[0] == "mtllib")
+		{
+			loadMaterialFile(dirName + "/" + params[1], dirName, file, context);
+		}
+		else if (params[0] == "usemtl")
+		{
+			if (renderData.size() > 0) {
+				currentGroup->bufferedObjectVertices = context->asyncObjectVBOCall(renderData);
+				if (currentGroup->bufferedObjectVertices != nullptr) {
+					file->groups.push_back(currentGroup);
+					renderData.clear();
+				}
+			}
+
+			currentGroup = std::make_shared<ObjectGroup>();
+			currentGroup->materialIndex = -1;
+
+			for (size_t i = 0; i < file->materials.size(); i++)
+			{
+				std::shared_ptr<MaterialInfo> info = file->materials.at(i);
+				if (info->name == params[1])
+				{
+					currentGroup->materialIndex = i;
+					break;
+				}
+			}
+			if (currentGroup->materialIndex == -1)
+				std::cout << "Could not find material name " << params[1] << std::endl;
+		}
+	}
+
+	if (renderData.size() > 0) {
+		currentGroup->bufferedObjectVertices = context->asyncObjectVBOCall(renderData);
+		if (currentGroup->bufferedObjectVertices != nullptr) {
+			file->groups.push_back(currentGroup);
+			renderData.clear();
+		}
+	}
+
+
+
+	// File is done
+	objectDataLock.lock();
+	file->animationIndex = listIndex;
+	objectData->push_back(file);
+	objectDataLock.unlock();
+
+	amountWorkers--;
+
+	// Printing debug information 
+	/*std::cout << "Amount of vertices: " << vertices.size() << std::endl;
+	std::cout << "Amount of normals: " << normals.size() << std::endl;
+	std::cout << "Amount of textures: " << file->materials.size() << std::endl;
+	std::cout << "Amount of texcoords: " << texcoords.size() << std::endl;
+	std::cout << "Amount of groups: " << file->groups.size() << std::endl;*/
+}
+
 /**
 * Reads a material file
 */
-void OBJComponent::loadMaterialFile(const std::string& fileName, const std::string& dirName)
+void OBJComponent::loadMaterialFile(const std::string& fileName, const std::string& dirName, std::shared_ptr<ObjectFile>& file, std::shared_ptr<ObjectBuilder> context)
 {
 	std::cout << "Loading " << fileName << std::endl;
 	std::ifstream pFile(fileName.c_str());
@@ -99,7 +240,7 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 		{
 			if (currentMaterial != NULL)
 			{
-				materials.push_back(currentMaterial);
+				file->materials.push_back(currentMaterial);
 			}
 			currentMaterial = std::make_shared<MaterialInfo>();
 			currentMaterial->name = params[1];
@@ -112,7 +253,7 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 			if (tex.find("\\"))
 				tex = tex.substr(tex.rfind("\\") + 1);
 			if (currentMaterial != NULL) {
-				currentMaterial->texture = std::make_shared<TextureComponent>(dirName + "/" + tex);
+				currentMaterial->texture = context->asyncObjectTextureCall(dirName + "/" + tex);
 			}
 		}
 		else if (params[0] == "kd")
@@ -148,132 +289,75 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 			std::cout << "Didn't parse " << params[0] << " in material file" << std::endl;
 	}
 	if (currentMaterial != NULL)
-		materials.push_back(currentMaterial);
+		file->materials.push_back(currentMaterial);
 }
 
 
-OBJComponent::OBJComponent(const std::string& fileName) 
+OBJComponent::OBJComponent(const std::string& fileName)
 {
-	// Checking wheter the file actually exists
-	std::cout << "Loading " << fileName << std::endl;
-	std::string dirName = fileName;
-	if (dirName.rfind("/") != std::string::npos)
-		dirName = dirName.substr(0, dirName.rfind("/"));
-	if (dirName.rfind("\\") != std::string::npos)
-		dirName = dirName.substr(0, dirName.rfind("\\"));
-	if (fileName == dirName)
-		dirName = "";
-
-	// Opening file
-	std::ifstream pFile(fileName.c_str());
-
-	if (!pFile.is_open())
-	{
-		std::cout << "Could not open file " << fileName << std::endl;
+	// If in cache
+	if (cachedObjects.contains(fileName)) {
+		objectData = cachedObjects.at(fileName);
 		return;
 	}
 
-	// The object groups.
-	std::shared_ptr<ObjectGroup> currentGroup = std::make_shared<ObjectGroup>();
-	currentGroup->materialIndex = -1;
+	// If not in cache
+	std::shared_ptr<ObjectBuilder> build = std::make_shared<ObjectBuilder>();
+	amountWorkers = 1;
+	std::thread thread(&OBJComponent::loadObjectFile, this, fileName, build, 0);
 
-	// Information for building the object
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> normals;
-	std::vector<glm::vec2> texcoords;
-	std::vector<tigl::Vertex> renderData;
+	// Awaiting vbo add calls.
+	while (amountWorkers > 0) {
+		build->awaitObjectGLCall();
+	}
 
-	while (!pFile.eof())
-	{
-		std::string line;
-		std::getline(pFile, line);
-		line = cleanLine(line);
-		if (line == "" || line[0] == '#') //skip empty or commented line
-			continue;
+	thread.join();
 
-		std::vector<std::string> params = split(line, " ");
-		params[0] = toLower(params[0]);
+	cachedObjects.insert({ fileName, objectData });
+}
 
-		// Location coordinate
-		if (params[0] == "v")
-			vertices.push_back(glm::vec3((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str())));
-		// Normal coordinate
-		else if (params[0] == "vn")
-			normals.push_back(glm::vec3((float)atof(params[1].c_str()), (float)atof(params[2].c_str()), (float)atof(params[3].c_str())));
-		// Texture coordinate
-		else if (params[0] == "vt")
-			texcoords.push_back(glm::vec2((float)atof(params[1].c_str()), 1 - (float)atof(params[2].c_str())));
 
-		// Structure data
-		else if (params[0] == "f")
-		{
-			for (size_t ii = 4; ii <= params.size(); ii++)
-			{
-				for (size_t i = ii - 3; i < ii; i++)
-				{
-					int position;
-					int normal;
-					int texcoord;
-					std::vector<std::string> indices = split(params[i == (ii - 3) ? 1 : i], "/");
-					if (indices.size() >= 1)	//er is een positie
-						position = atoi(indices[0].c_str()) - 1;
-					if (indices.size() == 2)		//alleen texture
-						texcoord = atoi(indices[1].c_str()) - 1;
-					if (indices.size() == 3)		//v/t/n of v//n
-					{
-						if (indices[1] != "")
-							texcoord = atoi(indices[1].c_str()) - 1;
-						normal = atoi(indices[2].c_str()) - 1;
-					}
-					renderData.push_back(tigl::Vertex::PCTN(vertices.at(position), materials.at(currentGroup->materialIndex)->diffuse, texcoords.at(texcoord), normals.at(normal)));
-				}
-			}
-		}
-		else if (params[0] == "mtllib")
-		{
-			loadMaterialFile(dirName + "/" + params[1], dirName);
-		}
-		else if (params[0] == "usemtl")
-		{
-			if (renderData.size() > 0) {
-				currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
-				if (currentGroup->bufferedObjectVertices != nullptr) {
-					groups.push_back(currentGroup);
-					renderData.clear();
-				}
-			}
+OBJComponent::OBJComponent(const std::string& folderName, float animationDelayIn)
+{
+	// Setting variables
+	animationDelay = animationDelayIn;
+	amountWorkers = 0;
 
-			currentGroup = std::make_shared<ObjectGroup>();
-			currentGroup->materialIndex = -1;
+	// If in cache
+	if (cachedObjects.contains(folderName)) {
+		objectData = cachedObjects.at(folderName);
+		return;
+	}
 
-			for (size_t i = 0; i < materials.size(); i++)
-			{
-				std::shared_ptr<MaterialInfo> info = materials.at(i);
-				if (info->name == params[1])
-				{
-					currentGroup->materialIndex = i;
-					break;
-				}
-			}
-			if (currentGroup->materialIndex == -1)
-				std::cout << "Could not find material name " << params[1] << std::endl;
+	// Booting up threads
+	std::vector<std::shared_ptr<ObjectBuilder>> builders;
+	std::vector<std::thread> threads;
+	int index = 0;
+	for (const auto& entry : std::filesystem::directory_iterator(folderName)) {
+		if (entry.path().extension().string()._Equal(".obj")){
+			// Setting up thread
+			amountWorkers++;
+			std::shared_ptr<ObjectBuilder> build = std::make_shared<ObjectBuilder>();
+			builders.push_back(build);
+			threads.push_back(std::thread(&OBJComponent::loadObjectFile, this, entry.path().string(), build, index));
+			index++;
 		}
 	}
 
-	if (renderData.size() > 0) {
-		currentGroup->bufferedObjectVertices = tigl::createVbo(renderData);
-		if (currentGroup->bufferedObjectVertices != nullptr) {
-			groups.push_back(currentGroup);
-			renderData.clear();
+	// Awaiting gl add calls.
+	while (amountWorkers > 0) {
+		for (std::shared_ptr<ObjectBuilder> b : builders) {
+			b->awaitObjectGLCall();
 		}
 	}
 
-	// Printing debug information 
-	std::cout << "Amount of vertices: " << vertices.size() << std::endl;
-	std::cout << "Amount of normals: " << normals.size() << std::endl;
-	std::cout << "Amount of textures: " << materials.size() << std::endl;
-	std::cout << "Amount of texcoords: " << texcoords.size() << std::endl;
-	std::cout << "Amount of groups: " << groups.size() << std::endl;
+	// Joining threads;
+	for (std::thread& t : threads) {
+		t.join();
+	}
+
+	// Adding it to cache
+	cachedObjects.insert({folderName, objectData});
 }
 
 OBJComponent::~OBJComponent()
@@ -282,22 +366,119 @@ OBJComponent::~OBJComponent()
 
 void OBJComponent::draw()
 {
+	if (objectData->size() == 1) objectDrawer(objectData->at(0));
+	else {
+		for (std::shared_ptr<ObjectFile> file : *objectData) {
+			if (file->animationIndex == animationIndex) {
+				objectDrawer(file);
+			}
+		}
+	}
+}
+
+void OBJComponent::objectDrawer(std::shared_ptr<ObjectFile> file) {
 	// Looping through list of obj-groups
-	for (std::shared_ptr<ObjectGroup> group : groups) {
-		if (materials.at(group->materialIndex)->texture != nullptr) {
+	for (std::shared_ptr<ObjectGroup> group : file->groups) {
+		if (file->materials.at(group->materialIndex)->texture != nullptr) {
 			// Enabling textures because standard disabled
 			tigl::shader->enableTexture(true);
-			materials.at(group->materialIndex)->texture->bind();
+			file->materials.at(group->materialIndex)->texture->bind();
 		}
 		if (group->bufferedObjectVertices != nullptr)
 			tigl::drawVertices(GL_TRIANGLES, group->bufferedObjectVertices);
+		tigl::shader->enableTexture(false);
 	}
 
 	// Disabling textures else components with colors will get textures
 	tigl::shader->enableTexture(false);
 }
 
+void OBJComponent::update(float elapsedTime)
+{
+	if ((animationTime += elapsedTime) > animationDelay) {
+		//std::cout << animationIndex << std::endl;
+		animationTime = animationTime - animationDelay;
+
+		animationIndex++;
+		if (animationIndex >= objectData->size()) {
+			animationIndex = 0;
+		}
+		
+	}
+}
+
 OBJComponent::MaterialInfo::MaterialInfo()
 {
 	texture = NULL;
+}
+
+tigl::VBO* OBJComponent::ObjectBuilder::asyncObjectVBOCall(std::vector<tigl::Vertex> vertices)
+{
+	buildLock.lock();
+	vboResponse = nullptr;
+	verticesRequest = vertices;
+	inputGiven = true;
+	outputGiven = false;
+	operation = 0;
+	buildLock.unlock();
+
+	while (true) {
+		buildLock.lock();
+		if (outputGiven == true) {
+			inputGiven = false;
+			outputGiven = false;
+			buildLock.unlock();
+			return vboResponse;
+		}
+		buildLock.unlock();
+
+		// Sleep to give other threads time to edit.
+		std::this_thread::sleep_for(std::chrono::microseconds(50));
+	}
+}
+
+std::shared_ptr<TextureComponent> OBJComponent::ObjectBuilder::asyncObjectTextureCall(std::string path)
+{
+	buildLock.lock();
+	textureResponse = nullptr;
+	pathRequest = path;
+	inputGiven = true;
+	outputGiven = false;
+	operation = 1;
+	buildLock.unlock();
+
+	while (true) {
+		buildLock.lock();
+		if (outputGiven == true) {
+			inputGiven = false;
+			outputGiven = false;
+			buildLock.unlock();
+			return textureResponse;
+		}
+		buildLock.unlock();
+
+		// Sleep to give other threads time to edit.
+		std::this_thread::sleep_for(std::chrono::microseconds(50));
+	}
+}
+
+void OBJComponent::ObjectBuilder::awaitObjectGLCall()
+{
+	buildLock.lock();
+	if (inputGiven == true) {
+		if (operation == 0) 
+		{
+			vboResponse = tigl::createVbo(verticesRequest);
+		}
+		else if (operation == 1) 
+		{
+			textureResponse = std::make_shared<TextureComponent>(pathRequest);
+		}
+		inputGiven = false;
+		outputGiven = true;
+	}
+	buildLock.unlock();
+
+	// Sleep to give other threads time to edit.
+	std::this_thread::sleep_for(std::chrono::microseconds(50));
 }
