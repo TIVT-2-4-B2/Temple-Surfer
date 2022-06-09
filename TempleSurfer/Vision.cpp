@@ -13,11 +13,11 @@
 using namespace cv;
 
 VideoCapture cap(0); //Camera id
-Mat img;
+Mat image;
 CascadeClassifier faceCascade;
 std::vector<Rect> faces;
 
-Mat image;
+Mat camImage;
 int count;
 
 std::shared_ptr<PlayerComponent> playerComponent;
@@ -48,11 +48,13 @@ cv::Mat Vision::getImage() {
 
     if (count % 5 == 0)
     {
-        cap.read(image);
-        flip(image, image, 1);
+        Mat tempimage;
+        cap.read(tempimage);
+        cv::cvtColor(tempimage, tempimage, COLOR_RGB2BGR);
+        flip(tempimage, camImage, 1);
     }
-    
-    return image;
+    count++;
+    return camImage;
 }
 
 void Vision::visionUpdate() {
@@ -62,8 +64,8 @@ void Vision::visionUpdate() {
         const double scale = 1.2;
         const int minNeighbors = 10;
 
-        cap.read(img);
-        faceCascade.detectMultiScale(img, faces, scale, minNeighbors, 0, Size(50, 50));
+        cap.read(image);
+        faceCascade.detectMultiScale(image, faces, scale, minNeighbors, 0, Size(50, 50));
     }
     
     if (faces.size() == 0)

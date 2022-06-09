@@ -56,7 +56,7 @@ bool isPlaying = false;
 
 double lastFrameTime = 0;
 
-const int textureInterval = 3;
+const int textureInterval = 1;
 
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
@@ -69,7 +69,7 @@ int WindowWidth;
 int WindowHeight;
 
 GLuint textureID;
-int textureCount;
+int textureCount = 0;
 
 int main(void)
 {
@@ -220,7 +220,7 @@ void createScene() {
 #ifndef COLLISION_DEBUG
 	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
 #endif
-	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1))); //ToDo change to accurate hitbox.
+	//player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1))); //ToDo change to accurate hitbox.
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
 	player->rotation = glm::vec3(0, -0.5f * (float)M_PI, 0);
@@ -308,6 +308,7 @@ void drawGUI() {
 	cv::Mat img = vision->getImage();
 
 	//Load image as texture
+	textureCount = 1;
 	if (textureCount % textureInterval == 0)
 	{
 		GenerateTexture(img);
@@ -342,6 +343,7 @@ void GenerateTexture(cv::Mat& cameraImage)
 	else {
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
+		glDeleteTextures(1, &textureID);
 		glGenTextures(1, &textureID);
 		BindTexture();
 
@@ -351,17 +353,15 @@ void GenerateTexture(cv::Mat& cameraImage)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-		cv::cvtColor(cameraImage, cameraImage, COLOR_RGB2BGR);
-
 		glTexImage2D(GL_TEXTURE_2D,     // Type of texture
 			0,							// Pyramid level (for mip-mapping) - 0 is the top level
 			GL_RGB,						// Internal colour format to convert to
-			cameraImage.cols,					// Image width  i.e. 640 for Kinect in standard mode
-			cameraImage.rows,					// Image height i.e. 480 for Kinect in standard mode
+			cameraImage.cols,			// Image width  i.e. 640 for Kinect in standard mode
+			cameraImage.rows,			// Image height i.e. 480 for Kinect in standard mode
 			0,							// Border width in pixels (can either be 1 or 0)
 			GL_RGB,						// Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
 			GL_UNSIGNED_BYTE,			// Image data type
-			cameraImage.ptr());				// The actual image data itself
+			cameraImage.ptr());			// The actual image data itself
 	}
 }
 
