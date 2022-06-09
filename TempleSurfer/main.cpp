@@ -76,6 +76,9 @@ int main(void)
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
 
 	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
+	WindowWidth = mode->width;
+	WindowHeight = mode->height;
+
 
 	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
@@ -252,10 +255,10 @@ void drawMenu()
 
 	//Draw orange quad for menu
 	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, WindowWidth, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(WindowWidth, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, WindowWidth, 0), glm::vec4(1.0f, 0.4f, 0.0f, 1.0f), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec4(1.0f, 0.4f, 0.0f, 1.0f), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(WindowWidth, 0, 0), glm::vec4(1.0f, 0.4f, 0.0f, 1.0f), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1.0f, 0.4f, 0.0f, 1.0f), glm::vec3(0, 1, 0)));
 	tigl::end();
 
 	glEnable(GL_DEPTH_TEST);

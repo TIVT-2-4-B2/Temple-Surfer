@@ -44,6 +44,7 @@ Vision::~Vision()
 cv::Mat Vision::getImage() {
     Mat image;
     cap.read(image);
+    flip(image, image, 1);
     return image;
 }
 
