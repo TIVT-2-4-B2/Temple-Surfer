@@ -78,7 +78,7 @@ static inline std::string cleanLine(std::string line)
 void OBJComponent::loadObjectFile(const std::string fileName, std::shared_ptr<ObjectBuilder> context, int listIndex)
 {
 	// Checking wheter the file actually exists
-	/*std::cout << "Loading " << fileName << std::endl;*/
+	std::cout << "Loading " << fileName << std::endl;
 	std::string dirName = fileName;
 	if (dirName.rfind("/") != std::string::npos)
 		dirName = dirName.substr(0, dirName.rfind("/"));
@@ -197,7 +197,7 @@ void OBJComponent::loadObjectFile(const std::string fileName, std::shared_ptr<Ob
 	// File is done
 	objectDataLock.lock();
 	file->animationIndex = listIndex;
-	objectData.push_back(file);
+	objectData->push_back(file);
 	objectDataLock.unlock();
 
 	amountWorkers--;
@@ -215,7 +215,7 @@ void OBJComponent::loadObjectFile(const std::string fileName, std::shared_ptr<Ob
 */
 void OBJComponent::loadMaterialFile(const std::string& fileName, const std::string& dirName, std::shared_ptr<ObjectFile>& file, std::shared_ptr<ObjectBuilder> context)
 {
-	//std::cout << "Loading " << fileName << std::endl;
+	std::cout << "Loading " << fileName << std::endl;
 	std::ifstream pFile(fileName.c_str());
 	if (!pFile.is_open())
 	{
@@ -295,6 +295,13 @@ void OBJComponent::loadMaterialFile(const std::string& fileName, const std::stri
 
 OBJComponent::OBJComponent(const std::string& fileName)
 {
+	// If in cache
+	if (cachedObjects.contains(fileName)) {
+		objectData = cachedObjects.at(fileName);
+		return;
+	}
+
+	// If not in cache
 	std::shared_ptr<ObjectBuilder> build = std::make_shared<ObjectBuilder>();
 	amountWorkers = 1;
 	std::thread thread(&OBJComponent::loadObjectFile, this, fileName, build, 0);
@@ -305,6 +312,8 @@ OBJComponent::OBJComponent(const std::string& fileName)
 	}
 
 	thread.join();
+
+	cachedObjects.insert({ fileName, objectData });
 }
 
 
@@ -313,6 +322,12 @@ OBJComponent::OBJComponent(const std::string& folderName, float animationDelayIn
 	// Setting variables
 	animationDelay = animationDelayIn;
 	amountWorkers = 0;
+
+	// If in cache
+	if (cachedObjects.contains(folderName)) {
+		objectData = cachedObjects.at(folderName);
+		return;
+	}
 
 	// Booting up threads
 	std::vector<std::shared_ptr<ObjectBuilder>> builders;
@@ -340,6 +355,9 @@ OBJComponent::OBJComponent(const std::string& folderName, float animationDelayIn
 	for (std::thread& t : threads) {
 		t.join();
 	}
+
+	// Adding it to cache
+	cachedObjects.insert({folderName, objectData});
 }
 
 OBJComponent::~OBJComponent()
@@ -348,9 +366,9 @@ OBJComponent::~OBJComponent()
 
 void OBJComponent::draw()
 {
-	if (objectData.size() == 1) objectDrawer(objectData.at(0));
+	if (objectData->size() == 1) objectDrawer(objectData->at(0));
 	else {
-		for (std::shared_ptr<ObjectFile> file : objectData) {
+		for (std::shared_ptr<ObjectFile> file : *objectData) {
 			if (file->animationIndex == animationIndex) {
 				objectDrawer(file);
 			}
@@ -379,8 +397,10 @@ void OBJComponent::update(float elapsedTime)
 {
 	if ((animationTime += elapsedTime) > animationDelay) {
 		//std::cout << animationIndex << std::endl;
+		animationTime = animationTime - animationDelay;
+
 		animationIndex++;
-		if (animationIndex >= objectData.size()) {
+		if (animationIndex >= objectData->size()) {
 			animationIndex = 0;
 		}
 		
@@ -404,7 +424,7 @@ tigl::VBO* OBJComponent::ObjectBuilder::asyncObjectVBOCall(std::vector<tigl::Ver
 
 	while (true) {
 		buildLock.lock();
-		if (outputGiven) {
+		if (outputGiven == true) {
 			inputGiven = false;
 			outputGiven = false;
 			buildLock.unlock();
@@ -429,7 +449,7 @@ std::shared_ptr<TextureComponent> OBJComponent::ObjectBuilder::asyncObjectTextur
 
 	while (true) {
 		buildLock.lock();
-		if (outputGiven) {
+		if (outputGiven == true) {
 			inputGiven = false;
 			outputGiven = false;
 			buildLock.unlock();
@@ -445,7 +465,7 @@ std::shared_ptr<TextureComponent> OBJComponent::ObjectBuilder::asyncObjectTextur
 void OBJComponent::ObjectBuilder::awaitObjectGLCall()
 {
 	buildLock.lock();
-	if (inputGiven) {
+	if (inputGiven == true) {
 		if (operation == 0) 
 		{
 			vboResponse = tigl::createVbo(verticesRequest);

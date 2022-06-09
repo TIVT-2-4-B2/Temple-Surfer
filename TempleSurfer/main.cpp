@@ -197,11 +197,11 @@ void createScene() {
 	//Add components to player object
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
 #ifndef COLLISION_DEBUG
-	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
+	player->addComponent(std::make_shared<OBJComponent>("models/dolphin/", 0.05f));
 #endif
 	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1))); //ToDo change to accurate hitbox.
 	player->addComponent(std::make_shared<PlayerComponent>());
-	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
+	player->scale = glm::vec3(1.0f, 1.0f, 1.0f);
 	player->rotation = glm::vec3(0, -1.57079633f, 0);
 	scene->addGameObject(player);
 

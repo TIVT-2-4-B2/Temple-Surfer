@@ -12,6 +12,8 @@
 #include <queue>
 #include "tigl.h"
 #include <mutex>
+#include <map>
+
 
 class OBJComponent : public DrawComponent {
 private:
@@ -39,6 +41,7 @@ private:
 		glm::vec4 diffuse;
 	};
 
+public:
 	// Holds a object file
 	class ObjectFile {
 	public:
@@ -48,6 +51,7 @@ private:
 		int animationIndex;
 	};
 
+private: 
 	// Object that is created when building to communicate with gl thread.
 	class ObjectBuilder {
 	public:
@@ -75,7 +79,7 @@ private:
 	
 	// Holds the information about the object
 	std::mutex objectDataLock;
-	std::vector<std::shared_ptr<ObjectFile>> objectData;
+	std::shared_ptr<std::vector<std::shared_ptr<ObjectFile>>> objectData = std::make_shared<std::vector<std::shared_ptr<ObjectFile>>>();
 
 	// Loads in the texture data.
 	void loadObjectFile(const std::string fileName, std::shared_ptr<ObjectBuilder> context, int listIndex);
@@ -89,3 +93,6 @@ public:
 	virtual void draw() override;
 	virtual void update(float elapsedTime) override;
 };
+
+// Global private caching map.
+static std::map<std::string, std::shared_ptr<std::vector<std::shared_ptr<OBJComponent::ObjectFile>>>> cachedObjects;
