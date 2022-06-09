@@ -67,8 +67,6 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	// Generating objects
 	std::list<std::shared_ptr<GameObject>> gameObjects;
 
-	// Adding in the floor
-	AddFloor(gameObjects);
 	float xPos;
 	float zPos;
 
@@ -111,8 +109,12 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 		}
 	}
 
+	// Adding in the floor
+	AddFloor(gameObjects);
+
 	// Filling the chunk
 	std::shared_ptr<GameChunk> chunkPointer = std::make_shared<GameChunk>(gameObjects, glm::vec3(0, 0, Z_THRESHOLD - (CHUNKS_ON_SCREEN * FLOOR_LENGTH)));
+
 	return chunkPointer;
 }
 
