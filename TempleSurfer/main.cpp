@@ -106,7 +106,7 @@ int main(void)
 			start();
 			isPlaying = true;
 			lastFrameTime = glfwGetTime();
-			vision = Vision(player->getComponent<PlayerComponent>());
+			vision = std::make_shared<Vision>(player->getComponent<PlayerComponent>());
 		}
 		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		{
@@ -120,12 +120,6 @@ int main(void)
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 			continue;
-		}
-
-		if (!initialized)
-		{
-			vision = std::make_shared<Vision>(player->getComponent<PlayerComponent>());
-			initialized = true;
 		}
 
 		update();
