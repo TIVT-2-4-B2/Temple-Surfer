@@ -6,6 +6,9 @@
 #include "OBJComponent.h"
 #include <memory>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -23,6 +26,7 @@
 #include "SpinComponent.h"
 #include "TimerJumper.h"
 #include "EnemyComponent.h"
+#include "CollisionComponent.h"
 
 #include "Vision.h"
 
@@ -48,7 +52,6 @@ void drawGUI();
 void BindTexture(cv::Mat& image);
 
 bool isPlaying = false;
-bool initialized = false;
 
 double lastFrameTime = 0;
 
@@ -69,18 +72,19 @@ int main(void)
 	}	
 
 	int count;
+
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
 
 	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
-	WindowWidth = mode->width;
-	WindowHeight = mode->height;
 
 	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
+	//Place null at monitors[0] 
 	window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", NULL, NULL);
+	//window = glfwCreateWindow(mode->width, mode->height, "Temple surfer", monitors[0], NULL);
 
 	if (!window)
 	{
@@ -102,6 +106,7 @@ int main(void)
 			start();
 			isPlaying = true;
 			lastFrameTime = glfwGetTime();
+			vision = Vision(player->getComponent<PlayerComponent>());
 		}
 		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		{
@@ -128,7 +133,10 @@ int main(void)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		
-		vision->visionUpdate();
+		if (isPlaying)
+		{
+		    vision->visionUpdate();
+		}
 
 	}
 
@@ -141,6 +149,8 @@ int main(void)
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	tigl::shader->enableLighting(true);
 	tigl::shader->setLightCount(1);
 	tigl::shader->setLightDirectional(0, true);
@@ -151,6 +161,7 @@ void init()
 	tigl::shader->setFogColor(glm::vec3(0.3f, 0.4f, 0.6f));
 	tigl::shader->setFogExp2(0.04f);
 	tigl::shader->setShinyness(0);
+	
 
 	createScene();
 
@@ -204,10 +215,13 @@ void createScene() {
 
 	//Add components to player object
 	player->addComponent(std::make_shared<MoveToComponent>(playerPos));
+#ifndef COLLISION_DEBUG
 	player->addComponent(std::make_shared<OBJComponent>("models/car/honda_jazz.obj"));
+#endif
+	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1))); //ToDo change to accurate hitbox.
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
-	player->rotation = glm::vec3(0, -1.57079633f, 0);
+	player->rotation = glm::vec3(0, -0.5f * (float)M_PI, 0);
 	scene->addGameObject(player);
 
 	std::list<std::shared_ptr<GameObject>> objectList;

@@ -20,7 +20,7 @@ void PlayerComponent::update(float _)
 	{
 		std::chrono::system_clock::duration duration = std::chrono::system_clock::now() - lastTime;
 		std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds> (duration);
-		if(seconds.count() > 1)
+		if(seconds.count() > 3)
 		{
 			resetY();
 			jumpOrCrouch = false;
@@ -57,7 +57,8 @@ void PlayerComponent::jump()
 {
 	if (!jumpOrCrouch)
 	{
-		gameObject->getComponent<MoveToComponent>()->target.y = 3.3f;
+		const float yTarget = 3.3f;
+		gameObject->getComponent<MoveToComponent>()->target.y = yTarget;
 		jumpOrCrouch = true;
 		lastTime = std::chrono::system_clock::now();
 	}
@@ -67,7 +68,8 @@ void PlayerComponent::crouch()
 {
 	if (!jumpOrCrouch)
 	{
-		gameObject->getComponent<MoveToComponent>()->target.y = 0;
+		const int yTarget = 0;
+		gameObject->getComponent<MoveToComponent>()->target.y = yTarget;
 		jumpOrCrouch = true;
 		lastTime = std::chrono::system_clock::now();
 	}
@@ -75,5 +77,6 @@ void PlayerComponent::crouch()
 
 void PlayerComponent::resetY()
 {
-	gameObject->getComponent<MoveToComponent>()->target.y = 1;
+	const int yTarget = 1;
+	gameObject->getComponent<MoveToComponent>()->target.y = yTarget;
 }

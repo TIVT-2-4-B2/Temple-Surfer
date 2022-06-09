@@ -12,7 +12,7 @@
 
 using namespace cv;
 
-VideoCapture cap(0);
+VideoCapture cap(0); //Camera id
 Mat img;
 CascadeClassifier faceCascade;
 std::vector<Rect> faces;
@@ -20,6 +20,11 @@ std::vector<Rect> faces;
 std::shared_ptr<PlayerComponent> playerComponent;
 
 int frames = 0;
+
+const int cameraWidth = 650;
+const int cameraHeight = 500;
+const int xOffset = 25;
+const int yOffset = 70;
 
 Vision::Vision()
 {
@@ -46,14 +51,22 @@ void Vision::visionUpdate() {
 
     if (frames % 10 == 0)
     {
+        const double scale = 1.2;
+        const int minNeighbors = 10;
+
         cap.read(img);
-        faceCascade.detectMultiScale(img, faces, 1.2, 10, 0, Size(50, 50));
+        faceCascade.detectMultiScale(img, faces, scale, minNeighbors, 0, Size(50, 50));
     }
     
     if (faces.size() == 0)
     {
         return;
     }
+
+    const int upperXThreshold = (cameraWidth - 2 * xOffset) / 3 * 2 + xOffset;
+    const int lowerXThreshold = (cameraWidth - 2 * xOffset) / 3 + xOffset;
+    const int upperYThreshold = (cameraHeight - 2 * yOffset) / 3 * 2 + yOffset;
+    const int lowerYThreshold = (cameraHeight - 2 * yOffset) / 3 + yOffset;
 
 #ifdef VIS_DEBUG
     //Show all detected faces
@@ -76,12 +89,12 @@ void Vision::visionUpdate() {
 
     //Drawing boundary lines
     //Horizontal
-    line(img, Point(0, 175), Point(650, 175), Scalar(0, 0, 255), 5); 
-    line(img, Point(0, 290), Point(650, 290), Scalar(0, 0, 255), 5);
+    line(img, Point(0, lowerYThreshold), Point(cameraWidth, lowerYThreshold), Scalar(0, 0, 255), 5); 
+    line(img, Point(0, upperYThreshold), Point(cameraWidth, upperYThreshold), Scalar(0, 0, 255), 5);
 
     //Vertical
-    line(img, Point(225, 0), Point(225, 500), Scalar(0, 0, 255), 5);
-    line(img, Point(415, 0), Point(415, 500), Scalar(0, 0, 255), 5);
+    line(img, Point(lowerXThreshold, 0), Point(lowerXThreshold, cameraHeight), Scalar(0, 0, 255), 5);
+    line(img, Point(upperXThreshold, 0), Point(upperXThreshold, cameraHeight), Scalar(0, 0, 255), 5);
 
     imshow("Debug", img);
     waitKey(1);
@@ -98,33 +111,33 @@ void Vision::visionUpdate() {
     int x = faces[0].x + (faces[0].width / 2);
     int y = faces[0].y + (faces[0].height / 2);
 
-    if (xPos != RIGHT && x < 225)
+    if (xPos != RIGHT && x < lowerXThreshold)
     {
         playerComponent->moveRight();
         xPos = RIGHT;
     }
-    else if (xPos != LEFT && x > 415)
+    else if (xPos != LEFT && x > upperXThreshold)
     {
         playerComponent->moveLeft();
         xPos = LEFT;
     }
-    else if (xPos != CENTER && x > 225 && x < 415)
+    else if (xPos != CENTER && x > lowerXThreshold && x < upperXThreshold)
     {
         playerComponent->moveCenter();
         xPos = CENTER;
     }
 
-    if (yPos != JUMP && y < 175)
+    if (yPos != JUMP && y < lowerYThreshold)
     {
         playerComponent->jump();
         yPos = JUMP;
     }
-    else if (yPos != DUCK && y > 290)
+    else if (yPos != DUCK && y > upperYThreshold)
     {
         playerComponent->crouch();
         yPos = DUCK;
     }
-    else if (yPos != STAND && y > 175 && y < 290)
+    else if (yPos != STAND && y > lowerYThreshold && y < upperYThreshold)
     {
         yPos = STAND;
     }
