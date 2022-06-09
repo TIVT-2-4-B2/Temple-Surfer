@@ -49,11 +49,14 @@ void createScene();
 void draw();
 void drawMenu();
 void drawGUI();
-void BindTexture(cv::Mat& image);
+void GenerateTexture(cv::Mat& image);
+void BindTexture();
 
 bool isPlaying = false;
 
 double lastFrameTime = 0;
+
+const int textureInterval = 3;
 
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
@@ -64,6 +67,9 @@ ChunkGenerator generator;
 
 int WindowWidth;
 int WindowHeight;
+
+GLuint textureID;
+int textureCount;
 
 int main(void)
 {
@@ -158,7 +164,6 @@ void init()
 	tigl::shader->setFogColor(glm::vec3(0.3f, 0.4f, 0.6f));
 	tigl::shader->setFogExp2(0.04f);
 	tigl::shader->setShinyness(0);
-	
 
 	createScene();
 
@@ -246,7 +251,7 @@ void drawMenu()
 	tigl::shader->enableTexture(false);
 	tigl::shader->enableColor(true);
 
-	glm::mat4 projection = glm::ortho(0.0f, (float)WindowWidth, (float)WindowHeight, 0.0f, -500.0f, 500.0f);
+	glm::mat4 projection = glm::ortho(0.0f, (float)WindowWidth, (float)WindowHeight, 0.0f, -1.0f, 1.0f);
 	tigl::shader->setProjectionMatrix(projection);
 	tigl::shader->setViewMatrix(glm::mat4(1.0f));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
@@ -291,7 +296,7 @@ void drawGUI() {
 	tigl::shader->enableFog(false);
 
 	//Draw UI
-	glm::mat4 projection = glm::ortho(0.0f, (float)WindowWidth, (float)WindowHeight, 0.0f, -500.0f, 500.0f);
+	glm::mat4 projection = glm::ortho(0.0f, (float)WindowWidth, (float)WindowHeight, 0.0f, -1.0f, 1.0f);
 	tigl::shader->setProjectionMatrix(projection);
 	tigl::shader->setViewMatrix(glm::mat4(1.0f));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
@@ -303,7 +308,14 @@ void drawGUI() {
 	cv::Mat img = vision->getImage();
 
 	//Load image as texture
-	BindTexture(img);
+	if (textureCount % textureInterval == 0)
+	{
+		GenerateTexture(img);
+	}
+	else {
+		BindTexture();
+	}
+	textureCount++;
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -321,18 +333,17 @@ void drawGUI() {
 	glEnable(GL_DEPTH_TEST);
 }
 
-void BindTexture(cv::Mat& image)
+void GenerateTexture(cv::Mat& cameraImage)
 {
-	GLuint id;
 
-	if (image.empty()) {
+	if (cameraImage.empty()) {
 		std::cout << "image empty" << std::endl;
 	}
 	else {
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-		glGenTextures(1, &id);
-		glBindTexture(GL_TEXTURE_2D, id);
+		glGenTextures(1, &textureID);
+		BindTexture();
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -340,16 +351,20 @@ void BindTexture(cv::Mat& image)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-		cv::cvtColor(image, image, COLOR_RGB2BGR);
+		cv::cvtColor(cameraImage, cameraImage, COLOR_RGB2BGR);
 
 		glTexImage2D(GL_TEXTURE_2D,     // Type of texture
 			0,							// Pyramid level (for mip-mapping) - 0 is the top level
 			GL_RGB,						// Internal colour format to convert to
-			image.cols,					// Image width  i.e. 640 for Kinect in standard mode
-			image.rows,					// Image height i.e. 480 for Kinect in standard mode
+			cameraImage.cols,					// Image width  i.e. 640 for Kinect in standard mode
+			cameraImage.rows,					// Image height i.e. 480 for Kinect in standard mode
 			0,							// Border width in pixels (can either be 1 or 0)
 			GL_RGB,						// Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
 			GL_UNSIGNED_BYTE,			// Image data type
-			image.ptr());				// The actual image data itself
+			cameraImage.ptr());				// The actual image data itself
 	}
+}
+
+void BindTexture() {
+	glBindTexture(GL_TEXTURE_2D, textureID);
 }

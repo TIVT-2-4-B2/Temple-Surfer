@@ -17,6 +17,9 @@ Mat img;
 CascadeClassifier faceCascade;
 std::vector<Rect> faces;
 
+Mat image;
+int count;
+
 std::shared_ptr<PlayerComponent> playerComponent;
 
 int frames = 0;
@@ -42,9 +45,13 @@ Vision::~Vision()
 }
 
 cv::Mat Vision::getImage() {
-    Mat image;
-    cap.read(image);
-    flip(image, image, 1);
+
+    if (count % 5 == 0)
+    {
+        cap.read(image);
+        flip(image, image, 1);
+    }
+    
     return image;
 }
 
