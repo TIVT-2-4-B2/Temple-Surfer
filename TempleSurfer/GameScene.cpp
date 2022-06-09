@@ -4,7 +4,6 @@
 
 ChunkGenerator chunkGenerator = ChunkGenerator();
 
-//TODO create more chunks and possibly add mist.
 GameScene::GameScene()
 {
 	chunkGenerator.generatorInit();
