@@ -5,6 +5,8 @@
 using tigl::Vertex;
 #include "OBJComponent.h"
 #include <memory>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include <opencv2/imgcodecs.hpp>
@@ -30,7 +32,6 @@ using tigl::Vertex;
 
 #include <iostream>
 #include <thread>
-
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
