@@ -20,7 +20,8 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	gameObjects.push_back(floor);
 
 	const int xOffset = 8;
-	const int yCoordinate = 2;
+	const int yCoordinate = 3;
+	const int yWater = 2;
 
 	//Adding sides
 	std::shared_ptr<GameObject> leftSide = std::make_shared<GameObject>();
@@ -48,10 +49,10 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	std::shared_ptr<GameObject> waterPane = std::make_shared<GameObject>();
 	waterPane->position = glm::vec3(0, 0, 0);
 	waterPane->addComponent(std::make_shared<PaneComponent>(
-		glm::vec3(-FLOOR_WIDTH - xOffset, 1, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(FLOOR_WIDTH + xOffset, 1, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(FLOOR_WIDTH + xOffset, 1, 0),
-		glm::vec3(-FLOOR_WIDTH - xOffset, 1, 0),
+		glm::vec3(-FLOOR_WIDTH - xOffset, yWater, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH + xOffset, yWater, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH + xOffset, yWater, 0),
+		glm::vec3(-FLOOR_WIDTH - xOffset, yWater, 0),
 		glm::vec4(0, 0.4f, 0.6f, 0.5f)));
 	gameObjects.push_back(waterPane);
 
@@ -83,25 +84,30 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	// Spawn objects on the sides
 	// List of objects
 	PresetList objectList;
-	objectList.emplace_back(AddCactusGroup);
-	objectList.emplace_back(AddCactusGroup);
-	objectList.emplace_back(AddCactusGroup);
-	objectList.emplace_back(AddEmpty);
-	objectList.emplace_back(AddEmpty);
-	objectList.emplace_back(AddCamel);
-	
+	PushMultiplePresets(objectList, AddCactusGroup, 3);
+	PushMultiplePresets(objectList, AddEmpty, 2);
+	PushMultiplePresets(objectList, AddCamel, 1);
+
 	float increment = FLOOR_LENGTH / 6;
-	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(FLOOR_WIDTH + 8 + (rand() % 5), 2, increment * 1), glm::vec3(1), glm::vec4(1));
-	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(FLOOR_WIDTH + 8 + (rand() % 5), 2, increment * 3), glm::vec3(1), glm::vec4(1));
-	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(FLOOR_WIDTH + 8 + (rand() % 5), 2, increment * 5), glm::vec3(1), glm::vec4(1));
-	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(-(FLOOR_WIDTH + 8 + (rand() % 5)), 2, increment * 1), glm::vec3(1), glm::vec4(1));
-	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(-(FLOOR_WIDTH + 8 + (rand() % 5)), 2, increment * 3), glm::vec3(1), glm::vec4(1));
-	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(-(FLOOR_WIDTH + 8 + (rand() % 5)), 2, increment * 5), glm::vec3(1), glm::vec4(1));
+	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(FLOOR_WIDTH + xOffset + (rand() % 5), yCoordinate, increment * 1), glm::vec3(1), glm::vec4(1));
+	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(FLOOR_WIDTH + xOffset + (rand() % 5), yCoordinate, increment * 3), glm::vec3(1), glm::vec4(1));
+	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(FLOOR_WIDTH + xOffset + (rand() % 5), yCoordinate, increment * 5), glm::vec3(1), glm::vec4(1));
+	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(-(FLOOR_WIDTH + xOffset + (rand() % 5)), yCoordinate, increment * 1), glm::vec3(1), glm::vec4(1));
+	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(-(FLOOR_WIDTH + xOffset + (rand() % 5)), yCoordinate, increment * 3), glm::vec3(1), glm::vec4(1));
+	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(-(FLOOR_WIDTH + xOffset + (rand() % 5)), yCoordinate, increment * 5), glm::vec3(1), glm::vec4(1));
+}
+
+void PushMultiplePresets(PresetList& presets, PresetFunc func, int count)
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		presets.emplace_back(func);
+	}
 }
 
 void AddEmpty(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
 {
-	
+
 }
 
 void AddCactusGroup(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
@@ -123,7 +129,7 @@ void AddCactus(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 po
 	cactus->addComponent(std::make_shared<OBJComponent>("models/cactus/10436_Cactus_v1_max2010_it2.obj"));
 	cactus->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
 	cactus->scale = size;
-	cactus->rotation = glm::vec3(-1.57079633f, 0, 0);
+	cactus->rotation = glm::vec3(-(M_PI / 2.0f), 0, 0);
 	gameObjects.push_back(cactus);
 }
 
@@ -137,7 +143,8 @@ void AddCamel(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	camel->addComponent(std::make_shared<OBJComponent>("models/camel/Camel.obj"));
 	camel->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
 	camel->scale = glm::vec3(0.005f);
-	camel->rotation = glm::vec3(-1.57079633f, 0, 0);
+	const int rotationCount = 8;
+	camel->rotation = glm::vec3(-(M_PI / 2.0f), 0, (rand() % rotationCount) * (2.0f / (float)rotationCount) * M_PI);
 	gameObjects.push_back(camel);
 }
 
@@ -152,8 +159,8 @@ void AddTugboat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 p
 	boat->addComponent(std::make_shared<OBJComponent>("models/tugboat/12218_tugboat_v1_L2.obj"));
 	boat->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
 	boat->scale = glm::vec3(0.001f, 0.001f, 0.001f);
-	std::vector<float> leftRight = { 0.0f, 3.14f };
-	boat->rotation = glm::vec3(-1.57079633f, 0, leftRight.at(rand() % leftRight.size()));
+	std::vector<float> leftRight = { 0.0f, M_PI };
+	boat->rotation = glm::vec3(-(M_PI / 2.0f), 0, leftRight.at(rand() % leftRight.size()));
 	gameObjects.push_back(boat);
 }
 
