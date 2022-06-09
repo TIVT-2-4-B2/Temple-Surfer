@@ -6,6 +6,9 @@ using tigl::Vertex;
 #include "OBJComponent.h"
 #include <memory>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -29,7 +32,6 @@ using tigl::Vertex;
 
 #include <iostream>
 #include <thread>
-
 
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
@@ -134,6 +136,8 @@ int main(void)
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	tigl::shader->enableLighting(true);
 	tigl::shader->setLightCount(1);
 	tigl::shader->setLightDirectional(0, true);
@@ -144,6 +148,7 @@ void init()
 	tigl::shader->setFogColor(glm::vec3(0.3f, 0.4f, 0.6f));
 	tigl::shader->setFogExp2(0.04f);
 	tigl::shader->setShinyness(0);
+	
 
 	createScene();
 
@@ -202,7 +207,7 @@ void createScene() {
 	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1))); //ToDo change to accurate hitbox.
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(0.03f, 0.03f, 0.03f);
-	player->rotation = glm::vec3(0, -1.57079633f, 0);
+	player->rotation = glm::vec3(0, -0.5f * (float)M_PI, 0);
 	scene->addGameObject(player);
 
 	std::list<std::shared_ptr<GameObject>> objectList;
