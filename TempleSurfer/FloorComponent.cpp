@@ -11,10 +11,11 @@ FloorComponent::FloorComponent()
 	const float offset = (FLOOR_WIDTH * (2.0f / 3.0f));
 	for (size_t i = 0; i < 3; i++) //For loop to make every seperate lane.
 	{
-		verts.push_back(Vertex::PCTN(glm::vec3(-offset + i * (FLOOR_WIDTH / 1.5), 0, 0) + glm::vec3(-FLOOR_WIDTH / 3, 0, FLOOR_LENGTH + FLOOR_OVERLAP), colorVecList[i], glm::vec2(0, 0), glm::vec3(0, -1, 0)));
-		verts.push_back(Vertex::PCTN(glm::vec3(-offset + i * (FLOOR_WIDTH / 1.5), 0, 0) + glm::vec3(FLOOR_WIDTH / 3, 0, FLOOR_LENGTH + FLOOR_OVERLAP), colorVecList[i], glm::vec2(1, 0), glm::vec3(0, -1, 0)));
-		verts.push_back(Vertex::PCTN(glm::vec3(-offset + i * (FLOOR_WIDTH / 1.5), 0, 0) + glm::vec3(FLOOR_WIDTH / 3, 0, 0), colorVecList[i], glm::vec2(1, 1), glm::vec3(0, -1, 0)));
-		verts.push_back(Vertex::PCTN(glm::vec3(-offset + i * (FLOOR_WIDTH / 1.5), 0, 0) + glm::vec3(-FLOOR_WIDTH / 3, 0, 0), colorVecList[i], glm::vec2(0, 1), glm::vec3(0, -1, 0)));
+		glm::vec3 chunkoffset = glm::vec3(-offset + i * (FLOOR_WIDTH / 1.5), -1, 0);
+		verts.push_back(Vertex::PCTN(chunkoffset + glm::vec3(-FLOOR_WIDTH / 3, 0, FLOOR_LENGTH + FLOOR_OVERLAP), colorVecList[i], glm::vec2(0, 0), glm::vec3(0, -1, 0)));
+		verts.push_back(Vertex::PCTN(chunkoffset + glm::vec3(FLOOR_WIDTH / 3, 0, FLOOR_LENGTH + FLOOR_OVERLAP), colorVecList[i], glm::vec2(1, 0), glm::vec3(0, -1, 0)));
+		verts.push_back(Vertex::PCTN(chunkoffset + glm::vec3(FLOOR_WIDTH / 3, 0, 0), colorVecList[i], glm::vec2(1, 1), glm::vec3(0, -1, 0)));
+		verts.push_back(Vertex::PCTN(chunkoffset + glm::vec3(-FLOOR_WIDTH / 3, 0, 0), colorVecList[i], glm::vec2(0, 1), glm::vec3(0, -1, 0)));
 	}
 }
 

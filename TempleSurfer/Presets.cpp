@@ -19,10 +19,10 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects)
 	std::shared_ptr<GameObject> leftSide = std::make_shared<GameObject>();
 	leftSide->position = glm::vec3(0, 0, 0);
 	leftSide->addComponent(std::make_shared<PaneComponent>(
-		glm::vec3(FLOOR_WIDTH, 0, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(FLOOR_WIDTH + 8, -4, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(FLOOR_WIDTH + 8, -4, 0),
-		glm::vec3(FLOOR_WIDTH, 0, 0),
+		glm::vec3(FLOOR_WIDTH, -1, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH + 8, 2, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH + 8, 2, 0),
+		glm::vec3(FLOOR_WIDTH, -1, 0),
 		glm::vec4(0, 0, 0, 1)));
 	leftSide->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));
 	gameObjects.push_back(leftSide);
@@ -30,13 +30,25 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects)
 	std::shared_ptr<GameObject> rightSide = std::make_shared<GameObject>();
 	rightSide->position = glm::vec3(0, 0, 0);
 	rightSide->addComponent(std::make_shared<PaneComponent>(
-		glm::vec3(-FLOOR_WIDTH, 0, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(-FLOOR_WIDTH - 8, -4, FLOOR_LENGTH + FLOOR_OVERLAP),
-		glm::vec3(-FLOOR_WIDTH - 8, -4, 0),
-		glm::vec3(-FLOOR_WIDTH, 0, 0),
+		glm::vec3(-FLOOR_WIDTH, -1, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(-FLOOR_WIDTH - 8, 2, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(-FLOOR_WIDTH - 8, 2, 0),
+		glm::vec3(-FLOOR_WIDTH, -1, 0),
 		glm::vec4(0, 0, 0, 1)));
 	rightSide->addComponent(std::make_shared<TextureComponent>("models/cube/tex2.bmp"));
 	gameObjects.push_back(rightSide);
+
+	//Adding water
+	std::shared_ptr<GameObject> waterPane = std::make_shared<GameObject>();
+	waterPane->position = glm::vec3(0, 0, 0);
+	waterPane->addComponent(std::make_shared<PaneComponent>(
+		glm::vec3(-FLOOR_WIDTH, 1, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH, 1, FLOOR_LENGTH + FLOOR_OVERLAP),
+		glm::vec3(FLOOR_WIDTH, 1, 0),
+		glm::vec3(-FLOOR_WIDTH, 1, 0),
+		glm::vec4(0, 0.4f, 0.6f, 0.5f)));
+	//waterPane->addComponent(std::make_shared<TextureComponent>("models/floor/waterpane.jpg"));
+	gameObjects.push_back(waterPane);
 }
 
 void AddTugboat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos)

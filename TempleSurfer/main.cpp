@@ -134,6 +134,8 @@ int main(void)
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	tigl::shader->enableLighting(true);
 	tigl::shader->setLightCount(1);
 	tigl::shader->setLightDirectional(0, true);
@@ -144,6 +146,7 @@ void init()
 	tigl::shader->setFogColor(glm::vec3(0.3f, 0.4f, 0.6f));
 	tigl::shader->setFogExp2(0.04f);
 	tigl::shader->setShinyness(0);
+	
 
 	createScene();
 
