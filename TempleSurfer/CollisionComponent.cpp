@@ -12,7 +12,7 @@ CollisionComponent::CollisionComponent(glm::vec3 hitbox) : hitbox(hitbox)
 {
 #ifdef COLLISION_DEBUG
 	glm::vec3 p(0, 0, 0); //Offset
-	glm::vec4 color(0.5f, 0.5f, 0.5f, 0.5f);
+	glm::vec4 color(0.5f, 0.5f, 0.5f, 0.5f); //Grey somewhat transparant.
 
 	//bottom
 	verts.push_back(Vertex::PCTN(p + glm::vec3(-hitbox.x, -hitbox.y, -hitbox.z), color, glm::vec2(0, 0), glm::vec3(0, -1, 0)));
