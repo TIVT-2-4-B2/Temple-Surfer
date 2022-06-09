@@ -26,14 +26,16 @@ void ChunkGenerator::generatorInit()
 		ChunkPreset preset;
     	while ( getline (presetFile,line) )
     	{
-			
-			for (int i = 0; i < 3; i++)
+			const int obstacleLines = 3;
+
+			for (int i = 0; i < obstacleLines; i++)
 			{
+				const int offset = 2;
 				int presetValue = stoi(line.substr(6 * i, 1));
 				preset.obstacles[i][0] = getObstacleFromInt(presetValue);
-				presetValue = stoi(line.substr(6 * i + 2, 1));
+				presetValue = stoi(line.substr(6 * i + offset, 1));
 				preset.obstacles[i][1] = getObstacleFromInt(presetValue);
-				presetValue = stoi(line.substr(6 * i + 4, 1));
+				presetValue = stoi(line.substr(6 * i + 2 * offset, 1));
 				preset.obstacles[i][2] = getObstacleFromInt(presetValue);
 			}
 			presets.push_back(preset);
@@ -65,28 +67,41 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	// Generating objects
 	std::list<std::shared_ptr<GameObject>> gameObjects;
 
-	// Adding in the floor
-	AddFloor(gameObjects);
 	float xPos;
 	float zPos;
+
+	// List of block objects
+	PresetList blockList;
+	//blockList.emplace_back(AddContainer);
+	//blockList.emplace_back(AddTugboat);
+	blockList.emplace_back(AddCube);
+
+	// List of jump objects
+	PresetList jumpList;
+	//jumpList.emplace_back(AddContainer);
+	jumpList.emplace_back(AddCube);
+
+	// List of duck objects
+	PresetList duckList;
+	duckList.emplace_back(AddCube);
+	//duckList.emplace_back(AddBoat);
+
 	// Adding in the generated config.
 	for (int i = 0; i < MATRIX_SIZE; i++)
 	{
-		zPos = ((1.0f / 6.0f) + (1.0f / 3.0f) * i) * FLOOR_LENGTH;
+		const float posOffset = 1.0f / 3.0f;
+		zPos = (posOffset / 2.0f + posOffset * i) * FLOOR_LENGTH;
 		for (int j = 0; j < MATRIX_SIZE; j++) {
-			xPos = -((2.0f / 3.0f) * FLOOR_WIDTH) + ((2.0f / 3.0f) * FLOOR_WIDTH) * j;  // X
+			xPos = -(2.0f * posOffset * FLOOR_WIDTH) + (2.0f * posOffset * FLOOR_WIDTH) * j;  // X
 			switch (preset.obstacles[i][j]) {
 				case BLOCK:
-					//AddTugboat(gameObjects, glm::vec3(xPos, 2, zPos));
-					//AddContainer(gameObjects, glm::vec3(xPos, 2, zPos));
-					AddCube(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1));
+					blockList.at(rand() % blockList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1));
 					break;
 				case JUMP:
-					//AddContainer(gameObjects, glm::vec3(xPos, 1, zPos));
-					AddCube(gameObjects, glm::vec3(xPos, 1, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0, 1));
+					jumpList.at(rand() % jumpList.size())(gameObjects, glm::vec3(xPos, 1, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0, 1));
 					break;
 				case DUCK:
-					AddCube(gameObjects, glm::vec3(xPos, 3, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
+					duckList.at(rand() % duckList.size())(gameObjects, glm::vec3(xPos, 3, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
 					break;
 				case NONE:
 					continue;
@@ -94,8 +109,12 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 		}
 	}
 
+	// Adding in the floor
+	AddFloor(gameObjects);
+
 	// Filling the chunk
 	std::shared_ptr<GameChunk> chunkPointer = std::make_shared<GameChunk>(gameObjects, glm::vec3(0, 0, Z_THRESHOLD - (CHUNKS_ON_SCREEN * FLOOR_LENGTH)));
+
 	return chunkPointer;
 }
 

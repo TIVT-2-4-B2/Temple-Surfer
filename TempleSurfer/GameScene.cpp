@@ -4,7 +4,6 @@
 
 ChunkGenerator chunkGenerator = ChunkGenerator();
 
-//TODO create more chunks and possibly add mist.
 GameScene::GameScene()
 {
 	chunkGenerator.generatorInit();
@@ -15,9 +14,9 @@ GameScene::~GameScene()
 }
 
 void GameScene::draw()
-{
-	for (auto& c : gameChunks)	c->draw();
+{	
 	for (auto& c : gameObjects)	c->draw();
+	for (auto& c : gameChunks)	c->draw();
 }
 
 void GameScene::addGameObject(std::shared_ptr<GameObject>& object)
