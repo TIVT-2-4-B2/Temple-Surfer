@@ -85,9 +85,9 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	// Spawn objects on the sides
 	// List of objects
 	PresetList objectList;
-	PushMultiplePresets(objectList, AddCactusGroup, 3);
-	PushMultiplePresets(objectList, AddEmpty, 2);
-	PushMultiplePresets(objectList, AddCamel, 1);
+	PushMultiplePresets(objectList, AddCactusGroup, 15);
+	PushMultiplePresets(objectList, AddEmpty, 10);
+	PushMultiplePresets(objectList, AddCamel, 5);
 	PushMultiplePresets(objectList, AddEvergiven, 1);
 
 	float increment = FLOOR_LENGTH / 6;
@@ -228,7 +228,7 @@ void AddPowerUp(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 p
 {
 	std::shared_ptr<GameObject> powerUp = std::make_shared<GameObject>();
 	powerUp->position = pos;
-	powerUp->addComponent(std::make_shared<OBJComponent>("models/powerupfish/12265_Fish_v1_L2.obj"));
+	powerUp->addComponent(std::make_shared<OBJComponent>("models/fish/12265_Fish_v1_L2.obj"));
 	powerUp->addComponent(std::make_shared<PowerUpComponent>(glm::vec3(0.05f, 0.025f, 0.05f)));
 	powerUp->scale = glm::vec3(0.1f);
 	powerUp->rotation = glm::vec3(0.5f * M_PI, M_PI, -0.5f * M_PI);

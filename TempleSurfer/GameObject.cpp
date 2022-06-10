@@ -43,16 +43,11 @@ void GameObject::draw(const glm::mat4& parentMatrix)
 
 	tigl::shader->setModelMatrix(modelMatrix);
 
-#ifdef COLLISION_DEBUG
 	for (auto& c : components) {
 		std::shared_ptr<DrawComponent> dc = dynamic_pointer_cast<DrawComponent>(c);
 		if (dc != nullptr)
 			dc->draw();
 	}
-#else	
-	drawComponent->draw();
-#endif
-
 }
 
 void GameObject::update(float elapsedTime)
@@ -63,6 +58,9 @@ void GameObject::update(float elapsedTime)
 
 void GameObject::update(float elapsedTime, const glm::vec3& parentMatrix)
 {
-	for (auto& c : components)
-		c->update(elapsedTime, parentMatrix);
+	for (auto& c : components) {
+		std::shared_ptr<Component> dc = dynamic_pointer_cast<Component>(c);
+		if (dc != nullptr)
+			dc->update(elapsedTime, parentMatrix);
+	}
 }

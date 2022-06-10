@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <iostream>
 #include <glm/glm.hpp>
 #include <list>
 #include <memory>
@@ -44,14 +45,16 @@ public:
 		return nullptr;
 	}
 
-	template<class T>
-	void removeComponent()
+	void removeComponent(const std::shared_ptr<Component>& component)
 	{
-		components.remove_if([](Component* c) 
+		for (auto& c : components)
 		{
-			T* t = dynamic_cast<T*>(c);
-			return t != nullptr;
-		});
+			if (c == component)
+			{
+				c = nullptr;
+			}
+		}
+		components.erase(std::remove(components.begin(), components.end(), nullptr), components.end());
 	}
 
 };
