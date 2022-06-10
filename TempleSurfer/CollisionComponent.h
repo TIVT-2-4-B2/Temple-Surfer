@@ -3,6 +3,7 @@
 #include "DrawComponent.h"
 #include <glm/glm.hpp>
 #include <vector>
+#include <string>
 #include "tigl.h"
 using tigl::Vertex;
 
@@ -16,6 +17,7 @@ private:
 public:
     glm::vec3 hitbox;
     bool powerup = false;
+    std::string name = "NoName";
 
     CollisionComponent();
 	CollisionComponent(glm::vec3 hitbox);

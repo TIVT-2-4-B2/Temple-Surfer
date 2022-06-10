@@ -72,13 +72,12 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 
 	// List of block objects
 	PresetList blockList;
-	blockList.emplace_back(AddContainer);
-	//blockList.emplace_back(AddCube);
+	PushMultiplePresets(blockList, AddContainer, 1);
 
 	// List of jump objects
 	PresetList jumpList;
-	jumpList.emplace_back(AddContainer);
-	//jumpList.emplace_back(AddCube);
+	PushMultiplePresets(jumpList, AddContainer, 3);
+	PushMultiplePresets(jumpList, AddBoat, 1);
 
 	// List of duck objects
 	PresetList duckList;
