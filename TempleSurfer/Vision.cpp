@@ -1,90 +1,80 @@
 #include "Vision.h"
+#include "PlayerComponent.h"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
 #include <iostream>
-
-#include "PlayerComponent.h"
-
-//#define VIS_DEBUG
+#include <thread>
 
 using namespace cv;
 
-VideoCapture cap(0); //Camera id
-Mat image;
-CascadeClassifier faceCascade;
-std::vector<Rect> faces;
+// Debug define for show debug window
+//#define VIS_DEBUG
+
+// Variables needed
+VideoCapture cap(0);            // Camera id
+CascadeClassifier faceCascade;  // Cascade used for regonizing
+std::vector<Rect> faces;        // The locations of faces
 
 Mat camImage;
-int count;
 
 std::shared_ptr<PlayerComponent> playerComponent;
 
 int frames = 0;
 
+// Settings
 const int cameraWidth = 650;
 const int cameraHeight = 500;
 const int xOffset = 25;
 const int yOffset = 70;
 
-Vision::Vision()
-{
-}
+// Boundries
+const int upperXThreshold = (cameraWidth - 2 * xOffset) / 3 * 2 + xOffset;
+const int lowerXThreshold = (cameraWidth - 2 * xOffset) / 3 + xOffset;
+const int upperYThreshold = (cameraHeight - 2 * yOffset) / 3 * 2 + yOffset;
+const int lowerYThreshold = (cameraHeight - 2 * yOffset) / 3 + yOffset;
 
+// Constructors and destructors
 Vision::Vision(std::shared_ptr<PlayerComponent> iPlayerComponent)
 {
+    // Initing cascade and setting components
     playerComponent = iPlayerComponent;
     faceCascade.load("Resources/haarcascade_frontalface_default.xml");
     if (faceCascade.empty()) { std::cout << "XML file not loaded" << std::endl; }
+
+    // Booting up regonision thread
+    std::thread(visionRoutine);
 }
 
 Vision::~Vision()
 {
 }
 
-cv::Mat Vision::getImage() {
-
-    if (count % 5 == 0)
-    {
-        Mat tempimage;
-        cap.read(tempimage);
-        cv::cvtColor(tempimage, tempimage, COLOR_RGB2BGR);
-        flip(tempimage, camImage, 1);
-    }
-    count++;
-    return camImage;
-}
-
-void Vision::visionUpdate() {
-
+// Usefull methods.
+void Vision::checkForFaces()
+{
+    // Does the image reginiosion.
     if (frames % 10 == 0)
     {
         const double scale = 1.2;
         const int minNeighbors = 10;
 
-        cap.read(image);
-        faceCascade.detectMultiScale(image, faces, scale, minNeighbors, 0, Size(50, 50));
+        cap.read(camImage);
+        faceCascade.detectMultiScale(camImage, faces, scale, minNeighbors, 0, Size(50, 50));
     }
-    
-    if (faces.size() == 0)
-    {
-        return;
-    }
+    frames++;
+}
 
-    const int upperXThreshold = (cameraWidth - 2 * xOffset) / 3 * 2 + xOffset;
-    const int lowerXThreshold = (cameraWidth - 2 * xOffset) / 3 + xOffset;
-    const int upperYThreshold = (cameraHeight - 2 * yOffset) / 3 * 2 + yOffset;
-    const int lowerYThreshold = (cameraHeight - 2 * yOffset) / 3 + yOffset;
-
-#ifdef VIS_DEBUG
+void Vision::debugWindow()
+{
     //Show all detected faces
     for (int i = 0; i < faces.size(); i++)
     {
         int x = faces[i].x + (faces[i].width / 2);
         int y = faces[i].y + (faces[i].height / 2);
-        line(img, Point(x, y), Point(x, y), Scalar(0, 0, 255), 50);
+        line(camImage, Point(x, y), Point(x, y), Scalar(0, 0, 255), 50);
     }
 
     //Get coordinates of main face
@@ -92,6 +82,7 @@ void Vision::visionUpdate() {
     int yd = faces[0].y + (faces[0].height / 2);
 
     //Draw point on middle of face
+    Mat img = camImage;
     line(img, Point(xd, yd), Point(xd, yd), Scalar(0, 255, 0), 50);
 
     //Debug for face coordinates
@@ -99,7 +90,7 @@ void Vision::visionUpdate() {
 
     //Drawing boundary lines
     //Horizontal
-    line(img, Point(0, lowerYThreshold), Point(cameraWidth, lowerYThreshold), Scalar(0, 0, 255), 5); 
+    line(img, Point(0, lowerYThreshold), Point(cameraWidth, lowerYThreshold), Scalar(0, 0, 255), 5);
     line(img, Point(0, upperYThreshold), Point(cameraWidth, upperYThreshold), Scalar(0, 0, 255), 5);
 
     //Vertical
@@ -108,11 +99,9 @@ void Vision::visionUpdate() {
 
     imshow("Debug", img);
     waitKey(1);
+}
 
-#endif // VIS_DEBUG
-
-    frames++;
-
+void Vision::checkResult() {
     if (faces.size() > 1)
     {
         return;
@@ -121,7 +110,7 @@ void Vision::visionUpdate() {
     int x = faces[0].x + (faces[0].width / 2);
     int y = faces[0].y + (faces[0].height / 2);
 
-    if (xPos != RIGHT && x < lowerXThreshold)
+    if (xPos != xPosition::RIGHT && x < lowerXThreshold)
     {
         playerComponent->moveRight();
         xPos = RIGHT;
@@ -151,6 +140,31 @@ void Vision::visionUpdate() {
     {
         yPos = STAND;
     }
+}
+
+cv::Mat Vision::getImage() {
+    return camImage;
+}
+
+
+
+void Vision::visionRoutine()
+{
+    while (true) {
+        checkForFaces();
+
+        // Debug window if needed
+        #ifdef VIS_DEBUG
+        debugWindow();
+        #endif 
+
+        checkResult();
+    }
+}
+
+void Vision::visionUpdate() {
+
+  
 
 }
 
