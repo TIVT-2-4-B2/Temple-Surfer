@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "PlayerComponent.h"
 #include "CollisionComponent.h"
+#include "CubeComponent.h"
 #include <Vector>
 #include <memory>
 #include <iostream>
@@ -26,9 +27,9 @@ void PowerUpComponent::powerupIntersect(glm::vec3 playerHitbox, glm::vec3 player
 	glm::vec3 hitBoxSum = makePositive((powerHitbox / this->gameObject->scale) + playerHitbox);
 	if (posDif.x <= hitBoxSum.x && posDif.y <= hitBoxSum.y && posDif.z <= hitBoxSum.z)
 	{
-		std::cout << "Powerup Engaged" << std::endl;
 		lastTime = std::chrono::system_clock::now();
 		player->getComponent<CollisionComponent>()->powerup = true;
+		gameObject->removeComponent<CubeComponent>();
 	}
 }
 
@@ -49,7 +50,7 @@ glm::vec3 PowerUpComponent::makePositive(glm::vec3 vector)
 	return vector;
 }
 
-const int powerupDuration = 8;
+const int powerupDuration = 12;
 
 void PowerUpComponent::update(float elapsedTime, const glm::vec3& parentMatrix) {
 	if (player != nullptr && player->getComponent<CollisionComponent>() != nullptr)
@@ -61,7 +62,6 @@ void PowerUpComponent::update(float elapsedTime, const glm::vec3& parentMatrix) 
 		std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds> (duration);
 		if (seconds.count() > powerupDuration)
 		{
-			std::cout << "Powerup Disengaged" << std::endl;
 			player->getComponent<CollisionComponent>()->powerup = false;
 		}
 	}
