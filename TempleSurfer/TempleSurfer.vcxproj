@@ -182,6 +182,7 @@
     <ClCompile Include="OBJComponent.cpp" />
     <ClCompile Include="PaneComponent.cpp" />
     <ClCompile Include="PlayerComponent.cpp" />
+    <ClCompile Include="PowerUpComponent.cpp" />
     <ClCompile Include="Presets.cpp" />
     <ClCompile Include="SpinComponent.cpp" />
     <ClCompile Include="TextureComponent.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="OBJComponent.h" />
     <ClInclude Include="PaneComponent.h" />
     <ClInclude Include="PlayerComponent.h" />
+    <ClInclude Include="PowerUpComponent.h" />
     <ClInclude Include="Presets.h" />
     <ClInclude Include="SpinComponent.h" />
     <ClInclude Include="stb_image.h" />
