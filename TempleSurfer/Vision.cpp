@@ -29,6 +29,7 @@ const int cameraWidth = 650;
 const int cameraHeight = 500;
 const int xOffset = 25;
 const int yOffset = 70;
+const int overFlowLimit = 100;
 
 // Boundries
 const int upperXThreshold = (cameraWidth - 2 * xOffset) / 3 * 2 + xOffset;
@@ -102,47 +103,33 @@ void Vision::debugWindow()
 }
 
 void Vision::checkResult() {
-    if (faces.size() > 1)
-    {
-        return;
-    }
+    // Returning when not needed
+    if (faces.size() > 1 || faces.size() == 0) return;
+    
 
     int x = faces[0].x + (faces[0].width / 2);
     int y = faces[0].y + (faces[0].height / 2);
 
-    if (xPos != xPosition::RIGHT && x < lowerXThreshold)
-    {
-        playerComponent->moveRight();
-        xPos = RIGHT;
+    lockInputQueues.lock();
+
+    // Checking if there is now input overflow
+    if (xInputQueue.size() < overFlowLimit) {
+        if (x < lowerXThreshold)  xInputQueue.emplace(xPosition::RIGHT);
+        else if (x > upperXThreshold)  xInputQueue.emplace(xPosition::LEFT);
+        else if (x > lowerXThreshold && x < upperXThreshold) xInputQueue.emplace(xPosition::CENTER);
     }
-    else if (xPos != LEFT && x > upperXThreshold)
-    {
-        playerComponent->moveLeft();
-        xPos = LEFT;
-    }
-    else if (xPos != CENTER && x > lowerXThreshold && x < upperXThreshold)
-    {
-        playerComponent->moveCenter();
-        xPos = CENTER;
+    // Checking if there is now input overflow
+    if (yInputQueue.size() < overFlowLimit) {
+        if (y < lowerYThreshold) yInputQueue.emplace(yPosition::JUMP);
+        else if (y > upperYThreshold) yInputQueue.emplace(yPosition::DUCK);
+        else if (y > lowerYThreshold && y < upperYThreshold)  yInputQueue.emplace(yPosition::STAND);
     }
 
-    if (yPos != JUMP && y < lowerYThreshold)
-    {
-        playerComponent->jump();
-        yPos = JUMP;
-    }
-    else if (yPos != DUCK && y > upperYThreshold)
-    {
-        playerComponent->crouch();
-        yPos = DUCK;
-    }
-    else if (yPos != STAND && y > lowerYThreshold && y < upperYThreshold)
-    {
-        yPos = STAND;
-    }
+    lockInputQueues.unlock();
 }
 
 cv::Mat Vision::getImage() {
+    // Returns the image given.
     return camImage;
 }
 
@@ -159,12 +146,31 @@ void Vision::visionRoutine()
         #endif 
 
         checkResult();
+
+        // Freeing time for other threads
+        std::this_thread::sleep_for(std::chrono::microseconds(500));
     }
 }
 
 void Vision::visionUpdate() {
+    lockInputQueues.lock();
 
-  
+    // Checking x-axis inputs
+    if (!xInputQueue.empty()) {
+        if (xInputQueue.front() == xPosition::RIGHT && xPos != xPosition::RIGHT) { playerComponent->moveRight();xPos = xPosition::RIGHT;}
+        else if (xInputQueue.front() == xPosition::LEFT && xPos != xPosition::LEFT) { playerComponent->moveLeft(); xPos = xPosition::LEFT;}
+        else if (xInputQueue.front() == xPosition::CENTER && xPos != xPosition::CENTER) { playerComponent->moveCenter(); xPos = xPosition::CENTER; }
+        xInputQueue.pop();
+    }
 
+    // Checking y-axis inputs
+    if (!yInputQueue.empty()) {
+        if (yInputQueue.front() == yPosition::DUCK && yPos != yPosition::DUCK) { playerComponent->crouch(); yPos = yPosition::DUCK; }
+        else if (yInputQueue.front() == yPosition::JUMP && yPos != yPosition::JUMP) { playerComponent->jump(); yPos = yPosition::JUMP; }
+        else if (yInputQueue.front() == yPosition::STAND && yPos != yPosition::STAND) { yPos = yPosition::STAND; }
+        yInputQueue.pop();
+    }
+    
+    lockInputQueues.unlock();
 }
 
