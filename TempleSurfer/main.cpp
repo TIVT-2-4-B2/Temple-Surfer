@@ -8,6 +8,8 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <stack>
+#include <algorithm>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -50,6 +52,7 @@ void draw();
 void drawMenu();
 void drawGUI();
 void GenerateTexture(cv::Mat& image);
+std::vector<int> intToDigits(int number);
 void BindTexture();
 
 bool isPlaying = false;
@@ -332,6 +335,22 @@ void drawGUI() {
 	tigl::shader->enableColor(true);
 
 	glEnable(GL_DEPTH_TEST);
+
+	
+
+}
+
+std::vector<int> intToDigits(int number) {
+	std::vector<int> digits;
+
+	while (number > 0) {
+		digits.push_back(number % 10);
+		number = number / 10;
+	}
+
+	std::reverse(digits.begin(), digits.end());
+
+	return digits;
 }
 
 void GenerateTexture(cv::Mat& cameraImage)
