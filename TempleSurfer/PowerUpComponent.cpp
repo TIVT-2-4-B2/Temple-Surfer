@@ -29,10 +29,11 @@ void PowerUpComponent::powerupIntersect(glm::vec3 playerHitbox, glm::vec3 player
 	glm::vec3 hitBoxSum = makePositive((powerHitbox / this->gameObject->scale) + playerHitbox);
 	if (posDif.x <= hitBoxSum.x && posDif.y <= hitBoxSum.y && posDif.z <= hitBoxSum.z)
 	{
-		lastTime = std::chrono::system_clock::now();
+		if (player->getComponent<CollisionComponent>()->powerup == false) {
+			lastTime = std::chrono::system_clock::now();
+			std::cout << "Engaged" << std::endl;
+		}
 		player->getComponent<CollisionComponent>()->powerup = true;
-		std::cout << "Engaged" << std::endl;
-		//To Do: Remove the powerup component on pick-up.
 	}
 }
 

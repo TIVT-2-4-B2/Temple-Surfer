@@ -211,7 +211,7 @@ void AddPowerUp(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 p
 	std::shared_ptr<GameObject> powerUp = std::make_shared<GameObject>();
 	powerUp->position = pos;
 	powerUp->addComponent(std::make_shared<OBJComponent>("models/powerupfish/12265_Fish_v1_L2.obj"));
-	powerUp->addComponent(std::make_shared<PowerUpComponent>(glm::vec3(0.05f)));
+	powerUp->addComponent(std::make_shared<PowerUpComponent>(glm::vec3(0.05f, 0.025f, 0.05f)));
 	powerUp->scale = glm::vec3(0.1f);
 	powerUp->rotation = glm::vec3(0.5f * M_PI, M_PI, -0.5f * M_PI);
 	gameObjects.push_back(powerUp);
