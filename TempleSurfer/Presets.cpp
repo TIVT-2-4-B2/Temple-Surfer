@@ -171,8 +171,9 @@ void AddTugboat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 p
 	//Add components to boat object
 	boat->addComponent(std::make_shared<MoveToComponent>(boatPos));
 	boat->addComponent(std::make_shared<OBJComponent>("models/tugboat/12218_tugboat_v1_L2.obj"));
-	boat->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
-	boat->scale = glm::vec3(0.001f, 0.001f, 0.001f);
+	boat->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.001f, 0.0005f, 0.001f)));
+	boat->getComponent<CollisionComponent>()->name = "Tugboat";
+	boat->scale = glm::vec3(0.001f);
 	std::vector<float> leftRight = { 0.0f, M_PI };
 	boat->rotation = glm::vec3(-(M_PI / 2.0f), 0, leftRight.at(rand() % leftRight.size()));
 	gameObjects.push_back(boat);
@@ -187,7 +188,8 @@ void AddBoat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos,
 	//Add components to boat object
 	boat->addComponent(std::make_shared<MoveToComponent>(boatPos));
 	boat->addComponent(std::make_shared<OBJComponent>("models/boat/12219_boat_v2_L2.obj"));
-	boat->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
+	boat->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.002f, 0.001f, 0.002f)));
+	boat->getComponent<CollisionComponent>()->name = "Boat";
 	boat->scale = glm::vec3(0.002f);
 	std::vector<float> leftRight = { 0.0f, (float)M_PI };
 	boat->rotation = glm::vec3(-1.57079633f, 0, leftRight.at(rand() % leftRight.size()));
@@ -203,7 +205,8 @@ void AddContainer(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3
 	//Add components to container object
 	container->addComponent(std::make_shared<MoveToComponent>(contianerPos));
 	container->addComponent(std::make_shared<OBJComponent>("models/container_v2/12281_Container_v2_L2.obj"));
-	container->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.007f)));
+	container->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.003f, 0.007f, 0.007f)));
+	container->getComponent<CollisionComponent>()->name = "Container";
 	container->scale = glm::vec3(size.y * 0.003f, size.z * 0.007f, size.x * 0.007f);
 	std::vector<float> leftRight = { 0.0f, (float)M_PI };
 	container->rotation = glm::vec3(-1.57079633f, -1.57079633f, leftRight.at(rand() % leftRight.size()));
@@ -216,5 +219,6 @@ void AddCube(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos,
 	cube->position = pos;
 	cube->addComponent(std::make_shared<CubeComponent>(size, color));
 	cube->addComponent(std::make_shared<CollisionComponent>(size));
+	cube->getComponent<CollisionComponent>()->name = "Cube";
 	gameObjects.push_back(cube);
 }

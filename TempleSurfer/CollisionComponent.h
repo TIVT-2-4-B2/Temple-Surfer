@@ -4,6 +4,7 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include <vector>
+#include <string>
 #include "tigl.h"
 using tigl::Vertex;
 
@@ -16,6 +17,7 @@ private:
 
 public:
     glm::vec3 hitbox;
+    std::string name = "NoName";
 
 	CollisionComponent(glm::vec3 hitbox);
 	~CollisionComponent();

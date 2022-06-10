@@ -70,6 +70,7 @@ void CollisionComponent::intersect(glm::vec3 playerHitbox, glm::vec3 playerPosit
 	if (posDif.x <= hitBoxSum.x && posDif.y <= hitBoxSum.y && posDif.z <= hitBoxSum.z)
 	{
 		AudioManager::instance()->onceMusic("Resources/bonk.mp3");
+		std::cout << this->name << std::endl;
 		isPlaying = false;
 	}
 }
