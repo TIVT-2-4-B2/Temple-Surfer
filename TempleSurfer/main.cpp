@@ -89,7 +89,7 @@ int main(void)
 {
 	if (!glfwInit()) {
 		throw "Could not initialize glwf";
-	}	
+	}
 
 	int count;
 
@@ -149,10 +149,10 @@ int main(void)
 		draw();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		
+
 		if (isPlaying)
 		{
-		    vision->visionUpdate();
+			vision->visionUpdate();
 		}
 
 	}
@@ -165,6 +165,19 @@ int main(void)
 //Initiate the game
 void init()
 {
+	// Precache objs
+	std::string objs[5] = { 
+		"models/evergiven/EverGiven.obj",
+		"models/tugboat/12218_tugboat_v1_L2.obj",
+		"models/boat/12219_boat_v2_L2.obj",
+		"models/container_v2/12281_Container_v2_L2.obj",
+		"models/fish/12265_Fish_v1_L2.obj"
+	};
+	for (int i = 0; i < 4; i++) {
+		std::shared_ptr<OBJComponent> obj1 = std::make_shared<OBJComponent>(objs[i]);
+	}
+	std::cout << "Loaded precache" << std::endl;
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -174,7 +187,7 @@ void init()
 	tigl::shader->setLightPosition(0, (glm::vec3(0, 7, 12)));
 	tigl::shader->setLightAmbient(0, glm::vec3(0.5f, 0.5f, 0.5f));
 	tigl::shader->setLightDiffuse(0, glm::vec3(0.5f, 0.5f, 0.5f));
-	tigl::shader->setLightSpecular(0, glm::vec3(1,1,1));
+	tigl::shader->setLightSpecular(0, glm::vec3(1, 1, 1));
 	tigl::shader->setFogColor(glm::vec3(0.3f, 0.4f, 0.6f));
 	tigl::shader->setFogExp2(0.04f);
 	tigl::shader->setShinyness(0);
@@ -182,11 +195,11 @@ void init()
 	createScene();
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-	{
-		if (key == GLFW_KEY_ESCAPE) {
-			glfwSetWindowShouldClose(window, true);
-		}
-	});
+		{
+			if (key == GLFW_KEY_ESCAPE) {
+				glfwSetWindowShouldClose(window, true);
+			}
+		});
 
 	update();
 
@@ -241,7 +254,7 @@ void createScene() {
 	scene->addGameObject(player);
 
 	std::list<std::shared_ptr<GameObject>> objectList;
-	
+
 	//Create floor object
 	AddFloor(objectList);
 
@@ -306,7 +319,7 @@ void draw()
 	glm::mat4 projection = glm::perspective(glm::radians(75.0f), viewport[2] / (float)viewport[3], 0.01f, 1000.0f);
 
 	tigl::shader->setProjectionMatrix(projection);
-	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(player->position.x,7,12), glm::vec3(player->position.x,0,0), glm::vec3(0,1,0)));
+	tigl::shader->setViewMatrix(glm::lookAt(glm::vec3(player->position.x, 7, 12), glm::vec3(player->position.x, 0, 0), glm::vec3(0, 1, 0)));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
 	tigl::shader->enableColor(true);
