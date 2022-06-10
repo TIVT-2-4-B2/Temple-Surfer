@@ -53,7 +53,7 @@ glm::vec3 PowerUpComponent::makePositive(glm::vec3 vector)
 	return vector;
 }
 
-const int powerupDuration = 10;
+const int powerupDuration = 12;
 
 void PowerUpComponent::update(float elapsedTime, const glm::vec3& parentMatrix) {
 	if (player != nullptr && player->getComponent<CollisionComponent>() != nullptr)
