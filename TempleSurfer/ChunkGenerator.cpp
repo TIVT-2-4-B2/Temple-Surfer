@@ -87,7 +87,7 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	//duckList.emplace_back(AddBoat);
 
 	PresetList powerUpList;
-	powerUpList.emplace_back(AddCube);
+	powerUpList.emplace_back(AddPowerUp);
 
 	// Adding in the generated config.
 	for (int i = 0; i < MATRIX_SIZE; i++)

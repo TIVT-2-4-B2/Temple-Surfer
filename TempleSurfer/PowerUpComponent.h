@@ -1,22 +1,27 @@
 #pragma once
 
-#include "CollisionComponent.h"
+#include "Component.h"
 #include <chrono>
+#include <vector>
+#include "tigl.h"
+using tigl::Vertex;
 
 
-class PowerUpComponent : public CollisionComponent
+class PowerUpComponent : public Component
 {
 private:
 	std::vector<Vertex> verts;
 	std::chrono::system_clock::time_point lastTime;
+	void powerupIntersect(glm::vec3 playerHitbox, glm::vec3 playerPosition, const glm::vec3& parentMatrix);
+	glm::vec3 makePositive(glm::vec3 vector);
+	glm::vec3 powerHitbox;
 
 public:
-	glm::vec3 powerHitbox;
+	
 
 	PowerUpComponent(glm::vec3 powerHitbox);
 	~PowerUpComponent();
 
-	void intersect(glm::vec3 playerHitbox, glm::vec3 playerPosition, const glm::vec3& parentMatrix);
 	virtual void update(float elapsedTime, const glm::vec3& parentMatrix) override;
-	virtual void draw() override;
+
 };

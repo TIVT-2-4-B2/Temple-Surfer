@@ -75,6 +75,7 @@ void CollisionComponent::intersect(glm::vec3 playerHitbox, glm::vec3 playerPosit
 	glm::vec3 hitBoxSum = makePositive((hitbox / this->gameObject->scale) + playerHitbox);
 	if (posDif.x <= hitBoxSum.x && posDif.y <= hitBoxSum.y && posDif.z <= hitBoxSum.z)
 	{
+		std::cout << "Collision Intersect" << std::endl;
 		isPlaying = false;
 	}
 }

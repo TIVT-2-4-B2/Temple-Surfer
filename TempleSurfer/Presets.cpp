@@ -85,9 +85,9 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	// Spawn objects on the sides
 	// List of objects
 	PresetList objectList;
-	PushMultiplePresets(objectList, AddCactusGroup, 3);
+	//PushMultiplePresets(objectList, AddCactusGroup, 3);
 	PushMultiplePresets(objectList, AddEmpty, 2);
-	PushMultiplePresets(objectList, AddCamel, 1);
+	//PushMultiplePresets(objectList, AddCamel, 1);
 
 	float increment = FLOOR_LENGTH / 6;
 	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(FLOOR_WIDTH + xOffset + (rand() % 5), yCoordinate, increment * 1), glm::vec3(1), glm::vec4(1));
