@@ -11,7 +11,7 @@ void AudioManager::loopMusic(std::string path)
 {
 	HSTREAM music;
 	if (IDMap.contains(path)) music = IDMap.at(path);
-	else music = BASS_StreamCreateFile(FALSE, path.c_str(), 0, 0, 0);
+	else music = BASS_StreamCreateFile(FALSE, path.c_str(), 0, 0, BASS_SAMPLE_LOOP);
 	BASS_ChannelPlay(music, TRUE);
 }
 
