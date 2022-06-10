@@ -234,7 +234,7 @@ void createScene() {
 #ifndef COLLISION_DEBUG
 	player->addComponent(std::make_shared<OBJComponent>("models/dolphin/", 0.05f));
 #endif
-	//player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.75f, 1, 1.2f))); //ToDo change to accurate hitbox.
+	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.75f, 1, 1.2f))); //ToDo change to accurate hitbox.
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(0.7f, 0.7f, 0.7f);
 	player->rotation = glm::vec3(0, -1 * (float)M_PI, 0);
@@ -407,8 +407,7 @@ void GenerateImageTexture(const std::string& fileName)
 	int width, height, bpp;
 	stbi_uc* data = stbi_load(fileName.c_str(), &width, &height, &bpp, 4);
 
-	//std::cout << data << std::endl;
-
+	glDeleteTextures(1, &id);
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
 	glTexImage2D(GL_TEXTURE_2D,
