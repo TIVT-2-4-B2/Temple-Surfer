@@ -8,6 +8,10 @@
 extern bool isPlaying;
 extern std::shared_ptr<GameObject> player;
 
+CollisionComponent::CollisionComponent() {
+
+}
+
 CollisionComponent::CollisionComponent(glm::vec3 hitbox) : hitbox(hitbox)
 {
 #ifdef COLLISION_DEBUG
@@ -63,6 +67,12 @@ void CollisionComponent::intersect(glm::vec3 playerHitbox, glm::vec3 playerPosit
 	{
 		return;
 	}
+
+	if (player->getComponent<CollisionComponent>()->powerup) 
+	{
+		return;
+	}
+
 	glm::vec3 gamePos = parentMatrix + this->gameObject->position;
 	glm::vec3 posDif = makePositive(gamePos - playerPosition);
 	glm::vec3 hitBoxSum = makePositive((hitbox / this->gameObject->scale) + playerHitbox);

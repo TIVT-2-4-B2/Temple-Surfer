@@ -87,6 +87,9 @@
     <ClCompile Include="DrawComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PowerUpComponent.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tigl.h">
@@ -154,6 +157,9 @@
     </ClInclude>
     <ClInclude Include="DrawComponent.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerUpComponent.h">
+      <Filter>components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
