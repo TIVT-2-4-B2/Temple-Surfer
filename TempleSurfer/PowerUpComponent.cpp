@@ -27,8 +27,8 @@ void PowerUpComponent::powerupIntersect(glm::vec3 playerHitbox, glm::vec3 player
 	if (posDif.x <= hitBoxSum.x && posDif.y <= hitBoxSum.y && posDif.z <= hitBoxSum.z)
 	{
 		std::cout << "Powerup Engaged" << std::endl;
-		player->getComponent<CollisionComponent>()->powerup = true;
 		lastTime = std::chrono::system_clock::now();
+		player->getComponent<CollisionComponent>()->powerup = true;
 	}
 }
 
@@ -57,10 +57,9 @@ void PowerUpComponent::update(float elapsedTime, const glm::vec3& parentMatrix) 
 		powerupIntersect(player->getComponent<CollisionComponent>()->hitbox, player->position, parentMatrix);
 	}
 	if (player->getComponent<CollisionComponent>()->powerup) {
-		//std::chrono::system_clock::duration duration = std::chrono::system_clock::now() - lastTime;
-		//std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds> (duration);
-		std::chrono::duration<double, std::milli> ms = std::chrono::system_clock::now() - lastTime;
-		if (ms.count() > powerupDuration * 1000)
+		std::chrono::system_clock::duration duration = std::chrono::system_clock::now() - lastTime;
+		std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds> (duration);
+		if (seconds.count() > powerupDuration)
 		{
 			std::cout << "Powerup Disengaged" << std::endl;
 			player->getComponent<CollisionComponent>()->powerup = false;

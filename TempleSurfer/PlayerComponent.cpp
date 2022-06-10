@@ -59,8 +59,8 @@ void PlayerComponent::jump()
 	{
 		const float yTarget = 3.3f;
 		gameObject->getComponent<MoveToComponent>()->target.y = yTarget;
-		jumpOrCrouch = true;
 		lastTime = std::chrono::system_clock::now();
+		jumpOrCrouch = true;
 	}
 }
 
@@ -70,8 +70,8 @@ void PlayerComponent::crouch()
 	{
 		const int yTarget = 0;
 		gameObject->getComponent<MoveToComponent>()->target.y = yTarget;
-		jumpOrCrouch = true;
 		lastTime = std::chrono::system_clock::now();
+		jumpOrCrouch = true;
 	}
 }
 

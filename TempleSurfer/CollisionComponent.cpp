@@ -63,13 +63,16 @@ CollisionComponent::~CollisionComponent()
 
 void CollisionComponent::intersect(glm::vec3 playerHitbox, glm::vec3 playerPosition, const glm::vec3& parentMatrix)
 {
-	if (powerup) {
-		return;
-	}
 	if (this->gameObject->position == playerPosition && hitbox == playerHitbox)
 	{
 		return;
 	}
+
+	if (player->getComponent<CollisionComponent>()->powerup) 
+	{
+		return;
+	}
+
 	glm::vec3 gamePos = parentMatrix + this->gameObject->position;
 	glm::vec3 posDif = makePositive(gamePos - playerPosition);
 	glm::vec3 hitBoxSum = makePositive((hitbox / this->gameObject->scale) + playerHitbox);
