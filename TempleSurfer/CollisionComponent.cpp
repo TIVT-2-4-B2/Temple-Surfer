@@ -8,6 +8,10 @@
 extern bool isPlaying;
 extern std::shared_ptr<GameObject> player;
 
+CollisionComponent::CollisionComponent() {
+
+}
+
 CollisionComponent::CollisionComponent(glm::vec3 hitbox) : hitbox(hitbox)
 {
 #ifdef COLLISION_DEBUG
@@ -59,6 +63,9 @@ CollisionComponent::~CollisionComponent()
 
 void CollisionComponent::intersect(glm::vec3 playerHitbox, glm::vec3 playerPosition, const glm::vec3& parentMatrix)
 {
+	if (powerup) {
+		return;
+	}
 	if (this->gameObject->position == playerPosition && hitbox == playerHitbox)
 	{
 		return;

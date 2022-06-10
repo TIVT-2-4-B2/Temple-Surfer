@@ -5,6 +5,10 @@
 
 class PowerUpComponent : public CollisionComponent
 {
+private:
+	std::vector<Vertex> verts;
+	std::chrono::system_clock::time_point lastTime;
+
 public:
 	glm::vec3 powerHitbox;
 
