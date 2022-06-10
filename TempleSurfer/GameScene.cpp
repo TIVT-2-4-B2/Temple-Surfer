@@ -6,6 +6,8 @@
 
 ChunkGenerator chunkGenerator = ChunkGenerator();
 
+extern int score = 0;
+
 GameScene::GameScene()
 {
 	chunkGenerator.generatorInit();

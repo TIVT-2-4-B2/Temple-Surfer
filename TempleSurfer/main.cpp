@@ -35,6 +35,9 @@
 #include <iostream>
 #include <thread>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 using tigl::Vertex;
 using namespace cv;
 
@@ -53,13 +56,21 @@ void drawMenu();
 void drawGUI();
 void GenerateTexture(cv::Mat& image);
 std::vector<int> intToDigits(int number);
+void showScore(std::vector<int> digits);
 void BindTexture();
+
+void GenerateImageTexture(const std::string& fileName);
+void BindImageTexture();
 
 bool isPlaying = false;
 
 double lastFrameTime = 0;
 
 const int textureInterval = 1;
+const int digitWidth = 60;
+const int digitHeight = 80;
+const int digitOffsetX = 20;
+const int digitOffsetY = 20;
 
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
@@ -223,7 +234,7 @@ void createScene() {
 #ifndef COLLISION_DEBUG
 	player->addComponent(std::make_shared<OBJComponent>("models/dolphin/", 0.05f));
 #endif
-	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.75f, 1, 1.2f))); //ToDo change to accurate hitbox.
+	//player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.75f, 1, 1.2f))); //ToDo change to accurate hitbox.
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(0.7f, 0.7f, 0.7f);
 	player->rotation = glm::vec3(0, -1 * (float)M_PI, 0);
@@ -259,17 +270,28 @@ void drawMenu()
 	tigl::shader->setViewMatrix(glm::mat4(1.0f));
 	tigl::shader->setModelMatrix(glm::mat4(1.0f));
 
+	tigl::shader->enableTexture(true);
+	tigl::shader->enableColor(false);
+
+	std::string fileName = "Resources\\Menu.png";
+	GenerateImageTexture(fileName);
+	BindImageTexture();
+
 	glDisable(GL_DEPTH_TEST);
 
 	//Draw orange quad for menu
 	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, WindowWidth, 0), glm::vec4(1.0f, 0.4f, 0.0f, 1.0f), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec4(1.0f, 0.4f, 0.0f, 1.0f), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(WindowWidth, 0, 0), glm::vec4(1.0f, 0.4f, 0.0f, 1.0f), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCN(glm::vec3(0, 0, 0), glm::vec4(1.0f, 0.4f, 0.0f, 1.0f), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(0, WindowHeight, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(0, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
 	tigl::end();
 
 	glEnable(GL_DEPTH_TEST);
+
+	tigl::shader->enableTexture(false);
+	tigl::shader->enableColor(true);
+
 }
 
 //Draw the game scene
@@ -296,6 +318,9 @@ void draw()
 }
 
 void drawGUI() {
+
+	extern int score;
+
 	tigl::shader->enableFog(false);
 
 	//Draw UI
@@ -331,12 +356,36 @@ void drawGUI() {
 	tigl::addVertex(Vertex::PCTN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
 	tigl::end();
 
+	std::vector digits = intToDigits(score);
+	showScore(digits);
+
 	tigl::shader->enableTexture(false);
 	tigl::shader->enableColor(true);
 
 	glEnable(GL_DEPTH_TEST);
 
-	
+}
+
+void showScore(std::vector<int> digits) {
+
+	for (int i = (digits.size() - 1); i >= 0; i--)
+	{
+		std::string fileName;
+		fileName.append("Resources\\digit");
+		fileName.append(std::to_string(digits.at(i)));
+		fileName.append(".png");
+
+		GenerateImageTexture(fileName);
+		BindImageTexture();
+
+		tigl::begin(GL_QUADS);
+		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitWidth - digitOffsetX, digitHeight + digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
+		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitOffsetX, digitHeight + digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
+		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitOffsetX, digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
+		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitWidth - digitOffsetX, digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
+		tigl::end();
+
+	}
 
 }
 
@@ -348,9 +397,37 @@ std::vector<int> intToDigits(int number) {
 		number = number / 10;
 	}
 
-	std::reverse(digits.begin(), digits.end());
-
 	return digits;
+}
+
+GLuint id;
+
+void GenerateImageTexture(const std::string& fileName)
+{
+	int width, height, bpp;
+	stbi_uc* data = stbi_load(fileName.c_str(), &width, &height, &bpp, 4);
+
+	//std::cout << data << std::endl;
+
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_2D, id);
+	glTexImage2D(GL_TEXTURE_2D,
+		0, //level
+		GL_RGBA, //internal format
+		width, //width
+		height, //height
+		0, //border
+		GL_RGBA, //data format
+		GL_UNSIGNED_BYTE, //data type
+		data); //data
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	stbi_image_free(data);
+}
+
+void BindImageTexture()
+{
+	glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void GenerateTexture(cv::Mat& cameraImage)
