@@ -5,6 +5,7 @@
 
 #include "OBJComponent.h"
 #include <memory>
+#include "AudioManager.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -39,6 +40,7 @@ using namespace cv;
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "bass.lib")
 
 GLFWwindow* window;
 
@@ -102,9 +104,15 @@ int main(void)
 	}
 	glfwMakeContextCurrent(window);
 
+	AudioManager::instance()->initAudio();
+	AudioManager::instance()->loopMusic("Resources/backgroundmusic.mp3");
+
 	tigl::init();
 
+	
+
 	init();
+
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -220,7 +228,7 @@ void createScene() {
 #ifndef COLLISION_DEBUG
 	player->addComponent(std::make_shared<OBJComponent>("models/dolphin/", 0.05f));
 #endif
-	player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.75f, 1, 1.2f))); //ToDo change to accurate hitbox.
+	//player->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.75f, 1, 1.2f))); //ToDo change to accurate hitbox.
 	player->addComponent(std::make_shared<PlayerComponent>());
 	player->scale = glm::vec3(0.7f, 0.7f, 0.7f);
 	player->rotation = glm::vec3(0, -1 * (float)M_PI, 0);

@@ -4,6 +4,7 @@
 #include <Vector>
 #include <memory>
 #include <iostream>
+#include "AudioManager.h"
 
 extern bool isPlaying;
 extern std::shared_ptr<GameObject> player;
@@ -68,6 +69,7 @@ void CollisionComponent::intersect(glm::vec3 playerHitbox, glm::vec3 playerPosit
 	glm::vec3 hitBoxSum = makePositive((hitbox / this->gameObject->scale) + playerHitbox);
 	if (posDif.x <= hitBoxSum.x && posDif.y <= hitBoxSum.y && posDif.z <= hitBoxSum.z)
 	{
+		AudioManager::instance()->onceMusic("Resources/bonk.mp3");
 		isPlaying = false;
 	}
 }
