@@ -9,6 +9,7 @@
 #include "OBJComponent.h"
 #include "CubeComponent.h"
 #include "CollisionComponent.h"
+#include "PowerUpComponent.h"
 
 void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
 {
@@ -203,4 +204,13 @@ void AddCube(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos,
 	cube->addComponent(std::make_shared<CubeComponent>(size, color));
 	cube->addComponent(std::make_shared<CollisionComponent>(size));
 	gameObjects.push_back(cube);
+}
+
+void AddPowerUp(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
+{
+	std::shared_ptr<GameObject> powerUp = std::make_shared<GameObject>();
+	powerUp->position = pos;
+	powerUp->addComponent(std::make_shared<CubeComponent>(size, color)); //To Do: Change this to a proper powerup model.
+	powerUp->addComponent(std::make_shared<PowerUpComponent>(size));
+	gameObjects.push_back(powerUp);
 }

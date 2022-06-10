@@ -29,4 +29,6 @@ void AddContainer(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3
 
 void AddCube(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color);
 
+void AddPowerUp(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color);
+
 

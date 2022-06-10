@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CollisionComponent.h"
+#include <chrono>
 
 
 class PowerUpComponent : public CollisionComponent
