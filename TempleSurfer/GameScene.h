@@ -9,7 +9,10 @@ class GameScene
 {
 	std::vector<std::shared_ptr<GameObject>> gameObjects;
 	std::vector<std::shared_ptr<GameChunk>> gameChunks;
+
+	bool scoreReset = false;
 public:
+
 	GameScene();
 	~GameScene();
 
