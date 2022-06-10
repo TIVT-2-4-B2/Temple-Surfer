@@ -72,19 +72,19 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 
 	// List of block objects
 	PresetList blockList;
-	//blockList.emplace_back(AddContainer);
-	//blockList.emplace_back(AddTugboat);
-	blockList.emplace_back(AddCube);
+	blockList.emplace_back(AddContainer);
+	//blockList.emplace_back(AddCube);
 
 	// List of jump objects
 	PresetList jumpList;
-	//jumpList.emplace_back(AddContainer);
-	jumpList.emplace_back(AddCube);
+	jumpList.emplace_back(AddContainer);
+	//jumpList.emplace_back(AddCube);
 
 	// List of duck objects
 	PresetList duckList;
-	duckList.emplace_back(AddCube);
-	//duckList.emplace_back(AddBoat);
+	//duckList.emplace_back(AddCube);
+	duckList.emplace_back(AddBoat);
+	duckList.emplace_back(AddTugboat);
 
 	// Adding in the generated config.
 	for (int i = 0; i < MATRIX_SIZE; i++)
@@ -101,7 +101,7 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 					jumpList.at(rand() % jumpList.size())(gameObjects, glm::vec3(xPos, 1, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0, 1));
 					break;
 				case DUCK:
-					duckList.at(rand() % duckList.size())(gameObjects, glm::vec3(xPos, 3, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
+					duckList.at(rand() % duckList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
 					break;
 				case NONE:
 					continue;

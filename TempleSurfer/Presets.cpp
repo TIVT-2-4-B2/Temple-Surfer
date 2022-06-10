@@ -87,6 +87,7 @@ void AddFloor(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	PushMultiplePresets(objectList, AddCactusGroup, 3);
 	PushMultiplePresets(objectList, AddEmpty, 2);
 	PushMultiplePresets(objectList, AddCamel, 1);
+	PushMultiplePresets(objectList, AddEvergiven, 1);
 
 	float increment = FLOOR_LENGTH / 6;
 	objectList.at(rand() % objectList.size())(gameObjects, glm::vec3(FLOOR_WIDTH + xOffset + (rand() % 5), yCoordinate, increment * 1), glm::vec3(1), glm::vec4(1));
@@ -127,7 +128,6 @@ void AddCactus(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 po
 	//Add components to cactus object
 	cactus->addComponent(std::make_shared<MoveToComponent>(pos));
 	cactus->addComponent(std::make_shared<OBJComponent>("models/cactus/10436_Cactus_v1_max2010_it2.obj"));
-	cactus->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
 	cactus->scale = size;
 	cactus->rotation = glm::vec3(-(M_PI / 2.0f), 0, 0);
 	gameObjects.push_back(cactus);
@@ -141,11 +141,25 @@ void AddCamel(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos
 	//Add components to object
 	camel->addComponent(std::make_shared<MoveToComponent>(pos));
 	camel->addComponent(std::make_shared<OBJComponent>("models/camel/Camel.obj"));
-	camel->addComponent(std::make_shared<CollisionComponent>(glm::vec3(1, 1, 1)));
 	camel->scale = glm::vec3(0.005f);
 	const int rotationCount = 8;
-	camel->rotation = glm::vec3(-(M_PI / 2.0f), 0, (rand() % rotationCount) * (2.0f / (float)rotationCount) * M_PI);
+	camel->rotation = glm::vec3(-(M_PI / 2.0f), 0, ((float)(rand() % rotationCount)) * (2.0f / (double)rotationCount) * M_PI);
 	gameObjects.push_back(camel);
+}
+
+void AddEvergiven(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
+{
+	std::shared_ptr<GameObject> boat = std::make_shared<GameObject>();
+	glm::vec3 boatPos = pos + glm::vec3(0, 0.2f, 0);
+	boat->position = boatPos;
+
+	//Add components to boat object
+	boat->addComponent(std::make_shared<MoveToComponent>(boatPos));
+	boat->addComponent(std::make_shared<OBJComponent>("models/evergiven/EverGiven.obj"));
+	boat->scale = glm::vec3(0.02f);
+	const int rotationCount = 8;
+	boat->rotation = glm::vec3(0.0f, ((float)(rand() % rotationCount)) * (2.0f / (double)rotationCount) * M_PI, 0.0f);
+	gameObjects.push_back(boat);
 }
 
 void AddTugboat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
@@ -167,7 +181,7 @@ void AddTugboat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 p
 void AddBoat(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3 pos, glm::vec3 size, glm::vec4 color)
 {
 	std::shared_ptr<GameObject> boat = std::make_shared<GameObject>();
-	glm::vec3 boatPos = pos;
+	glm::vec3 boatPos = pos + glm::vec3(0, -0.3f, 0);
 	boat->position = boatPos;
 
 	//Add components to boat object
@@ -190,7 +204,7 @@ void AddContainer(std::list<std::shared_ptr<GameObject>>& gameObjects, glm::vec3
 	container->addComponent(std::make_shared<MoveToComponent>(contianerPos));
 	container->addComponent(std::make_shared<OBJComponent>("models/container_v2/12281_Container_v2_L2.obj"));
 	container->addComponent(std::make_shared<CollisionComponent>(glm::vec3(0.007f)));
-	container->scale = glm::vec3(0.007f);
+	container->scale = glm::vec3(size.y * 0.003f, size.z * 0.007f, size.x * 0.007f);
 	std::vector<float> leftRight = { 0.0f, (float)M_PI };
 	container->rotation = glm::vec3(-1.57079633f, -1.57079633f, leftRight.at(rand() % leftRight.size()));
 	gameObjects.push_back(container);

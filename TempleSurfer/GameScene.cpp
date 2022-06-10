@@ -16,7 +16,9 @@ GameScene::~GameScene()
 void GameScene::draw()
 {	
 	for (auto& c : gameObjects)	c->draw();
-	for (auto& c : gameChunks)	c->draw();
+	for (int i = gameChunks.size() - 1; i >= 0; i--) {
+		gameChunks[i]->draw();
+	}
 }
 
 void GameScene::addGameObject(std::shared_ptr<GameObject>& object)
