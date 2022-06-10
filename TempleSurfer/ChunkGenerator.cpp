@@ -86,6 +86,9 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 	duckList.emplace_back(AddCube);
 	//duckList.emplace_back(AddBoat);
 
+	PresetList powerUpList;
+	powerUpList.emplace_back(AddCube);
+
 	// Adding in the generated config.
 	for (int i = 0; i < MATRIX_SIZE; i++)
 	{
@@ -102,6 +105,9 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 					break;
 				case DUCK:
 					duckList.at(rand() % duckList.size())(gameObjects, glm::vec3(xPos, 3, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
+					break;
+				case POWERUP:
+					powerUpList.at(rand() % powerUpList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
 					break;
 				case NONE:
 					continue;
@@ -130,6 +136,8 @@ ChunkObstacle ChunkGenerator::getObstacleFromInt(int index)
 		return JUMP;
 	case 3:
 		return DUCK;
+	case 4:
+		return POWERUP;
 	}
 }
 

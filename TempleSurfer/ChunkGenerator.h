@@ -10,7 +10,8 @@ enum class ChunkObstacle {
 	NONE,
 	BLOCK,
 	JUMP,
-	DUCK
+	DUCK,
+	POWERUP
 };
 
 /*These are all the possible locations for these settings*/
