@@ -19,39 +19,34 @@ void ChunkGenerator::generatorInit()
 
 	// Loading all the possible presets
 	std::string line;
-  	std::ifstream presetFile ("Resources/Presets.txt");
-	
-  	if (presetFile.is_open())
-  	{
-		ChunkPreset preset;
-    	while ( getline (presetFile,line) )
-    	{
-			const int obstacleLines = 3;
+	std::ifstream presetFile("Resources/Presets.txt");
 
-			bool powerUpfound = false;
+	if (presetFile.is_open())
+	{
+		ChunkPreset preset;
+		while (getline(presetFile, line))
+		{
+			const int obstacleLines = 3;
 
 			for (int i = 0; i < obstacleLines; i++)
 			{
 				const int offset = 2;
 				int presetValue = stoi(line.substr(6 * i, 1));
 				preset.obstacles[i][0] = getObstacleFromInt(presetValue);
-				if (checkForPowerup(presetValue)) powerUpfound = true;
 				presetValue = stoi(line.substr(6 * i + offset, 1));
 				preset.obstacles[i][1] = getObstacleFromInt(presetValue);
-				if (checkForPowerup(presetValue)) powerUpfound = true;
 				presetValue = stoi(line.substr(6 * i + 2 * offset, 1));
 				preset.obstacles[i][2] = getObstacleFromInt(presetValue);
-				if (checkForPowerup(presetValue)) powerUpfound = true;
 			}
 			presets.push_back(preset);
-    	}
-    	presetFile.close();
-  	}
-  	else
+		}
+		presetFile.close();
+	}
+	else
 	{
 		presets.push_back({ {{{NONE},{JUMP},{BLOCK}},
 						{{BLOCK},{BLOCK},{NONE}},
-						{{NONE},{NONE},{DUCK}}}});
+						{{NONE},{NONE},{DUCK}}} });
 		presets.push_back({ {{{NONE},{NONE},{BLOCK}},
 						{{BLOCK},{NONE},{NONE}},
 						{{NONE},{NONE},{BLOCK}}} });
@@ -61,15 +56,33 @@ void ChunkGenerator::generatorInit()
 	}
 }
 
+bool hasPowerUp(ChunkPreset preset)
+{
+	for (size_t i = 0; i < 3; i++)
+	{
+		for (size_t j = 0; j < 3; j++)
+		{
+			if (preset.obstacles[i][j] == POWERUP)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 std::shared_ptr<GameChunk> ChunkGenerator::getChunk()
 {
-	// Returning a random chunk that is generated.
-	std::shared_ptr<GameChunk> chunk = buildChunk(presets.at(rand() % presets.size()));
-	while (lastChunkHadPowerup)
+	ChunkPreset preset = presets.at(rand() % presets.size());
+	if (hasPowerUp(preset) && lastChunkHadPowerup)
 	{
-		chunk = buildChunk(presets.at(rand() % presets.size()));
+		std::cout << "Resetting" << std::endl;
+		preset = presets.at(0);
 	}
-	return chunk;
+	lastChunkHadPowerup = hasPowerUp(preset);
+
+	// Returning a random chunk that is generated.
+	return buildChunk(preset);
 }
 
 std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
@@ -106,20 +119,20 @@ std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
 		for (int j = 0; j < MATRIX_SIZE; j++) {
 			xPos = -(2.0f * posOffset * FLOOR_WIDTH) + (2.0f * posOffset * FLOOR_WIDTH) * j;  // X
 			switch (preset.obstacles[i][j]) {
-				case BLOCK:
-					blockList.at(rand() % blockList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1));
-					break;
-				case JUMP:
-					jumpList.at(rand() % jumpList.size())(gameObjects, glm::vec3(xPos, 1, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0, 1));
-					break;
-				case DUCK:
-					duckList.at(rand() % duckList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
-					break;
-				case POWERUP:
-					powerUpList.at(rand() % powerUpList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
-					break;
-				case NONE:
-					continue;
+			case BLOCK:
+				blockList.at(rand() % blockList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 2, 1), glm::vec4(0, 1.0f, 1.0f, 1));
+				break;
+			case JUMP:
+				jumpList.at(rand() % jumpList.size())(gameObjects, glm::vec3(xPos, 1, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 1.0f, 0, 1));
+				break;
+			case DUCK:
+				duckList.at(rand() % duckList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
+				break;
+			case POWERUP:
+				powerUpList.at(rand() % powerUpList.size())(gameObjects, glm::vec3(xPos, 2, zPos), glm::vec3(1, 1, 1), glm::vec4(1.0f, 0, 1.0f, 1));
+				break;
+			case NONE:
+				continue;
 			}
 		}
 	}
