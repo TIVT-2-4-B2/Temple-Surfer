@@ -36,6 +36,8 @@ private:
 	std::queue<xPosition> xInputQueue;
 	std::queue<yPosition> yInputQueue;
 	std::mutex lockInputQueues;
+	std::thread cvThread;
+	bool running;
 
 	// Private methods
 	void visionRoutine();
@@ -45,10 +47,12 @@ private:
 	void debugWindow();
 	void checkResult();
 
+
 public:
-	Vision(std::shared_ptr<PlayerComponent> playerComponent);
+	Vision(std::shared_ptr<PlayerComponent> iPlayerComponent);
 	~Vision();
 
+	void setNewPlayer(std::shared_ptr<PlayerComponent> iPlayerComponent);
 	cv::Mat getImage();
 	void visionUpdate();
 };

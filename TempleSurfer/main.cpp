@@ -78,7 +78,8 @@ std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
 std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
-std::shared_ptr<Vision> vision;
+std::shared_ptr<Vision> vision = nullptr;
+bool initVision = false;
 ChunkGenerator generator;
 
 int WindowWidth;
@@ -118,8 +119,8 @@ int main(void)
 	}
 	glfwMakeContextCurrent(window);
 
-	AudioManager::instance()->initAudio();
-	AudioManager::instance()->loopMusic("Resources/backgroundmusic.mp3");
+	AudioManager::instanceAudio()->initAudio();
+	AudioManager::instanceAudio()->loopMusic("Resources/backgroundmusic.mp3");
 
 	tigl::init();
 
@@ -137,7 +138,10 @@ int main(void)
 			start();
 			isPlaying = true;
 			lastFrameTime = glfwGetTime();
-			vision = std::make_shared<Vision>(player->getComponent<PlayerComponent>());
+			if (vision == nullptr)
+				vision = std::make_shared<Vision>(player->getComponent<PlayerComponent>());
+			else
+				vision->setNewPlayer(player->getComponent<PlayerComponent>());
 		}
 		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		{
@@ -160,11 +164,13 @@ int main(void)
 
 		if (isPlaying)
 		{
+			if (vision != NULL)
 			vision->visionUpdate();
 		}
 
 	}
 
+	vision->~Vision();
 	glfwTerminate();
 
 	return 0;
@@ -354,7 +360,9 @@ void drawGUI() {
 	tigl::shader->enableColor(false);
 
 	//Get image from vision
-	cv::Mat img = vision->getImage();
+	cv::Mat img;
+	if (vision != nullptr)
+	img = vision->getImage();
 
 	//Load image as texture
 	textureCount = 1;

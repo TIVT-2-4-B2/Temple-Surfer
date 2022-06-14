@@ -37,7 +37,6 @@ const int lowerXThreshold = (cameraWidth - 2 * xOffset) / 3 + xOffset;
 const int upperYThreshold = (cameraHeight - 2 * yOffset) / 3 * 2 + yOffset;
 const int lowerYThreshold = (cameraHeight - 2 * yOffset) / 3 + yOffset;
 
-// Constructors and destructors
 Vision::Vision(std::shared_ptr<PlayerComponent> iPlayerComponent)
 {
     // Initing cascade and setting components
@@ -45,27 +44,30 @@ Vision::Vision(std::shared_ptr<PlayerComponent> iPlayerComponent)
     faceCascade.load("Resources/haarcascade_frontalface_default.xml");
     if (faceCascade.empty()) { std::cout << "XML file not loaded" << std::endl; }
 
+    std::cout << "Started vision regon" << std::endl;
     // Booting up regonision thread
-    std::thread(visionRoutine);
+    running = true;
+    cvThread = std::thread(&Vision::visionRoutine, this);
+    cvThread.detach();
 }
 
 Vision::~Vision()
 {
+    running = false;
+    if (cvThread.joinable())
+    cvThread.join();
 }
 
 // Usefull methods.
 void Vision::checkForFaces()
 {
     // Does the image reginiosion.
-    if (frames % 10 == 0)
-    {
-        const double scale = 1.2;
-        const int minNeighbors = 10;
+    const double scale = 1.2;
+    const int minNeighbors = 10;
 
-        cap.read(camImage);
-        faceCascade.detectMultiScale(camImage, faces, scale, minNeighbors, 0, Size(50, 50));
-    }
-    frames++;
+    cap.read(camImage);
+    faceCascade.detectMultiScale(camImage, faces, scale, minNeighbors, 0, Size(50, 50));
+
 }
 
 void Vision::debugWindow()
@@ -128,6 +130,10 @@ void Vision::checkResult() {
     lockInputQueues.unlock();
 }
 
+void Vision::setNewPlayer(std::shared_ptr<PlayerComponent> iPlayerComponent){
+    playerComponent = iPlayerComponent;
+}
+
 cv::Mat Vision::getImage() {
     // Returns the image given.
     return camImage;
@@ -137,7 +143,8 @@ cv::Mat Vision::getImage() {
 
 void Vision::visionRoutine()
 {
-    while (true) {
+    std::cout << "Started vision regon" << std::endl;
+    while (running) {
         checkForFaces();
 
         // Debug window if needed
@@ -157,8 +164,8 @@ void Vision::visionUpdate() {
 
     // Checking x-axis inputs
     if (!xInputQueue.empty()) {
-        if (xInputQueue.front() == xPosition::RIGHT && xPos != xPosition::RIGHT) { playerComponent->moveRight();xPos = xPosition::RIGHT;}
-        else if (xInputQueue.front() == xPosition::LEFT && xPos != xPosition::LEFT) { playerComponent->moveLeft(); xPos = xPosition::LEFT;}
+        if (xInputQueue.front() == xPosition::RIGHT && xPos != xPosition::RIGHT) { playerComponent->moveLeft();xPos = xPosition::RIGHT;}
+        else if (xInputQueue.front() == xPosition::LEFT && xPos != xPosition::LEFT) { playerComponent->moveRight(); xPos = xPosition::LEFT;}
         else if (xInputQueue.front() == xPosition::CENTER && xPos != xPosition::CENTER) { playerComponent->moveCenter(); xPos = xPosition::CENTER; }
         xInputQueue.pop();
     }
