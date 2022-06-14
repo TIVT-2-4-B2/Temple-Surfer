@@ -23,6 +23,7 @@ Mat camImage;
 std::shared_ptr<PlayerComponent> playerComponent;
 
 int frames = 0;
+int count;
 
 // Settings
 const int cameraWidth = 650;
@@ -116,8 +117,8 @@ void Vision::checkResult() {
 
     // Checking if there is now input overflow
     if (xInputQueue.size() < overFlowLimit) {
-        if (x < lowerXThreshold)  xInputQueue.emplace(xPosition::RIGHT);
-        else if (x > upperXThreshold)  xInputQueue.emplace(xPosition::LEFT);
+        if (x < lowerXThreshold)  xInputQueue.emplace(xPosition::LEFT);
+        else if (x > upperXThreshold)  xInputQueue.emplace(xPosition::RIGHT);
         else if (x > lowerXThreshold && x < upperXThreshold) xInputQueue.emplace(xPosition::CENTER);
     }
     // Checking if there is now input overflow
@@ -134,9 +135,19 @@ void Vision::setNewPlayer(std::shared_ptr<PlayerComponent> iPlayerComponent){
     playerComponent = iPlayerComponent;
 }
 
+Mat tempImage2;
 cv::Mat Vision::getImage() {
+    if (count % 5 == 0)
+    {
+        Mat tempImage;
+        cap.read(tempImage);
+        cvtColor(tempImage, tempImage, COLOR_RGB2BGR);
+        flip(tempImage, tempImage2, 1);
+    }
+    count++;
+
     // Returns the image given.
-    return camImage;
+    return tempImage2;
 }
 
 
