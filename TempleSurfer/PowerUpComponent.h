@@ -22,5 +22,6 @@ public:
 	~PowerUpComponent();
 
 	virtual void update(float elapsedTime, const glm::vec3& parentMatrix) override;
+	void showIcon();
 
 };

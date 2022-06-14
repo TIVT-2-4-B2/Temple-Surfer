@@ -9,35 +9,19 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <stack>
-#include <algorithm>
-
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
 
 #include "ChunkGenerator.h"
 #include "FloorComponent.h"
 #include "GameChunk.h"
 #include "GameScene.h"
-#include "GameObject.h"
 #include "Presets.h"
-#include "PlayerComponent.h"
-#include "CubeComponent.h"
-#include "TextureComponent.h"
 #include "MoveToComponent.h"
-#include "SpinComponent.h"
-#include "TimerJumper.h"
-#include "EnemyComponent.h"
 #include "CollisionComponent.h"
+#include "GUI.h"
 
 #include "Vision.h"
 
 #include <iostream>
-#include <thread>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 using tigl::Vertex;
 using namespace cv;
@@ -56,25 +40,10 @@ void update();
 void start();
 void createScene();
 void draw();
-void drawMenu();
-void drawGUI();
-void GenerateTexture(cv::Mat& image);
-std::vector<int> intToDigits(int number);
-void showScore(std::vector<int> digits);
-void BindTexture();
-
-void GenerateImageTexture(const std::string& fileName);
-void BindImageTexture();
 
 bool isPlaying = false;
 
 double lastFrameTime = 0;
-
-const int textureInterval = 1;
-const int digitWidth = 60;
-const int digitHeight = 80;
-const int digitOffsetX = 20;
-const int digitOffsetY = 20;
 
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
@@ -82,13 +51,11 @@ std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
 std::shared_ptr<Vision> vision = nullptr;
 bool initVision = false;
+std::shared_ptr<GUI> gui;
 ChunkGenerator generator;
 
 int WindowWidth;
 int WindowHeight;
-
-GLuint textureID;
-int textureCount = 0;
 
 int main(void)
 {
@@ -103,7 +70,6 @@ int main(void)
 	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
 	WindowWidth = mode->width;
 	WindowHeight = mode->height;
-
 
 	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
@@ -126,10 +92,7 @@ int main(void)
 
 	tigl::init();
 
-	
-
 	init();
-
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -154,7 +117,7 @@ int main(void)
 		if (!isPlaying)
 		{
 			score = 0;
-			drawMenu();
+			gui->drawMenu();
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 			continue;
@@ -196,6 +159,8 @@ void init()
 	}
 	std::cout << "Loaded precache" << std::endl;
 
+	gui = std::make_shared<GUI>(WindowWidth, WindowHeight);
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -212,12 +177,11 @@ void init()
 
 	createScene();
 
-	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-		{
-			if (key == GLFW_KEY_ESCAPE) {
-				glfwSetWindowShouldClose(window, true);
-			}
-		});
+	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+		if (key == GLFW_KEY_ESCAPE) {
+			glfwSetWindowShouldClose(window, true);
+		}
+	});
 
 	update();
 
@@ -286,45 +250,6 @@ void createScene() {
 	}
 }
 
-//Draw the main menu
-void drawMenu()
-{
-	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	tigl::shader->enableFog(false);
-	tigl::shader->enableTexture(false);
-	tigl::shader->enableColor(true);
-
-	glm::mat4 projection = glm::ortho(0.0f, (float)WindowWidth, (float)WindowHeight, 0.0f, -1.0f, 1.0f);
-	tigl::shader->setProjectionMatrix(projection);
-	tigl::shader->setViewMatrix(glm::mat4(1.0f));
-	tigl::shader->setModelMatrix(glm::mat4(1.0f));
-
-	tigl::shader->enableTexture(true);
-	tigl::shader->enableColor(false);
-
-	std::string fileName = "Resources\\Menu.png";
-	GenerateImageTexture(fileName);
-	BindImageTexture();
-
-	glDisable(GL_DEPTH_TEST);
-
-	//Draw orange quad for menu
-	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCTN(glm::vec3(0, WindowHeight, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(0, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
-	tigl::end();
-
-	glEnable(GL_DEPTH_TEST);
-
-	tigl::shader->enableTexture(false);
-	tigl::shader->enableColor(true);
-
-}
-
 //Draw the game scene
 void draw()
 {
@@ -344,153 +269,5 @@ void draw()
 
 	scene->draw();
 
-	drawGUI();
-
-}
-
-void drawGUI() {
-
-	tigl::shader->enableFog(false);
-
-	//Draw UI
-	glm::mat4 projection = glm::ortho(0.0f, (float)WindowWidth, (float)WindowHeight, 0.0f, -1.0f, 1.0f);
-	tigl::shader->setProjectionMatrix(projection);
-	tigl::shader->setViewMatrix(glm::mat4(1.0f));
-	tigl::shader->setModelMatrix(glm::mat4(1.0f));
-
-	tigl::shader->enableTexture(true);
-	tigl::shader->enableColor(false);
-
-	//Get image from vision
-	cv::Mat img;
-	if (vision != nullptr)
-	img = vision->getImage();
-
-	//Load image as texture
-	textureCount = 1;
-	if (textureCount % textureInterval == 0)
-	{
-		GenerateTexture(img);
-	}
-	else {
-		BindTexture();
-	}
-	textureCount++;
-
-	glDisable(GL_DEPTH_TEST);
-
-	//Draw camera corner
-	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCTN(glm::vec3(0, img.rows / 2, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(img.cols / 2, img.rows / 2, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(img.cols / 2, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
-	tigl::end();
-
-	std::vector digits = intToDigits(score);
-	showScore(digits);
-
-	tigl::shader->enableTexture(false);
-	tigl::shader->enableColor(true);
-
-	glEnable(GL_DEPTH_TEST);
-
-}
-
-void showScore(std::vector<int> digits) {
-
-	for (int i = (digits.size() - 1); i >= 0; i--)
-	{
-		std::string fileName;
-		fileName.append("Resources\\digit");
-		fileName.append(std::to_string(digits.at(i)));
-		fileName.append(".png");
-
-		GenerateImageTexture(fileName);
-		BindImageTexture();
-
-		tigl::begin(GL_QUADS);
-		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitWidth - digitOffsetX, digitHeight + digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
-		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitOffsetX, digitHeight + digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
-		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitOffsetX, digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
-		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitWidth - digitOffsetX, digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
-		tigl::end();
-
-	}
-
-}
-
-std::vector<int> intToDigits(int number) {
-	std::vector<int> digits;
-
-	while (number > 0) {
-		digits.push_back(number % 10);
-		number = number / 10;
-	}
-
-	return digits;
-}
-
-GLuint id;
-
-void GenerateImageTexture(const std::string& fileName)
-{
-	int width, height, bpp;
-	stbi_uc* data = stbi_load(fileName.c_str(), &width, &height, &bpp, 4);
-
-	glDeleteTextures(1, &id);
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
-	glTexImage2D(GL_TEXTURE_2D,
-		0, //level
-		GL_RGBA, //internal format
-		width, //width
-		height, //height
-		0, //border
-		GL_RGBA, //data format
-		GL_UNSIGNED_BYTE, //data type
-		data); //data
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	stbi_image_free(data);
-}
-
-void BindImageTexture()
-{
-	glBindTexture(GL_TEXTURE_2D, id);
-}
-
-void GenerateTexture(cv::Mat& cameraImage)
-{
-
-	if (cameraImage.empty()) {
-		std::cout << "image empty" << std::endl;
-	}
-	else {
-		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-		glDeleteTextures(1, &textureID);
-		glGenTextures(1, &textureID);
-		BindTexture();
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-		glTexImage2D(GL_TEXTURE_2D,     // Type of texture
-			0,							// Pyramid level (for mip-mapping) - 0 is the top level
-			GL_RGB,						// Internal colour format to convert to
-			cameraImage.cols,			// Image width  i.e. 640 for Kinect in standard mode
-			cameraImage.rows,			// Image height i.e. 480 for Kinect in standard mode
-			0,							// Border width in pixels (can either be 1 or 0)
-			GL_RGB,						// Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-			GL_UNSIGNED_BYTE,			// Image data type
-			cameraImage.ptr());			// The actual image data itself
-	}
-}
-
-void BindTexture() {
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	gui->drawGUI(vision);
 }
