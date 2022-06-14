@@ -140,7 +140,7 @@ cv::Mat Vision::getImage() {
     if (count % 5 == 0)
     {
         Mat tempImage;
-        cap.read(tempImage);
+        camImage.copyTo(tempImage);
         cvtColor(tempImage, tempImage, COLOR_RGB2BGR);
         flip(tempImage, tempImage2, 1);
     }
