@@ -39,6 +39,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+//
+#define ToAspect(v, w, h) (v/w*h)
+
 using tigl::Vertex;
 using namespace cv;
 
@@ -68,11 +71,13 @@ bool isPlaying = false;
 
 double lastFrameTime = 0;
 
-const int textureInterval = 1;
+const int textureInterval = 5;
 const int digitWidth = 60;
 const int digitHeight = 80;
 const int digitOffsetX = 20;
 const int digitOffsetY = 20;
+
+const float cameraScale = 0.16f;
 
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
@@ -101,7 +106,6 @@ int main(void)
 	WindowWidth = mode->width;
 	WindowHeight = mode->height;
 
-
 	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
@@ -122,8 +126,6 @@ int main(void)
 	AudioManager::instance()->loopMusic("Resources/backgroundmusic.mp3");
 
 	tigl::init();
-
-	
 
 	init();
 
@@ -170,6 +172,9 @@ int main(void)
 	return 0;
 }
 
+std::vector<Vertex> menuVerts;
+std::vector<Vertex> cameraVerts;
+
 //Initiate the game
 void init()
 {
@@ -202,12 +207,21 @@ void init()
 
 	createScene();
 
-	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-		{
-			if (key == GLFW_KEY_ESCAPE) {
-				glfwSetWindowShouldClose(window, true);
-			}
-		});
+	menuVerts.push_back(Vertex::PT(glm::vec3(0, WindowHeight, 0), glm::vec2(0, 1)));
+	menuVerts.push_back(Vertex::PT(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec2(1, 1)));
+	menuVerts.push_back(Vertex::PT(glm::vec3(WindowWidth, 0, 0), glm::vec2(1, 0)));
+	menuVerts.push_back(Vertex::PT(glm::vec3(0, 0, 0), glm::vec2(0, 0)));
+
+	cameraVerts.push_back(Vertex::PT(glm::vec3(0, ToAspect(WindowWidth / (1 / cameraScale), 4, 3), 0), glm::vec2(0, 1)));
+	cameraVerts.push_back(Vertex::PT(glm::vec3((WindowWidth / (1 / cameraScale)), ToAspect(WindowWidth / (1 / cameraScale), 4, 3), 0), glm::vec2(1, 1)));
+	cameraVerts.push_back(Vertex::PT(glm::vec3((WindowWidth / (1 / cameraScale)), 0, 0), glm::vec2(1, 0)));
+	cameraVerts.push_back(Vertex::PT(glm::vec3(0, 0, 0), glm::vec2(0, 0)));
+
+	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+		if (key == GLFW_KEY_ESCAPE) {
+			glfwSetWindowShouldClose(window, true);
+		}
+	});
 
 	update();
 
@@ -300,13 +314,8 @@ void drawMenu()
 
 	glDisable(GL_DEPTH_TEST);
 
-	//Draw orange quad for menu
-	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCTN(glm::vec3(0, WindowHeight, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(0, 0, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
-	tigl::end();
+	//Draw menu verts
+	tigl::drawVertices(GL_QUADS, menuVerts);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -357,7 +366,6 @@ void drawGUI() {
 	cv::Mat img = vision->getImage();
 
 	//Load image as texture
-	textureCount = 1;
 	if (textureCount % textureInterval == 0)
 	{
 		GenerateTexture(img);
@@ -369,13 +377,8 @@ void drawGUI() {
 
 	glDisable(GL_DEPTH_TEST);
 
-	//Draw camera corner
-	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCTN(glm::vec3(0, img.rows / 2, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(img.cols / 2, img.rows / 2, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(img.cols / 2, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(0, 0, 0), glm::vec4(1, 0.4, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
-	tigl::end();
+	//Draw camera verts
+	tigl::drawVertices(GL_QUADS, cameraVerts);
 
 	std::vector digits = intToDigits(score);
 	showScore(digits);
@@ -399,11 +402,13 @@ void showScore(std::vector<int> digits) {
 		GenerateImageTexture(fileName);
 		BindImageTexture();
 
+		int digitX = (WindowWidth - (i * digitWidth)) - digitOffsetX;
+
 		tigl::begin(GL_QUADS);
-		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitWidth - digitOffsetX, digitHeight + digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
-		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitOffsetX, digitHeight + digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
-		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitOffsetX, digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
-		tigl::addVertex(Vertex::PCTN(glm::vec3((WindowWidth - (i * digitWidth)) - digitWidth - digitOffsetX, digitOffsetY, 0), glm::vec4(0, 0, 0, 1), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
+		tigl::addVertex(Vertex::PT(glm::vec3(digitX - digitWidth, digitOffsetY + digitHeight, 0), glm::vec2(0, 1)));
+		tigl::addVertex(Vertex::PT(glm::vec3(digitX, digitOffsetY + digitHeight, 0), glm::vec2(1, 1)));
+		tigl::addVertex(Vertex::PT(glm::vec3(digitX, digitOffsetY, 0), glm::vec2(1, 0)));
+		tigl::addVertex(Vertex::PT(glm::vec3(digitX - digitWidth, digitOffsetY, 0), glm::vec2(0, 0)));
 		tigl::end();
 
 	}
