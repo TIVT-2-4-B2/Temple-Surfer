@@ -64,6 +64,8 @@ void BindTexture();
 void GenerateImageTexture(const std::string& fileName);
 void BindImageTexture();
 
+void showPowerupIcon();
+
 bool isPlaying = false;
 
 double lastFrameTime = 0;
@@ -73,6 +75,8 @@ const int digitWidth = 60;
 const int digitHeight = 80;
 const int digitOffsetX = 20;
 const int digitOffsetY = 20;
+const int powerIconWidth = 120;
+const int powerIconHeight = 240;
 
 std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
@@ -335,6 +339,7 @@ void draw()
 	scene->draw();
 
 	drawGUI();
+	
 
 }
 
@@ -379,6 +384,10 @@ void drawGUI() {
 
 	std::vector digits = intToDigits(score);
 	showScore(digits);
+	
+	if (player->getComponent<CollisionComponent>()->powerup == true) {
+		showPowerupIcon();
+	}
 
 	tigl::shader->enableTexture(false);
 	tigl::shader->enableColor(true);
@@ -427,7 +436,6 @@ void GenerateImageTexture(const std::string& fileName)
 {
 	int width, height, bpp;
 	stbi_uc* data = stbi_load(fileName.c_str(), &width, &height, &bpp, 4);
-
 	glDeleteTextures(1, &id);
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
@@ -483,4 +491,17 @@ void GenerateTexture(cv::Mat& cameraImage)
 
 void BindTexture() {
 	glBindTexture(GL_TEXTURE_2D, textureID);
+}
+
+
+void showPowerupIcon() {
+	GenerateImageTexture("models/powerupicon.png");
+	BindImageTexture();
+
+	tigl::begin(GL_QUADS);
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 - powerIconWidth, 0, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 + powerIconWidth, 0, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 + powerIconWidth, powerIconHeight, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 - powerIconWidth, powerIconHeight, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
+	tigl::end();
 }
