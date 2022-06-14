@@ -30,5 +30,4 @@ private:
 
 	std::shared_ptr<GameChunk> buildChunk(ChunkPreset preset);
 	ChunkObstacle getObstacleFromInt(int index);
-	bool checkForPowerup(int presetInt);
 };

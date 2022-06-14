@@ -15,9 +15,6 @@ private:
 	void powerupIntersect(glm::vec3 playerHitbox, glm::vec3 playerPosition, const glm::vec3& parentMatrix);
 	glm::vec3 makePositive(glm::vec3 vector);
 	glm::vec3 powerHitbox;
-
-	std::chrono::seconds seconds = std::chrono::seconds::max();
-
 public:
 	
 

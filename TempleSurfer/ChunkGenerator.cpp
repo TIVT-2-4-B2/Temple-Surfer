@@ -77,7 +77,8 @@ std::shared_ptr<GameChunk> ChunkGenerator::getChunk()
 	if (hasPowerUp(preset) && lastChunkHadPowerup)
 	{
 		std::cout << "Resetting" << std::endl;
-		preset = presets.at(0);
+		const int amountOfPowerupChunks = 2;
+		preset = presets.at(rand() % (presets.size() - amountOfPowerupChunks));
 	}
 	lastChunkHadPowerup = hasPowerUp(preset);
 
@@ -161,13 +162,4 @@ ChunkObstacle ChunkGenerator::getObstacleFromInt(int index)
 	case 4:
 		return POWERUP;
 	}
-}
-
-bool ChunkGenerator::checkForPowerup(int presetInt)
-{
-	if (presetInt == 4)
-	{
-		lastChunkHadPowerup = true;
-	}
-	return presetInt == 4;
 }
