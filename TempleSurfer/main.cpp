@@ -49,6 +49,8 @@ using namespace cv;
 
 GLFWwindow* window;
 
+extern int score;
+
 void init();
 void update();
 void start();
@@ -147,6 +149,7 @@ int main(void)
 		//If the game hasn't been started, draw the menu and not the scene
 		if (!isPlaying)
 		{
+			score = 0;
 			drawMenu();
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -339,8 +342,6 @@ void draw()
 }
 
 void drawGUI() {
-
-	extern int score;
 
 	tigl::shader->enableFog(false);
 
