@@ -177,6 +177,7 @@
     <ClCompile Include="FloorComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="GUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveToComponent.cpp" />
     <ClCompile Include="OBJComponent.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="FloorComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="GUI.h" />
     <ClInclude Include="MoveToComponent.h" />
     <ClInclude Include="OBJComponent.h" />
     <ClInclude Include="PaneComponent.h" />
