@@ -9,6 +9,9 @@
 #include "tigl.h"
 #include "Vision.h"
 
+#include "GameObject.h"
+#include "CollisionComponent.h"
+
 //v for width to convert
 //w for width
 //h for height
@@ -18,12 +21,17 @@
 GLuint textureID;
 int textureCount = 0;
 
+extern std::shared_ptr<GameObject> player;
+
 const int textureInterval = 5;
 
 const int digitWidth = 60;
 const int digitHeight = 80;
 const int digitOffsetX = 20;
 const int digitOffsetY = 20;
+
+const int powerIconWidth = 120;
+const int powerIconHeight = 240;
 
 const float cameraScale = 0.16f;
 
@@ -118,6 +126,10 @@ void GUI::drawGUI(std::shared_ptr<Vision> vision) {
 
 	std::vector digits = intToDigits(score);
 	showScore(digits);
+
+	if (player->getComponent<CollisionComponent>()->powerup == true) {
+		showPowerupIcon();
+	}
 
 	tigl::shader->enableTexture(false);
 	tigl::shader->enableColor(true);
@@ -221,4 +233,16 @@ void GUI::GenerateTexture(cv::Mat& cameraImage) {
 
 void GUI::BindTexture() {
 	glBindTexture(GL_TEXTURE_2D, textureID);
+}
+
+void GUI::showPowerupIcon() {
+	GenerateImageTexture("models/powerupicon.png");
+	BindImageTexture();
+
+	tigl::begin(GL_QUADS);
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 - powerIconWidth, 0, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 + powerIconWidth, 0, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 + powerIconWidth, powerIconHeight, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
+	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 - powerIconWidth, powerIconHeight, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
+	tigl::end();
 }

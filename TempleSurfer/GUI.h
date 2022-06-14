@@ -15,7 +15,6 @@ private:
 	void BindImageTexture();
 	void GenerateTexture(cv::Mat& cameraImage);
 	void BindTexture();
-	
 
 public:
 
@@ -24,6 +23,7 @@ public:
 
 	void drawMenu();
 	void drawGUI(std::shared_ptr<Vision> vision);
+	void showPowerupIcon();
 
 };
 
