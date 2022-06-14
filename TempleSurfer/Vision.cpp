@@ -24,7 +24,6 @@ Mat texImage;
 std::shared_ptr<PlayerComponent> playerComponent;
 
 int frames = 0;
-int count;
 
 // Settings
 const int cameraWidth = 650;
