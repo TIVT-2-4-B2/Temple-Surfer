@@ -36,6 +36,7 @@ private:
 	std::queue<xPosition> xInputQueue;
 	std::queue<yPosition> yInputQueue;
 	std::mutex lockInputQueues;
+	std::mutex lockGetImage;
 	std::thread cvThread;
 	bool running;
 
@@ -46,6 +47,7 @@ private:
 	void checkForFaces();
 	void debugWindow();
 	void checkResult();
+	void getImageProcessing();
 
 
 public:

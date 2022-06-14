@@ -173,6 +173,7 @@ int main(void)
 
 	}
 
+	if (vision != nullptr)
 	vision->~Vision();
 	glfwTerminate();
 
