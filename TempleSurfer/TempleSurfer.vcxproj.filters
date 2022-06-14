@@ -87,6 +87,9 @@
     <ClCompile Include="DrawComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AudioManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="PowerUpComponent.cpp">
       <Filter>components</Filter>
     </ClCompile>
@@ -158,6 +161,9 @@
     <ClInclude Include="DrawComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AudioManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="PowerUpComponent.h">
       <Filter>components</Filter>
     </ClInclude>
@@ -166,5 +172,8 @@
     <Xml Include="haarcascade_frontalface_default.xml">
       <Filter>Resource Files</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\..\..\Music\bonk.mp3" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@
 
 #include "OBJComponent.h"
 #include <memory>
+#include "AudioManager.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -44,6 +45,7 @@ using namespace cv;
 #pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "glew32s.lib")
 #pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "bass.lib")
 
 GLFWwindow* window;
 
@@ -116,9 +118,15 @@ int main(void)
 	}
 	glfwMakeContextCurrent(window);
 
+	AudioManager::instance()->initAudio();
+	AudioManager::instance()->loopMusic("Resources/backgroundmusic.mp3");
+
 	tigl::init();
 
+	
+
 	init();
+
 
 	while (!glfwWindowShouldClose(window))
 	{
