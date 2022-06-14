@@ -19,6 +19,7 @@ CascadeClassifier faceCascade;  // Cascade used for regonizing
 std::vector<Rect> faces;        // The locations of faces
 
 Mat camImage;
+Mat texImage;
 
 std::shared_ptr<PlayerComponent> playerComponent;
 
@@ -130,18 +131,25 @@ void Vision::checkResult() {
     lockInputQueues.unlock();
 }
 
+void Vision::getImageProcessing()
+{
+    lockGetImage.lock();
+    camImage.copyTo(texImage);
+    cvtColor(texImage, texImage, COLOR_RGB2BGR);
+    flip(texImage, texImage, 1);
+    lockGetImage.unlock();
+}
+
 void Vision::setNewPlayer(std::shared_ptr<PlayerComponent> iPlayerComponent){
     playerComponent = iPlayerComponent;
 }
 
 cv::Mat Vision::getImage() {
-    Mat tempImage;
-    camImage.copyTo(tempImage);
-    cvtColor(tempImage, tempImage, COLOR_RGB2BGR);
-    flip(tempImage, tempImage, 1);
-
-    // Returns the image given.
-    return tempImage;
+    lockGetImage.lock();
+    Mat temp;
+    texImage.copyTo(temp);
+    lockGetImage.unlock();
+    return temp;
 }
 
 
@@ -158,6 +166,7 @@ void Vision::visionRoutine()
         #endif 
 
         checkResult();
+        getImageProcessing();
 
         // Freeing time for other threads
         std::this_thread::sleep_for(std::chrono::microseconds(500));
