@@ -12,7 +12,7 @@ public:
 	void onceMusic(std::string path);
 	void killMusic();
 
-	static std::shared_ptr<AudioManager> instance();
+	static std::shared_ptr<AudioManager> instanceAudio();
 private:
 	std::map<std::string, HSTREAM> IDMap;
 };
