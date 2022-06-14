@@ -23,7 +23,6 @@ Mat camImage;
 std::shared_ptr<PlayerComponent> playerComponent;
 
 int frames = 0;
-int count;
 
 // Settings
 const int cameraWidth = 650;
@@ -135,19 +134,14 @@ void Vision::setNewPlayer(std::shared_ptr<PlayerComponent> iPlayerComponent){
     playerComponent = iPlayerComponent;
 }
 
-Mat tempImage2;
 cv::Mat Vision::getImage() {
-    if (count % 5 == 0)
-    {
-        Mat tempImage;
-        camImage.copyTo(tempImage);
-        cvtColor(tempImage, tempImage, COLOR_RGB2BGR);
-        flip(tempImage, tempImage2, 1);
-    }
-    count++;
+    Mat tempImage;
+    camImage.copyTo(tempImage);
+    cvtColor(tempImage, tempImage, COLOR_RGB2BGR);
+    flip(tempImage, tempImage, 1);
 
     // Returns the image given.
-    return tempImage2;
+    return tempImage;
 }
 
 
