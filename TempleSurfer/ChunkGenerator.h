@@ -26,6 +26,9 @@ public:
 private:
 	std::vector<ChunkPreset> presets;
 
+	bool lastChunkHadPowerup = false;
+
 	std::shared_ptr<GameChunk> buildChunk(ChunkPreset preset);
 	ChunkObstacle getObstacleFromInt(int index);
+	bool checkForPowerup(int presetInt);
 };

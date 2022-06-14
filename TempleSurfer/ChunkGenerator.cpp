@@ -28,15 +28,20 @@ void ChunkGenerator::generatorInit()
     	{
 			const int obstacleLines = 3;
 
+			bool powerUpfound = false;
+
 			for (int i = 0; i < obstacleLines; i++)
 			{
 				const int offset = 2;
 				int presetValue = stoi(line.substr(6 * i, 1));
 				preset.obstacles[i][0] = getObstacleFromInt(presetValue);
+				if (checkForPowerup(presetValue)) powerUpfound = true;
 				presetValue = stoi(line.substr(6 * i + offset, 1));
 				preset.obstacles[i][1] = getObstacleFromInt(presetValue);
+				if (checkForPowerup(presetValue)) powerUpfound = true;
 				presetValue = stoi(line.substr(6 * i + 2 * offset, 1));
 				preset.obstacles[i][2] = getObstacleFromInt(presetValue);
+				if (checkForPowerup(presetValue)) powerUpfound = true;
 			}
 			presets.push_back(preset);
     	}
@@ -59,7 +64,12 @@ void ChunkGenerator::generatorInit()
 std::shared_ptr<GameChunk> ChunkGenerator::getChunk()
 {
 	// Returning a random chunk that is generated.
-	return buildChunk(presets.at(rand() % presets.size()));
+	std::shared_ptr<GameChunk> chunk = buildChunk(presets.at(rand() % presets.size()));
+	while (lastChunkHadPowerup)
+	{
+		chunk = buildChunk(presets.at(rand() % presets.size()));
+	}
+	return chunk;
 }
 
 std::shared_ptr<GameChunk> ChunkGenerator::buildChunk(ChunkPreset preset)
@@ -140,3 +150,11 @@ ChunkObstacle ChunkGenerator::getObstacleFromInt(int index)
 	}
 }
 
+bool ChunkGenerator::checkForPowerup(int presetInt)
+{
+	if (presetInt == 4)
+	{
+		lastChunkHadPowerup = true;
+	}
+	return presetInt == 4;
+}
