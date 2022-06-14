@@ -33,6 +33,8 @@ using namespace cv;
 
 GLFWwindow* window;
 
+extern int score;
+
 void init();
 void update();
 void start();
@@ -47,7 +49,8 @@ std::shared_ptr<GameObject> player;
 std::shared_ptr<GameChunk> chunk;
 std::list<std::shared_ptr<GameObject>> list;
 std::shared_ptr<GameScene> scene;
-std::shared_ptr<Vision> vision;
+std::shared_ptr<Vision> vision = nullptr;
+bool initVision = false;
 std::shared_ptr<GUI> gui;
 ChunkGenerator generator;
 
@@ -84,8 +87,8 @@ int main(void)
 	}
 	glfwMakeContextCurrent(window);
 
-	AudioManager::instance()->initAudio();
-	AudioManager::instance()->loopMusic("Resources/backgroundmusic.mp3");
+	AudioManager::instanceAudio()->initAudio();
+	AudioManager::instanceAudio()->loopMusic("Resources/backgroundmusic.mp3");
 
 	tigl::init();
 
@@ -100,7 +103,10 @@ int main(void)
 			start();
 			isPlaying = true;
 			lastFrameTime = glfwGetTime();
-			vision = std::make_shared<Vision>(player->getComponent<PlayerComponent>());
+			if (vision == nullptr)
+				vision = std::make_shared<Vision>(player->getComponent<PlayerComponent>());
+			else
+				vision->setNewPlayer(player->getComponent<PlayerComponent>());
 		}
 		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		{
@@ -110,6 +116,7 @@ int main(void)
 		//If the game hasn't been started, draw the menu and not the scene
 		if (!isPlaying)
 		{
+			score = 0;
 			gui->drawMenu();
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -123,11 +130,14 @@ int main(void)
 
 		if (isPlaying)
 		{
+			if (vision != NULL)
 			vision->visionUpdate();
 		}
 
 	}
 
+	if (vision != nullptr)
+	vision->~Vision();
 	glfwTerminate();
 
 	return 0;

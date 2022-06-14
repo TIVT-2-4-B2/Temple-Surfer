@@ -11,10 +11,10 @@ private:
 
 	void showScore(std::vector<int> digits);
 	std::vector<int> intToDigits(int number);
-	void GenerateImageTexture(const std::string& fileName);
-	void BindImageTexture();
-	void GenerateTexture(cv::Mat& cameraImage);
-	void BindTexture();
+	void GenerateDigitTexture(const std::string& fileName);
+	void GenerateCameraTexture(cv::Mat& cameraImage);
+	void GeneratePowerUpTexture(const std::string& fileName);
+	void BindTexture(GLuint id);
 
 public:
 

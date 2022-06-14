@@ -18,7 +18,9 @@
 //Swap width and height if value is height instead of width
 #define ToAspect(v, w, h) (v/w*h)
 
-GLuint textureID;
+GLuint digitID;
+GLuint cameraID;
+GLuint powerupID;
 int textureCount = 0;
 
 extern std::shared_ptr<GameObject> player;
@@ -37,11 +39,14 @@ const float cameraScale = 0.16f;
 
 std::vector<Vertex> menuVerts;
 std::vector<Vertex> cameraVerts;
+std::vector<Vertex> powerupVerts;
 
 GUI::GUI(int WindowWidth, int WindowHeight)
 {
 	this->WindowWidth = WindowWidth;
 	this->WindowHeight = WindowHeight;
+
+	GeneratePowerUpTexture("models/powerupicon.png");
 
 	menuVerts.push_back(Vertex::PT(glm::vec3(0, WindowHeight, 0), glm::vec2(0, 1)));
 	menuVerts.push_back(Vertex::PT(glm::vec3(WindowWidth, WindowHeight, 0), glm::vec2(1, 1)));
@@ -52,6 +57,11 @@ GUI::GUI(int WindowWidth, int WindowHeight)
 	cameraVerts.push_back(Vertex::PT(glm::vec3((WindowWidth / (1 / cameraScale)), ToAspect(WindowWidth / (1 / cameraScale), 4, 3), 0), glm::vec2(1, 1)));
 	cameraVerts.push_back(Vertex::PT(glm::vec3((WindowWidth / (1 / cameraScale)), 0, 0), glm::vec2(1, 0)));
 	cameraVerts.push_back(Vertex::PT(glm::vec3(0, 0, 0), glm::vec2(0, 0)));
+
+	powerupVerts.push_back(Vertex::PCTN(glm::vec3(WindowWidth / 2 - powerIconWidth, 0, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
+	powerupVerts.push_back(Vertex::PCTN(glm::vec3(WindowWidth / 2 + powerIconWidth, 0, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
+	powerupVerts.push_back(Vertex::PCTN(glm::vec3(WindowWidth / 2 + powerIconWidth, powerIconHeight, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
+	powerupVerts.push_back(Vertex::PCTN(glm::vec3(WindowWidth / 2 - powerIconWidth, powerIconHeight, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
 
 }
 
@@ -76,8 +86,8 @@ void GUI::drawMenu() {
 	tigl::shader->enableColor(false);
 
 	std::string fileName = "Resources\\Menu.png";
-	GenerateImageTexture(fileName);
-	BindImageTexture();
+	GenerateDigitTexture(fileName);
+	BindTexture(digitID);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -112,10 +122,10 @@ void GUI::drawGUI(std::shared_ptr<Vision> vision) {
 	//Load image as texture
 	if (textureCount % textureInterval == 0)
 	{
-		GenerateTexture(img);
+		GenerateCameraTexture(img);
 	}
 	else {
-		BindTexture();
+		BindTexture(cameraID);
 	}
 	textureCount++;
 
@@ -147,8 +157,8 @@ void GUI::showScore(std::vector<int> digits) {
 		fileName.append(std::to_string(digits.at(i)));
 		fileName.append(".png");
 
-		GenerateImageTexture(fileName);
-		BindImageTexture();
+		GenerateDigitTexture(fileName);
+		BindTexture(digitID);
 
 		int digitX = (WindowWidth - (i * digitWidth)) - digitOffsetX;
 
@@ -174,15 +184,15 @@ std::vector<int> GUI::intToDigits(int number) {
 	return digits;
 }
 
-GLuint id;
 
-void GUI::GenerateImageTexture(const std::string& fileName) {
+
+void GUI::GeneratePowerUpTexture(const std::string& fileName) {
 	int width, height, bpp;
 	stbi_uc* data = stbi_load(fileName.c_str(), &width, &height, &bpp, 4);
 
-	glDeleteTextures(1, &id);
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
+	glDeleteTextures(1, &powerupID);
+	glGenTextures(1, &powerupID);
+	BindTexture(powerupID);
 	glTexImage2D(GL_TEXTURE_2D,
 		0, //level
 		GL_RGBA, //internal format
@@ -197,11 +207,28 @@ void GUI::GenerateImageTexture(const std::string& fileName) {
 	stbi_image_free(data);
 }
 
-void GUI::BindImageTexture() {
-	glBindTexture(GL_TEXTURE_2D, id);
+void GUI::GenerateDigitTexture(const std::string& fileName) {
+	int width, height, bpp;
+	stbi_uc* data = stbi_load(fileName.c_str(), &width, &height, &bpp, 4);
+
+	glDeleteTextures(1, &digitID);
+	glGenTextures(1, &digitID);
+	BindTexture(digitID);
+	glTexImage2D(GL_TEXTURE_2D,
+		0, //level
+		GL_RGBA, //internal format
+		width, //width
+		height, //height
+		0, //border
+		GL_RGBA, //data format
+		GL_UNSIGNED_BYTE, //data type
+		data); //data
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	stbi_image_free(data);
 }
 
-void GUI::GenerateTexture(cv::Mat& cameraImage) {
+void GUI::GenerateCameraTexture(cv::Mat& cameraImage) {
 
 	if (cameraImage.empty()) {
 		std::cout << "image empty" << std::endl;
@@ -209,9 +236,9 @@ void GUI::GenerateTexture(cv::Mat& cameraImage) {
 	else {
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-		glDeleteTextures(1, &textureID);
-		glGenTextures(1, &textureID);
-		BindTexture();
+		glDeleteTextures(1, &cameraID);
+		glGenTextures(1, &cameraID);
+		BindTexture(cameraID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -231,18 +258,11 @@ void GUI::GenerateTexture(cv::Mat& cameraImage) {
 	}
 }
 
-void GUI::BindTexture() {
-	glBindTexture(GL_TEXTURE_2D, textureID);
+void GUI::BindTexture(GLuint id) {
+	glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void GUI::showPowerupIcon() {
-	GenerateImageTexture("models/powerupicon.png");
-	BindImageTexture();
-
-	tigl::begin(GL_QUADS);
-	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 - powerIconWidth, 0, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(0, 0), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 + powerIconWidth, 0, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(1, 0), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 + powerIconWidth, powerIconHeight, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(1, 1), glm::vec3(0, 1, 0)));
-	tigl::addVertex(Vertex::PCTN(glm::vec3(WindowWidth / 2 - powerIconWidth, powerIconHeight, 0), glm::vec4(0, 1, 1, 0.7f), glm::vec2(0, 1), glm::vec3(0, 1, 0)));
-	tigl::end();
+	BindTexture(powerupID);
+	tigl::drawVertices(GL_QUADS, powerupVerts);
 }

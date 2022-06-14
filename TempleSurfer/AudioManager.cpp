@@ -35,7 +35,7 @@ void AudioManager::killMusic()
 	}
 }
 
-std::shared_ptr<AudioManager> AudioManager::instance()
+std::shared_ptr<AudioManager> AudioManager::instanceAudio()
 {
 	static std::shared_ptr<AudioManager> s{ new AudioManager };
 	return s;

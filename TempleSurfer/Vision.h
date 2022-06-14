@@ -8,33 +8,53 @@
 #include <opencv2/objdetect.hpp>
 
 #include "PlayerComponent.h"
+#include <queue>
+#include <mutex>
 
 class Vision
 {
 private:	
-	enum xPosition
+	// Creating enums for position
+	enum class xPosition
 	{
-		LEFT = 0,
-		CENTER = 1,
-		RIGHT = 2
+		LEFT,
+		CENTER,
+		RIGHT
+	};
+	enum class yPosition
+	{
+		JUMP,
+		STAND,
+		DUCK
 	};
 
-	enum yPosition
-	{
-		JUMP = 0,
-		STAND = 1,
-		DUCK = 2
-	};
+	// Setting standard positions
+	xPosition xPos = xPosition::CENTER;
+	yPosition yPos = yPosition::STAND;
 
-	xPosition xPos = CENTER;
-	yPosition yPos = STAND;
+	// For crossthread communication
+	std::queue<xPosition> xInputQueue;
+	std::queue<yPosition> yInputQueue;
+	std::mutex lockInputQueues;
+	std::mutex lockGetImage;
+	std::thread cvThread;
+	bool running;
+
+	// Private methods
+	void visionRoutine();
+
+	// Sub divided methods that check other things
+	void checkForFaces();
+	void debugWindow();
+	void checkResult();
+	void getImageProcessing();
+
 
 public:
-
-	Vision();
-	Vision(std::shared_ptr<PlayerComponent> playerComponent);
+	Vision(std::shared_ptr<PlayerComponent> iPlayerComponent);
 	~Vision();
 
+	void setNewPlayer(std::shared_ptr<PlayerComponent> iPlayerComponent);
 	cv::Mat getImage();
 	void visionUpdate();
 };
