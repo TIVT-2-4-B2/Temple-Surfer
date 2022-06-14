@@ -21,10 +21,6 @@ PowerUpComponent::~PowerUpComponent()
 }
 
 void PowerUpComponent::powerupIntersect(glm::vec3 playerHitbox, glm::vec3 playerPosition, const glm::vec3& parentMatrix) {
-	if (this->gameObject->position == playerPosition && powerHitbox == playerHitbox)
-	{
-		return;
-	}
 	glm::vec3 gamePos = parentMatrix + this->gameObject->position;
 	glm::vec3 posDif = makePositive(gamePos - playerPosition);
 	glm::vec3 hitBoxSum = makePositive((powerHitbox / this->gameObject->scale) + playerHitbox);
@@ -71,6 +67,7 @@ void PowerUpComponent::update(float elapsedTime, const glm::vec3& parentMatrix) 
 		{
 			std::cout << "Disengaged" << std::endl;
 			player->getComponent<CollisionComponent>()->powerup = false;
+			seconds = std::chrono::seconds::max();
 		}
 	}
 }
